@@ -281,7 +281,7 @@
    * 7.  roots() yields all known inflection points on this curve.
    * 8.  offset(t, d) yields a coordinate that is a point on the curve at 't',
    *                 offset by distance 'd' along its normal.
-   * 9.  reduce() yields an array of 'simple' curve segments that model the curve a poly-bezier.
+   * 9.  reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
    * 10. scale(d) yields the curve scaled approximately along its normals by distance 'd'.
    *
    */
