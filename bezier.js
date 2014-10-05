@@ -14,16 +14,34 @@
 (function() {
   "use strict";
 
+  // utility function: map number from one domain to another
+  var map = function(v, ds,de, ts,te) {
+    var d1 = de-ds, d2 = te-ts, v2 =  v-ds, r = v2/d1;
+    return ts + d2*r;
+  };
+
+  // utility function: copy objects
+  var copy = function(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  // utility function: compute a line/line intersection coordinate
+  var lli = function(v1, v2) {
+    var x1=v1.c.x, y1=v1.c.y,
+        x2=v1.x, y2=v1.y,
+        x3=v2.c.x,y3=v2.c.y,
+        x4=v2.x,y4=v2.y,
+        nx=(x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4),
+        ny=(x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4),
+        d=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+    if(d==0) { return false; }
+    return { x: nx/d, y: ny/d, z: 0 };
+  };
+
   /**
    * Legendre-Gauss root finding functions
    */
-  var findRoots = (function() {
-
-    // utility function
-    var map = function(v, ds,de, ts,te) {
-      var d1 = de-ds, d2 = te-ts, v2 =  v-ds, r = v2/d1;
-      return ts + d2*r;
-    };
+  var RootFinder = (function() {
 
     // Legendre-Gauss abscissae (x_i values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
     var Tvalues = [
@@ -191,27 +209,39 @@
       var roots = [];
       var root;
       for(var t=0; t<=1.0; t+= 0.01) {
-//        try {
-          root = Math.round(findRoots(derivative, t, values)/NRRF_PRECISION) * NRRF_PRECISION;
-          if(root<0 || root>1) continue;
-          if(Math.abs(root-t)<=NRRF_PRECISION) continue;
-          if(roots.indexOf(root) > -1) continue;
-          roots.push(root);
-//        } catch (e) {
-          // We don't actually care about this error,
-          // it simply indicates no satisfactory root
-          // could be found at this 't' value.
-//          console.log(e);
-//        }
+        root = Math.round(findRoots(derivative, t, values)/NRRF_PRECISION) * NRRF_PRECISION;
+        if(root<0 || root>1) continue;
+        if(Math.abs(root-t)<=NRRF_PRECISION) continue;
+        if(roots.indexOf(root) > -1) continue;
+        roots.push(root);
       }
       return roots;
     };
 
-    return findAllRoots;
+    return { find: findAllRoots };
   }());
 
+
+  /**
+   * Bezier curve constructor. The constructor argument can be one of three things:
+   *
+   * 1. array/4 of {x:..., y:..., z:...}, z optional
+   * 2. numerical array/8 ordered x1,y1,x2,y2,x3,y3,x4,y4
+   * 3. numerical array/12 ordered x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4
+   *
+   */
   var Bezier = function(coords) {
-    var args = (coords && coords.forEach ? coords:arguments);
+    var args = (coords && coords.forEach ? coords : arguments);
+    if(typeof args[0] === "object") {
+      args = [];
+      for(var i=0; i<coords.length; i++) {
+        ['x','y','z'].forEach(function(d) {
+          if(coords[i][d]) {
+            args.push(coords[i][d]);
+          }
+        });
+      }
+    }
     var len = args.length;
     if(len!==8 && len!==12) {
       throw new Error("Not a cubic curve");
@@ -237,6 +267,24 @@
 
   };
 
+
+  /**
+   * Bezier curve prototype. API:
+   *
+   * 1.  getLUT(steps) yields array/steps of {x:..., y:..., z:...} coordinates.
+   * 2.  get(t) alias for compute(t).
+   * 3.  compute(t) yields the curve coordinate at 't'.
+   * 4.  derivative(t) yields the curve derivative at 't' as vector.
+   * 5.  normal(t) yields the normal vector for the curve at 't'.
+   * 6a. split(t) split the curve at 't' and return both segments as new curves.
+   * 6b. split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
+   * 7.  roots() yields all known inflection points on this curve.
+   * 8.  offset(t, d) yields a coordinate that is a point on the curve at 't',
+   *                 offset by distance 'd' along its normal.
+   * 9.  reduce() yields an array of 'simple' curve segments that model the curve a poly-bezier.
+   * 10. scale(d) yields the curve scaled approximately along its normals by distance 'd'.
+   *
+   */
   Bezier.prototype = {
     getLUT: function(steps) {
       var points = [];
@@ -249,11 +297,14 @@
       return this.compute(t);
     },
     compute: function(t) {
+      if(t===0) { return this.points[0]; }
+      if(t===1) { return this.points[3]; }
       var dims=this.dims,len=this.dimlen,i,dim,result={};
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
         result[dim] = this.computeDim(dim,t);
       }
+      if(!result.z) result.z=0;
       return result;
     },
     computeDim: function(v,t) {
@@ -321,11 +372,15 @@
       };
       return n;
     },
-    split: function(t) {
+    split: function(t1, t2) {
+      // shortcuts
+      if(t1===0 && !!t2) { return this.split(t2)[0]; }
+      if(t2===1) { return this.split(t1)[1]; }
+      // split on t1 first, regardless of whether there's a t2
       var dims=this.dims,len=this.dimlen,i,dim,result={};
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
-        result[dim] = this.splitDim(dim,t);
+        result[dim] = this.splitDim(dim,t1);
       }
       var args, j, idx, curves = [];
       for(i=0; i<2; i++) {
@@ -337,6 +392,12 @@
           }
         }
         curves.push(new Bezier(args));
+      }
+      // if we have a t2, split again:
+      if(t2) {
+        t2 = map(t2,t1,1,0,1);
+        curves = curves[1].split(t2);
+        return curves[0];
       }
       return curves;
     },
@@ -364,7 +425,7 @@
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
         p = this.points.map(function(v) { return v[dim]; });
-        result[dim] = findRoots(1,p).concat(findRoots(2,p));
+        result[dim] = RootFinder.find(1,p).concat(RootFinder.find(2,p));
         roots = roots.concat(result[dim]);
       }
       roots.sort();
@@ -375,10 +436,83 @@
       var c = this.get(t);
       var n = this.normal(t);
       return {
+        c: c,
+        n: n,
         x: c.x + n.x * d,
         y: c.y + n.y * d,
         z: c.z + n.z * d,
       };
+    },
+    simple: function() {
+      var s = this.points[0];
+      var e = this.points[3];
+      var tm = this.get(0.5);
+      var ds = { x: tm.x-s.x, y: tm.y-s.y, z: tm.z-s.z };
+      ds = Math.sqrt(ds.x*ds.x + ds.y*ds.y + ds.z*ds.z);
+      var de = { x: tm.x-e.x, y: tm.y-e.y, z: tm.z-e.z };
+      de = Math.sqrt(de.x*de.x + de.y*de.y + de.z*de.z);
+      var diff = Math.abs(ds-de);
+      return diff < 10;
+    },
+    reduce: function() {
+      /**
+        "simple" curve definition: a curve with an orientable hull,
+        and a point t=0.5 roughly equidistant to the start and end points.
+      **/
+      var t1=0, t2=0, step=0.01, segment, segments=[];
+      while(t2 <= 1) {
+        for(t2=t1+step; t2<=1+step; t2+=step) {
+          segment = this.split(t1,t2);
+          if(!segment.simple()) {
+            t2 -= step;
+            segments.push(this.split(t1,t2));
+            t1 = t2;
+            break;
+          }
+        }
+      }
+      if(t1<1) { segments.push(this.split(t1,1)); }
+      return segments;
+/*
+      var roots = this.roots().roots;
+      if(roots.indexOf(0) === -1) { roots = [0].concat(roots); }
+      if(roots.indexOf(1) === -1) { roots.push(1); }
+      var i, t1, t2, segment, segments=[];
+      for(i=1; i<roots.length; i++) {
+        t1 = roots[i-1];
+        t2 = roots[i];
+        segment = this.split(t1,t2);
+        segment._t1 = t1;
+        segment._t2 = t2;
+        segments.push(segment);
+      }
+      return segments;
+*/
+    },
+    scale: function(d) {
+      var v = [ this.offset(0,10), this.offset(1,10) ];
+      var o = lli(v[0],v[1]);
+      if(!o) { throw "cannot scale this curve. Try reducing it first."; }
+      // move all points by distance 'd' wrt the origin 'o'
+      var points=this.points,np=[],p;
+      // move end points by fixed distance along normal.
+      [0,1].forEach(function(t) {
+        var p = np[t*3] = copy(points[t*3]);
+        p.x += d * v[t].n.x;
+        p.y += d * v[t].n.y;
+      }.bind(this));
+      // move control points by "however much necessary to ensure
+      // the correct tangent to endpoint".
+      [0,1].forEach(function(t) {
+        var d = this.derivative(t);
+        var x = np[t*3].x;
+        var y = np[t*3].y;
+        var ls = { x: x, y: y, c: { x: x + d.x, y: y + d.y }};
+        o.c = points[t+1];
+        var o2 = lli(ls, o);
+        np[t+1] = o2;
+      }.bind(this));
+      return new Bezier(np);
     }
   };
 
