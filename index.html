@@ -1,36 +1,44 @@
 <!doctype html>
-<style>
-dt { font-weight: bold; }
-dd { position: relative; top: -1em; left: 5em; margin-bottom: -1em;}
-</style>
-<title>Bezier.js, for doing bezier curve things</title>
-<h1>Bezier.js, for doing bezier curve things</h1>
-<canvas width="250" height="250"></canvas>
-<p>This animated diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really.</p>
-<dl>
-  <dt>getLUT(steps)</dt>
-  <dd>yields array/steps of {x:..., y:..., z:...} coordinates.</dd>
-  <dt>get(t)</dt>
-  <dd>alias for compute(t).</dd>
-  <dt>compute(t)</dt>
-  <dd>yields the curve coordinate at 't'.</dd>
-  <dt>derivative(t)</dt>
-  <dd>yields the curve derivative at 't' as vector.</dd>
-  <dt>normal(t)</dt>
-  <dd>yields the normal vector for the curve at 't'.</dd>
-  <dt>split(t)</dt>
-  <dd>split the curve at 't' and return both segments as new curves.</dd>
-  <dt>split(t1,t2)</dt>
-  <dd>split the curve between 't1' and 't2' and return the segment as new curve.</dd>
-  <dt>roots()</dt>
-  <dd>yields all known inflection points on this curve.</dd>
-  <dt>offset(t, d)</dt>
-  <dd>yields a coordinate that is a point on the curve at 't', offset by distance 'd' alongits normal.</dd>
-  <dt>reduce()</dt>
-  <dd>yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.</dd>
-  <dt>scale(d)</dt>
-  <dd>yields the curve scaled approximately along its normals by distance 'd'.</dd>
-</dl>
-<script src="bezier.js"></script>
-<script src="beziertest.js"></script>
-<p>Made by <a href="https://twitter.com/TheRealPomax">Pomax</a>. Based on the work done for <a href="http://pomax.github.io/bezierinfo">A Primer on Bézier Curves</a>. Naturally, the code open source over on <a href="http://github.com/Pomax/bezierjs">github</a>.</p>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Bezier.js, for doing bezier curve things</title>
+    <style>
+      body { padding: 0 1em; }
+      dt { font-weight: bold; }
+      dd { position: relative; top: -1em; left: 5em; margin-right: 5em; margin-bottom: -1em;}
+    </style>
+  </head>
+  <body>
+    <h1>Bezier.js, for doing bezier curve things</h1>
+    <canvas width="250" height="250"></canvas>
+    <p>This animated diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really.</p>
+    <dl>
+      <dt>getLUT(steps)</dt>
+      <dd>yields array/steps of {x:..., y:..., z:...} coordinates.</dd>
+      <dt>get(t)</dt>
+      <dd>alias for compute(t).</dd>
+      <dt>compute(t)</dt>
+      <dd>yields the curve coordinate at 't'.</dd>
+      <dt>derivative(t)</dt>
+      <dd>yields the curve derivative at 't' as vector.</dd>
+      <dt>normal(t)</dt>
+      <dd>yields the normal vector for the curve at 't'.</dd>
+      <dt>split(t)</dt>
+      <dd>split the curve at 't' and return both segments as new curves.</dd>
+      <dt>split(t1,t2)</dt>
+      <dd>split the curve between 't1' and 't2' and return the segment as new curve.</dd>
+      <dt>roots()</dt>
+      <dd>yields all known inflection points on this curve.</dd>
+      <dt>offset(t, d)</dt>
+      <dd>yields a coordinate that is a point on the curve at 't', offset by distance 'd' alongits normal.</dd>
+      <dt>reduce()</dt>
+      <dd>yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.</dd>
+      <dt>scale(d)</dt>
+      <dd>yields the curve scaled approximately along its normals by distance 'd'.</dd>
+    </dl>
+    <script src="bezier.js"></script>
+    <script src="beziertest.js"></script>
+    <p>Made by <a href="https://twitter.com/TheRealPomax">Pomax</a>. Based on the work done for <a href="http://pomax.github.io/bezierinfo">A Primer on Bézier Curves</a>. Naturally, the code open source over on <a href="http://github.com/Pomax/bezierjs">github</a>.</p>
+  </body>
+</html>
