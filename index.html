@@ -1,0 +1,76 @@
+<!doctype html>
+<canvas width="400" height="400"></canvas>
+<script src="bezier.js"></script>
+<script>
+  var cvs = document.querySelector("canvas");
+  var curve = new Bezier(120,160,32,200,220,260,220,40);
+
+  var t = 0.5, forward = true;
+  (function split() {
+    cvs.width = cvs.width;
+    var ctx = cvs.getContext("2d");
+    var curves = curve.split(t);
+    curves[0].color = "red";
+    curves[1].color = "blue";
+    curves.forEach(function(curve) {
+      ctx.strokeStyle = curve.color;
+      points = curve.getLUT(100);
+      ctx.beginPath();
+      var p = points[0], i;
+      ctx.moveTo(p.x, p.y);
+      for(i=1; i<points.length; i++) {
+        p = points[i];
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+      ctx.closePath();
+    });
+
+    var c = curve.get(t);
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
+    ctx.stroke();
+
+    var l=25;
+
+    var d = curve.derivative(t);
+    ctx.strokeStyle = "green";
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y);
+    var q = Math.sqrt(d.x*d.x + d.y*d.y)
+    ctx.lineTo(c.x + l * d.x/q, c.y + l * d.y/q);
+    ctx.stroke();
+
+    var n = curve.normal(t);
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y);
+    ctx.lineTo(c.x + l * n.x, c.y + l * n.y);
+    ctx.stroke();
+
+    var roots = curve.roots().roots;
+    if(roots.indexOf(0) === -1) {
+      roots = [0].concat(roots);
+    }
+    ctx.strokeStyle = "pink";
+    roots.forEach(function(t) {
+      c = curve.get(t);
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(c.x,c.y);
+      c = curve.offset(t,20);
+      ctx.lineTo(c.x,c.y);
+      ctx.stroke();
+    });
+
+    // next!
+    if (t>1) { forward = false; }
+    if (t<0) { forward = true; }
+    t = t + (forward? 1 : -1) * 0.01;
+    setTimeout(split, 25);
+  }());
+
+</script>
