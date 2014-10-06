@@ -25,26 +25,37 @@
     <dl>
       <dt>new Bezier(...)</dt>
       <dd>constructor taking either [c,c,c,c] where c is an {x:..., y:..., z:...} coordinate (z optional), or an array of size 8 or 12 ordered x,y,z,x,y,z,x,y,z,x,y,z where z is optional.</dt>
+
       <dt>getLUT(steps)</dt>
       <dd>yields array/steps of {x:..., y:..., z:...} coordinates.</dd>
+
       <dt>get(t)</dt>
       <dd>alias for compute(t).</dd>
+
       <dt>compute(t)</dt>
       <dd>yields the curve coordinate at 't'.</dd>
+
       <dt>derivative(t)</dt>
       <dd>yields the curve derivative at 't' as vector.</dd>
+
       <dt>normal(t)</dt>
       <dd>yields the normal vector for the curve at 't'.</dd>
+
       <dt>split(t)</dt>
       <dd>split the curve at 't' and return both segments as new curves.</dd>
+
       <dt>split(t1,t2)</dt>
       <dd>split the curve between 't1' and 't2' and return the segment as new curve.</dd>
+
       <dt>inflections()</dt>
-      <dd>yields all known inflection points on this curve.</dd>
+      <dd>yields all known inflection points on this curve as {x:[...], y:[...], z:[...], values:[...]}, 'values' acting as aggregate for x/y/z.</dd>
+
       <dt>offset(t, d)</dt>
       <dd>yields a coordinate that is a point on the curve at 't', offset by distance 'd' alongits normal.</dd>
+
       <dt>reduce()</dt>
       <dd>yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.</dd>
+
       <dt>scale(d)</dt>
       <dd>yields the curve scaled approximately along its normals by distance 'd'.</dd>
     </dl>
