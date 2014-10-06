@@ -8,6 +8,7 @@
       dl { width: calc(100% - 3em); margin-left: 1em; }
       dt { font-weight: bold; }
       dd { position: relative; top: -1em; left: 5em; margin-right: 5em; margin-bottom: -1em; }
+      canvas { border: 1px solid rgba(0,0,0,0.2); }
     </style>
   </head>
   <body>
@@ -15,7 +16,7 @@
 
     <canvas width="300" height="280"></canvas>
 
-    <p>This animated diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really.</p>
+    <p>This animated, <em><strong>interactive</strong></em> diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really. <strong>And again</strong>: this is an interactive graphic. You can drag around the start, control, and end points to manipulate the curve.</p>
 
     <p>The diagram shows (1) a curve that's being rendered split at a "t" value that moves between 0 and 1, with (2) the resulting subcurves colours differently so that it's obvious they're different segments. (3) The travelling "t" point is also showing (4) its (scaled to have a sensible length) tangent vector, and (5) its (scaled) normal vector. (6) In pink/purple we see all the inflection points that this curve has, and (7) in grey we see the curve's "offset curve", which is actually a poly-bezier consisting of the curve split up into "simple" segments (defined as control points on the same side of the curve, and the point t=0.5 roughly equidistant to the start and end points), each of which has been scaled to lie (very close to) a fixed distance "d" along the curve's normal field away from the curve.(8) The curve's control points are shown in dark grey, and (9) the bounding box for this curve is shown fading in and out depending on the "t" position.</p>
 

@@ -1,5 +1,6 @@
 var cvs = document.querySelector("canvas");
-var curve = new Bezier(120,160,32,200,220,260,220,40);
+var lpts = [{x:120,y:160}, {x:32,y:200}, {x:220,y:260}, {x:220,y:40}];
+var curve = new Bezier(lpts);
 var t = 0.5, forward = true;
 
 // helper function for drawing curves
@@ -18,6 +19,48 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.stroke();
   ctx.closePath();
 };
+
+
+(function handleInteraction() {
+  lpts = curve.points;
+  var moving = false, mx = my = ox = oy = 0, cx, cy, mp = false;
+  cvs.addEventListener("mousedown", function(evt) {
+    mx = evt.offsetX;
+    my = evt.offsetY;
+    lpts.forEach(function(p) {
+      if(Math.abs(mx-p.x)<10 && Math.abs(my-p.y)<10) {
+        moving = true;
+        mp = p;
+        cx = p.x;
+        cy = p.y;
+      }
+    });
+  });
+  cvs.addEventListener("mousemove", function(evt) {
+    var found = false;
+    lpts.forEach(function(p) {
+      var mx = evt.offsetX;
+      var my = evt.offsetY;
+      if(Math.abs(mx-p.x)<10 && Math.abs(my-p.y)<10) {
+        found = found || true;
+      }
+    });
+    cvs.style.cursor = found ? "pointer" : "default";
+
+    if(!moving) return;
+    ox = evt.offsetX - mx;
+    oy = evt.offsetY - my;
+    mp.x = cx + ox;
+    mp.y = cy + oy;
+  });
+  cvs.addEventListener("mouseup", function(evt) {
+    if(!moving) return;
+
+    moving = false;
+    mp = false;
+  });
+}());
+
 
 // this is where the Bezier object gets used.
 (function split() {
@@ -88,17 +131,51 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.lineTo(c.x + l * n.x, c.y + l * n.y);
   ctx.stroke();
 
-  //
-  // All inflection points for the curve
-  //
-  var roots = curve.roots().roots;
-  ctx.strokeStyle = "purple";
-  roots.forEach(function(t) {
-    c = curve.get(t);
+  // things involving roots MIGHT fail, so we try/catch wrap them
+  (function() {
+    //
+    // All inflection points for the curve
+    //
+    var roots = curve.roots().roots;
+    ctx.strokeStyle = "purple";
+    roots.forEach(function(t) {
+      c = curve.get(t);
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
+      ctx.stroke();
+    });
+    //
+    // The curve's bounding box
+    //
+    ctx.strokeStyle = "rgba(255,0,0," + Math.max(0,t/3) + ")";
+    var bbox = curve.bbox();
     ctx.beginPath();
-    ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
+    ctx.moveTo(bbox.x.min, bbox.y.min);
+    ctx.lineTo(bbox.x.min, bbox.y.max);
+    ctx.lineTo(bbox.x.max, bbox.y.max);
+    ctx.lineTo(bbox.x.max, bbox.y.min);
+    ctx.lineTo(bbox.x.min, bbox.y.min);
     ctx.stroke();
-  });
+    //
+    // The "offset curve", which is actually a poly-bezier
+    //
+    ctx.strokeStyle = "lightgrey";
+    var reduced = curve.reduce();
+    reduced.forEach(function(segment) {
+      [-l/2, l].forEach(function(d) {
+        var scaled = segment.scale(d);
+        drawCurve(ctx, scaled);
+        for(var t=0,p1,p2; t<=1; t++) {
+          p1 = segment.get(t);
+          p2 = scaled.get(t);
+          ctx.beginPath();
+          ctx.moveTo(p1.x,p1.y);
+          ctx.lineTo(p2.x,p2.y);
+          ctx.stroke();
+        }
+      })
+    });
+  }());
 
   //
   // Show the terminals, for good measure
@@ -114,38 +191,6 @@ var drawCurve = function(ctx, curve, offset) {
   c = curve.get(1);
   ctx.arc(c.x, c.y, 2, 0, 2*Math.PI);
   ctx.stroke();
-
-  //
-  // The curve's bounding box
-  //
-  ctx.strokeStyle = "rgba(255,0,0," + Math.max(0,t/3) + ")";
-  var bbox = curve.bbox();
-  ctx.beginPath();
-  ctx.moveTo(bbox.x.min, bbox.y.min);
-  ctx.lineTo(bbox.x.min, bbox.y.max);
-  ctx.lineTo(bbox.x.max, bbox.y.max);
-  ctx.lineTo(bbox.x.max, bbox.y.min);
-  ctx.lineTo(bbox.x.min, bbox.y.min);
-  ctx.stroke();
-
-  //
-  // The "offset curve", which is actually a poly-bezier
-  //
-  ctx.strokeStyle = "lightgrey";
-  curve.reduce().forEach(function(segment) {
-    [-l/2, l].forEach(function(d) {
-      var scaled = segment.scale(d);
-      drawCurve(ctx, scaled);
-      for(var t=0,p1,p2; t<=1; t++) {
-        p1 = segment.get(t);
-        p2 = scaled.get(t);
-        ctx.beginPath();
-        ctx.moveTo(p1.x,p1.y);
-        ctx.lineTo(p2.x,p2.y);
-        ctx.stroke();
-      }
-    })
-  });
 
   // and then we just go draw the next frame.
   if (t>1) { forward = false; }
