@@ -36,9 +36,30 @@ var drawCurve = function(ctx, curve, offset) {
   });
 
   //
+  // The control points
+  //
+  var s = curve.point(0),
+      c1 = curve.point(1),
+      c2 = curve.point(2),
+      e = curve.point(3);
+
+  ctx.strokeStyle = "grey";
+  ctx.beginPath();
+  ctx.moveTo(s.x,s.y);
+  ctx.lineTo(c1.x,c1.y);
+  ctx.arc(c1.x, c1.y, 2, 0, 2*Math.PI);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.x,e.y);
+  ctx.lineTo(c2.x,c2.y);
+  ctx.arc(c2.x, c2.y, 2, 0, 2*Math.PI);
+  ctx.stroke();
+
+
+  //
   // the splitting point
   //
-  var c = curve.get(t);
+  c = curve.get(t);
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
@@ -71,8 +92,6 @@ var drawCurve = function(ctx, curve, offset) {
   // All inflection points for the curve
   //
   var roots = curve.roots().roots;
-  if(roots.indexOf(0) === -1) { roots = [0].concat(roots); }
-  if(roots.indexOf(1) === -1) { roots.push(1) }
   ctx.strokeStyle = "purple";
   roots.forEach(function(t) {
     c = curve.get(t);
@@ -82,20 +101,50 @@ var drawCurve = function(ctx, curve, offset) {
   });
 
   //
+  // Show the terminals, for good measure
+  //
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  c = curve.get(0);
+  ctx.arc(c.x, c.y, 2, 0, 2*Math.PI);
+  ctx.stroke();
+
+  ctx.strokeStyle = "blue";
+  ctx.beginPath();
+  c = curve.get(1);
+  ctx.arc(c.x, c.y, 2, 0, 2*Math.PI);
+  ctx.stroke();
+
+  //
+  // The curve's bounding box
+  //
+  ctx.strokeStyle = "rgba(255,0,0," + Math.max(0,t/3) + ")";
+  var bbox = curve.bbox();
+  ctx.beginPath();
+  ctx.moveTo(bbox.x.min, bbox.y.min);
+  ctx.lineTo(bbox.x.min, bbox.y.max);
+  ctx.lineTo(bbox.x.max, bbox.y.max);
+  ctx.lineTo(bbox.x.max, bbox.y.min);
+  ctx.lineTo(bbox.x.min, bbox.y.min);
+  ctx.stroke();
+
+  //
   // The "offset curve", which is actually a poly-bezier
   //
   ctx.strokeStyle = "lightgrey";
   curve.reduce().forEach(function(segment) {
-    var scaled = segment.scale(l);
-    drawCurve(ctx, scaled);
-    for(var t=0,p1,p2; t<=1; t++) {
-      p1 = segment.get(t);
-      p2 = scaled.get(t);
-      ctx.beginPath();
-      ctx.moveTo(p1.x,p1.y);
-      ctx.lineTo(p2.x,p2.y);
-      ctx.stroke();
-    }
+    [-l/2, l].forEach(function(d) {
+      var scaled = segment.scale(d);
+      drawCurve(ctx, scaled);
+      for(var t=0,p1,p2; t<=1; t++) {
+        p1 = segment.get(t);
+        p2 = scaled.get(t);
+        ctx.beginPath();
+        ctx.moveTo(p1.x,p1.y);
+        ctx.lineTo(p2.x,p2.y);
+        ctx.stroke();
+      }
+    })
   });
 
   // and then we just go draw the next frame.

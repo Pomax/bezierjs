@@ -296,6 +296,9 @@
     get: function(t) {
       return this.compute(t);
     },
+    point: function(idx) {
+      return this.points[idx];
+    },
     compute: function(t) {
       if(t===0) { return this.points[0]; }
       if(t===1) { return this.points[3]; }
@@ -426,11 +429,31 @@
         dim = dims[i];
         p = this.points.map(function(v) { return v[dim]; });
         result[dim] = RootFinder.find(1,p).concat(RootFinder.find(2,p));
-        roots = roots.concat(result[dim]);
+        roots = roots.concat(result[dim].sort());
       }
       roots.sort();
       result.roots = roots;
       return result;
+    },
+    bbox: function() {
+      var roots = this.roots(), result = {};
+      ['x','y','z'].forEach(function(d) {
+        result[d] = this.getminmax(d, roots[d]);
+      }.bind(this));
+      return result;
+    },
+    getminmax: function(d, list) {
+      if(!list) return { min:0, max:0 };
+      var min=0xFFFFFFFFFFFFFFFF, max=-min,t,c;
+      if(list.indexOf(0)===-1) { list = [0].concat(list); }
+      if(list.indexOf(1)===-1) { list.push(1); }
+      for(var i=0,len=list.length; i<len; i++) {
+        t = list[i];
+        c = this.get(t);
+        if(c[d] < min) { min = c[d]; }
+        if(c[d] > max) { max = c[d]; }
+      }
+      return { min:min, max:max };
     },
     offset: function(t, d) {
       var c = this.get(t);

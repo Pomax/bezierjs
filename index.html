@@ -5,15 +5,25 @@
     <title>Bezier.js, for doing bezier curve things</title>
     <style>
       body { padding: 0 1em; }
+      dl { width: calc(100% - 3em); margin-left: 1em; }
       dt { font-weight: bold; }
-      dd { position: relative; top: -1em; left: 5em; margin-right: 5em; margin-bottom: -1em;}
+      dd { position: relative; top: -1em; left: 5em; margin-right: 5em; margin-bottom: -1em; }
     </style>
   </head>
   <body>
     <h1>Bezier.js, for doing bezier curve things</h1>
-    <canvas width="250" height="250"></canvas>
+
+    <canvas width="300" height="280"></canvas>
+
     <p>This animated diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really.</p>
+
+    <p>The diagram shows (1) a curve that's being rendered split at a "t" value that moves between 0 and 1, with (2) the resulting subcurves colours differently so that it's obvious they're different segments. (3) The travelling "t" point is also showing (4) its (scaled to have a sensible length) tangent vector, and (5) its (scaled) normal vector. (6) In pink/purple we see all the inflection points that this curve has, and (7) in grey we see the curve's "offset curve", which is actually a poly-bezier consisting of the curve split up into "simple" segments (defined as control points on the same side of the curve, and the point t=0.5 roughly equidistant to the start and end points), each of which has been scaled to lie (very close to) a fixed distance "d" along the curve's normal field away from the curve.(8) The curve's control points are shown in dark grey, and (9) the bounding box for this curve is shown fading in and out depending on the "t" position.</p>
+
+    <p>The API for this library:</p>
+
     <dl>
+      <dt>new Bezier(...)</dt>
+      <dd>constructor taking either [c,c,c,c] where c is an {x:..., y:..., z:...} coordinate (z optional), or an array of size 8 or 12 ordered x,y,z,x,y,z,x,y,z,x,y,z where z is optional.</dt>
       <dt>getLUT(steps)</dt>
       <dd>yields array/steps of {x:..., y:..., z:...} coordinates.</dd>
       <dt>get(t)</dt>
@@ -37,8 +47,10 @@
       <dt>scale(d)</dt>
       <dd>yields the curve scaled approximately along its normals by distance 'd'.</dd>
     </dl>
+
     <script src="bezier.js"></script>
     <script src="beziertest.js"></script>
+
     <p>Made by <a href="https://twitter.com/TheRealPomax">Pomax</a>. Based on the work done for <a href="http://pomax.github.io/bezierinfo">A Primer on Bézier Curves</a>. Naturally, the code's open source over on <a href="http://github.com/Pomax/bezierjs">github</a>.</p>
   </body>
 </html>
