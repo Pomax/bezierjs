@@ -136,9 +136,9 @@ var drawCurve = function(ctx, curve, offset) {
     //
     // All inflection points for the curve
     //
-    var roots = curve.roots().roots;
+    var inflections = curve.inflections().values;
     ctx.strokeStyle = "purple";
-    roots.forEach(function(t) {
+    inflections.forEach(function(t) {
       c = curve.get(t);
       ctx.beginPath();
       ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);

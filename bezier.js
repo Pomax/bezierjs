@@ -94,7 +94,7 @@
    * 5.  normal(t) yields the normal vector for the curve at 't'.
    * 6a. split(t) split the curve at 't' and return both segments as new curves.
    * 6b. split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
-   * 7.  roots() yields all known inflection points on this curve.
+   * 7.  inflections() yields all known inflection points on this curve.
    * 8.  offset(t, d) yields a coordinate that is a point on the curve at 't',
    *                 offset by distance 'd' along its normal.
    * 9.  reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
@@ -265,7 +265,7 @@
       if(a!==b) { return [a/(a-b)] }
       return [];
     },
-    roots: function() {
+    inflections: function() {
       var dims=this.dims,len=this.dimlen,i,dim,p,result={},roots=[];
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
@@ -277,13 +277,13 @@
         roots = roots.concat(result[dim].sort());
       }
       roots.sort();
-      result.roots = roots;
+      result.values = roots;
       return result;
     },
     bbox: function() {
-      var roots = this.roots(), result = {};
+      var inflections = this.inflections(), result = {};
       ['x','y','z'].forEach(function(d) {
-        result[d] = this.getminmax(d, roots[d]);
+        result[d] = this.getminmax(d, inflections[d]);
       }.bind(this));
       return result;
     },
@@ -322,11 +322,11 @@
       var i, t1=0, t2=0, step=0.01, segment, pass1=[], pass2=[];
 
       // first pass: split on inflections
-      var roots = this.roots().roots;
-      if(roots.indexOf(0)===-1) { roots = [0].concat(roots); }
-      if(roots.indexOf(1)===-1) { roots.push(1); }
-      for(t1=roots[0], i=1; i<roots.length; i++) {
-        t2 = roots[i];
+      var inflections = this.inflections().values;
+      if(inflections.indexOf(0)===-1) { inflections = [0].concat(inflections); }
+      if(inflections.indexOf(1)===-1) { inflections.push(1); }
+      for(t1=inflections[0], i=1; i<inflections.length; i++) {
+        t2 = inflections[i];
         pass1.push(this.split(t1,t2));
         t1 = t2;
       }
