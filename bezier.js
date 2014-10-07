@@ -87,18 +87,24 @@
   /**
    * Bezier curve prototype. API:
    *
-   * 1.  getLUT(steps) yields array/steps of {x:..., y:..., z:...} coordinates.
-   * 2.  get(t) alias for compute(t).
-   * 3.  compute(t) yields the curve coordinate at 't'.
-   * 4.  derivative(t) yields the curve derivative at 't' as vector.
-   * 5.  normal(t) yields the normal vector for the curve at 't'.
-   * 6a. split(t) split the curve at 't' and return both segments as new curves.
-   * 6b. split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
-   * 7.  inflections() yields all known inflection points on this curve.
-   * 8.  offset(t, d) yields a coordinate that is a point on the curve at 't',
+   * 1.   getLUT(steps) yields array/steps of {x:..., y:..., z:...} coordinates.
+   * 2.   get(t) alias for compute(t).
+   * 3.   compute(t) yields the curve coordinate at 't'.
+   * 4.   derivative(t) yields the curve derivative at 't' as vector.
+   * 5.   normal(t) yields the normal vector for the curve at 't'.
+   * 6a.  split(t) split the curve at 't' and return both segments as new curves.
+   * 6b.  split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
+   * 7.   inflections() yields all known inflection points on this curve.
+   * 8.   offset(t, d) yields a coordinate that is a point on the curve at 't',
    *                 offset by distance 'd' along its normal.
-   * 9.  reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
-   * 10. scale(d) yields the curve scaled approximately along its normals by distance 'd'.
+   * 9.   reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
+   * 10.  scale(d) yields the curve scaled approximately along its normals by distance 'd'.
+   * 11a. outline(d) yields the outline coordinates for the curve offset by 'd' pixels on either side,
+   *                 encoded as as an object of form {"+":[p,...], "-":[p,...]}, where each point
+   *                 'p' is of the form {p: {x:..., y:..., z:...}, c: true/false}. z is optional,
+   *                 and c:true means on-curve point, with c:false means off-curve point.
+   * 11b. outline(d1,d2) yields the outline coordinates for the curve offset by d1 on its normal, and
+  *                      d2 on its opposite side.
    *
    */
   Bezier.prototype = {
@@ -378,6 +384,33 @@
         np[t+1] = o2;
       }.bind(this));
       return new Bezier(np);
+    },
+    outline: function(d1, d2) {
+      if(!d2) { d2=d1; d1=d1; }
+      var reduced = this.reduce();
+      var scaled = { "-": [], "+": [] };
+      reduced.forEach(function(segment) {
+        scaled["+"].push(segment.scale(d1));
+        scaled["-"].push(segment.scale(-d2));
+      });
+      var coords = { "-": [], "+": [] }, i, last, segment, points;
+      for(i=0, last=scaled["+"].length; i<last; i++) {
+        segment = scaled["+"][i];
+        points = segment.points;
+        coords["+"].push({ p: points[0], c: true });
+        coords["+"].push({ p: points[1], c: false });
+        coords["+"].push({ p: points[2], c: false });
+      }
+      coords["+"].push({ p: scaled["+"][last-1].points[3], c: true });
+      for(i=i-1; i>=0; i--) {
+        segment = scaled["-"][i];
+        points = segment.points;
+        coords["-"].push({ p: points[3], c: true });
+        coords["-"].push({ p: points[2], c: false });
+        coords["-"].push({ p: points[1], c: false });
+      }
+      coords["-"].push({ p: scaled["-"][0].points[0], c: true });
+      return coords;
     }
   };
 

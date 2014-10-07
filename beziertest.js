@@ -192,6 +192,37 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.arc(c.x, c.y, 2, 0, 2*Math.PI);
   ctx.stroke();
 
+  (function drawOutline() {
+    var outline = curve.outline(l, l/2),
+        forward = outline["+"],
+        back = outline["-"];
+
+    ctx.strokeStyle = "rgb(50,20,0)";
+    drawCurve(ctx, curve, {x:300,y:0});
+
+    ctx.strokeStyle = "grey";
+    ctx.fillStyle = "rgba(255,225,0,0.2)";
+    ctx.beginPath();
+    ctx.moveTo(300 + forward[0].p.x, forward[0].p.y);
+    for(var i=1, p1, p2, p3; i<forward.length; i+=3) {
+      p1 = forward[i+0].p;
+      p2 = forward[i+1].p;
+      p3 = forward[i+2].p;
+      ctx.bezierCurveTo(300 + p1.x, p1.y, 300 + p2.x, p2.y, 300 + p3.x, p3.y);
+    }
+    ctx.lineTo(300 + back[0].p.x, back[0].p.y);
+    for(var i=1, p1, p2, p3; i<back.length; i+=3) {
+      p1 = back[i].p;
+      p2 = back[i+1].p;
+      p3 = back[i+2].p;
+      ctx.bezierCurveTo(300 + p1.x, p1.y, 300 + p2.x, p2.y, 300 + p3.x, p3.y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+  }());
+
+
   // and then we just go draw the next frame.
   if (t>1) { forward = false; }
   if (t<0) { forward = true; }
