@@ -386,7 +386,7 @@
       return new Bezier(np);
     },
     outline: function(d1, d2) {
-      if(!d2) { d2=d1; d1=d1; }
+      d2 = d2 || d1;
       var reduced = this.reduce();
       var scaled = { "-": [], "+": [] };
       reduced.forEach(function(segment) {
