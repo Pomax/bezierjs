@@ -222,6 +222,19 @@ var drawCurve = function(ctx, curve, offset) {
     ctx.fill();
   }());
 
+  if(false)
+  (function() {
+    // FIXME: code still finds overlaps in bits that should not count as overlapping
+    var intersections = curve.intersects();
+    console.log(intersections);
+    intersections.forEach(function(v) {
+      console.log(v);
+      v.split("/").map(function(v) { return parseFloat(v); }).forEach(function(t) {
+        var c = curve.get(t);
+        console.log(c.x, c.y);
+      });
+    });
+  }());
 
   // and then we just go draw the next frame.
   if (t>1) { forward = false; }

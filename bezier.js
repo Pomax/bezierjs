@@ -14,29 +14,140 @@
 (function() {
   "use strict";
 
-  // utility function: map number from one domain to another
-  var map = function(v, ds,de, ts,te) {
-    var d1 = de-ds, d2 = te-ts, v2 =  v-ds, r = v2/d1;
-    return ts + d2*r;
+
+  /**
+   * Utility functions for doing Bezier-related things
+   */
+  var utils = {
+    map: function(v, ds,de, ts,te) {
+      var d1 = de-ds, d2 = te-ts, v2 =  v-ds, r = v2/d1;
+      return ts + d2*r;
+    },
+    copy: function(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    },
+    lli: function(v1, v2) {
+      var x1=v1.c.x, y1=v1.c.y,
+          x2=v1.x, y2=v1.y,
+          x3=v2.c.x,y3=v2.c.y,
+          x4=v2.x,y4=v2.y,
+          nx=(x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4),
+          ny=(x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4),
+          d=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+      if(d==0) { return false; }
+      return { x: nx/d, y: ny/d, z: 0 };
+    },
+    computeDim: function(p,v,t) {
+      p = [p[0][v], p[1][v], p[2][v], p[3][v]];
+      var mt = 1-t,
+          t2 = t*t,
+          mt2 = mt*mt,
+          a = mt2*mt,
+          b = mt2*t*3,
+          c = mt*t2*3,
+          d = t*t2;
+      return a*p[0] + b*p[1] + c*p[2] + d*p[3];
+    },
+    splitDim: function(p,v,z) {
+      // see http://pomax.github.io/bezierinfo/#matrixsplit
+      p = [p[0][v], p[1][v], p[2][v], p[3][v]];
+      var zm = z-1,
+          z2 = z*z,
+          zm2 = zm*zm,
+          z3 = z2*z,
+          zm3 = zm2*zm;
+      var p1 = p[0],
+          p2 = z*p[1] - zm*p[0],
+          p3 = z2*p[2] - 2*z*zm*p[1] + zm2*p[0],
+          p4 = z3*p[3] - 3*z2*zm*p[2] + 3*z*zm2*p[1]-zm3*p[0],
+          p5 = p4,
+          p6 = z2*p[3] - 2*z*zm*p[2] + zm2*p[1],
+          p7 = z*p[3] - zm*p[2],
+          p8 = p[3];
+      return [[p1,p2,p3,p4],[p5,p6,p7,p8]];
+    },
+    getminmax: function(curve, d, list) {
+      if(!list) return { min:0, max:0 };
+      var min=0xFFFFFFFFFFFFFFFF, max=-min,t,c;
+      if(list.indexOf(0)===-1) { list = [0].concat(list); }
+      if(list.indexOf(1)===-1) { list.push(1); }
+      for(var i=0,len=list.length; i<len; i++) {
+        t = list[i];
+        c = curve.get(t);
+        if(c[d] < min) { min = c[d]; }
+        if(c[d] > max) { max = c[d]; }
+      }
+      return { min:min, mid:(min+max)/2, max:max, size:max-min };
+    },
+    bboxoverlap: function(b1,b2) {
+      var dims = ['x','y'], i,dim,l,t,d
+      for(i=0; i<2; i++) {
+        dim = dims[i];
+        l = b1[dim].mid;
+        t = b2[dim].mid;
+        d = (b1[dim].size + b2[dim].size)/2;
+        if(Math.abs(l-t) >= d) return false;
+      }
+      return true;
+    },
+    pairiteration: function(c1,c2) {
+      var c1b = c1.bbox(),
+          c2b = c2.bbox();
+      if(c1b.x.size + c1b.y.size < 1.5 && c2b.x.size + c2b.y.size < 1.5) {
+        return [ (c1._t1+c1._t2)/2 + "/" + (c2._t1+c2._t2)/2 ];
+      }
+      var cc1 = c1.split(0.5),
+          cc2 = c2.split(0.5),
+          pairs = [
+            {left: cc1[0], right: cc2[0] },
+            {left: cc1[0], right: cc2[1] },
+            {left: cc1[1], right: cc2[1] },
+            {left: cc1[1], right: cc2[0] }];
+      pairs = pairs.filter(function(pair) {
+        return utils.bboxoverlap(pair.left.bbox(),pair.right.bbox());
+      });
+      var results = [];
+      if(pairs.length === 0) return results;
+      if(pairs.length === 4) {
+        console.error("ERROR: no reduction in pair overlap occurred!");
+        return results;
+      }
+      pairs.forEach(function(pair) {
+        results = results.concat( utils.pairiteration(pairs[0].left, pairs[0].right) );
+      })
+      results = results.filter(function(v,i) {
+        return results.indexOf(v) === i;
+      });
+      return results;
+    },
+    rootsd1: function(p) {
+      var a = 3*(p[1]-p[0]),
+          b = 3*(p[2]-p[1]),
+          c = 3*(p[3]-p[2]),
+          d = a - 2*b + c;
+      if(d!==0) {
+        var m1 = -Math.sqrt(b*b-a*c),
+            m2 = -a+b,
+            v1 = -( m1+m2)/d,
+            v2 = -(-m1+m2)/d;
+        return [v1, v2];
+      }
+      else if(b!==c && d===0) {
+        return [ (2*b-c)/2*(b-c) ];
+      }
+      return [];
+    },
+    rootsd2: function(p) {
+      var a = 3*(p[1]-p[0]),
+          b = 3*(p[2]-p[1]),
+          c = 3*(p[3]-p[2]);
+      a = 2*(b-a);
+      b = 2*(c-b);
+      if(a!==b) { return [a/(a-b)] }
+      return [];
+    }
   };
 
-  // utility function: copy objects
-  var copy = function(obj) {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  // utility function: compute a line/line intersection coordinate
-  var lli = function(v1, v2) {
-    var x1=v1.c.x, y1=v1.c.y,
-        x2=v1.x, y2=v1.y,
-        x3=v2.c.x,y3=v2.c.y,
-        x4=v2.x,y4=v2.y,
-        nx=(x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4),
-        ny=(x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4),
-        d=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
-    if(d==0) { return false; }
-    return { x: nx/d, y: ny/d, z: 0 };
-  };
 
   /**
    * Bezier curve constructor. The constructor argument can be one of three things:
@@ -80,7 +191,8 @@
     if(this._3d) dims.push('z');
     this.dims = dims;
     this.dimlen = dims.length;
-
+    this._t1 = 0;
+    this._t2 = 1;
   };
 
 
@@ -127,22 +239,10 @@
       var dims=this.dims,len=this.dimlen,i,dim,result={};
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
-        result[dim] = this.computeDim(dim,t);
+        result[dim] = utils.computeDim(this.points,dim,t);
       }
       if(!result.z) result.z=0;
       return result;
-    },
-    computeDim: function(v,t) {
-      var p = this.points;
-      p = [p[0][v], p[1][v], p[2][v], p[3][v]];
-      var mt = 1-t,
-          t2 = t*t,
-          mt2 = mt*mt,
-          a = mt2*mt,
-          b = mt2*t*3,
-          c = mt*t2*3,
-          d = t*t2;
-      return a*p[0] + b*p[1] + c*p[2] + d*p[3];
     },
     derivative: function(t) {
       var dims=this.dims,len=this.dimlen,i,dim,result={};
@@ -205,9 +305,9 @@
       var dims=this.dims,len=this.dimlen,i,dim,result={};
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
-        result[dim] = this.splitDim(dim,t1);
+        result[dim] = utils.splitDim(this.points,dim,t1);
       }
-      var args, j, idx, curves = [];
+      var args, j, idx, curves = [], segment;
       for(i=0; i<2; i++) {
         args = [];
         for(idx=0; idx<4;idx++) {
@@ -216,60 +316,18 @@
             args.push(result[dim][i][idx])
           }
         }
-        curves.push(new Bezier(args));
+        segment = new Bezier(args);
+        segment._t1 = utils.map(i===0 ? 0:t1, 0,1, this._t1,this._t2);
+        segment._t2 = utils.map(i===0 ? t1:1, 0,1, this._t1,this._t2);
+        curves.push(segment);
       }
       // if we have a t2, split again:
       if(t2) {
-        t2 = map(t2,t1,1,0,1);
+        t2 = utils.map(t2,t1,1,0,1);
         curves = curves[1].split(t2);
         return curves[0];
       }
       return curves;
-    },
-    splitDim: function(v,z) {
-      // see http://pomax.github.io/bezierinfo/#matrixsplit
-      var p = this.points;
-      p = [p[0][v], p[1][v], p[2][v], p[3][v]];
-      var zm = z-1,
-          z2 = z*z,
-          zm2 = zm*zm,
-          z3 = z2*z,
-          zm3 = zm2*zm;
-      var p1 = p[0],
-          p2 = z*p[1] - zm*p[0],
-          p3 = z2*p[2] - 2*z*zm*p[1] + zm2*p[0],
-          p4 = z3*p[3] - 3*z2*zm*p[2] + 3*z*zm2*p[1]-zm3*p[0],
-          p5 = p4,
-          p6 = z2*p[3] - 2*z*zm*p[2] + zm2*p[1],
-          p7 = z*p[3] - zm*p[2],
-          p8 = p[3];
-      return [[p1,p2,p3,p4],[p5,p6,p7,p8]];
-    },
-    rootsd1: function(p) {
-      var a = 3*(p[1]-p[0]),
-          b = 3*(p[2]-p[1]),
-          c = 3*(p[3]-p[2]),
-          d = a - 2*b + c;
-      if(d!==0) {
-        var m1 = -Math.sqrt(b*b-a*c),
-            m2 = -a+b,
-            v1 = -( m1+m2)/d,
-            v2 = -(-m1+m2)/d;
-        return [v1, v2];
-      }
-      else if(b!==c && d===0) {
-        return [ (2*b-c)/2*(b-c) ];
-      }
-      return [];
-    },
-    rootsd2: function(p) {
-      var a = 3*(p[1]-p[0]),
-          b = 3*(p[2]-p[1]),
-          c = 3*(p[3]-p[2]);
-      a = 2*(b-a);
-      b = 2*(c-b);
-      if(a!==b) { return [a/(a-b)] }
-      return [];
     },
     inflections: function() {
       var dims=this.dims,len=this.dimlen,i,dim,p,result={},roots=[];
@@ -277,7 +335,7 @@
         dim = dims[i];
         p = this.points.map(function(v) { return v[dim]; });
         // get all iflection points along the curvature
-        result[dim] = this.rootsd1(p).concat(this.rootsd2(p));
+        result[dim] = utils.rootsd1(p).concat(utils.rootsd2(p));
         // filter out t<0 and t>1 values
         result[dim] = result[dim].filter(function(v) { return (v>=0 && v<=1); });
         roots = roots.concat(result[dim].sort());
@@ -289,22 +347,14 @@
     bbox: function() {
       var inflections = this.inflections(), result = {};
       ['x','y','z'].forEach(function(d) {
-        result[d] = this.getminmax(d, inflections[d]);
+        result[d] = utils.getminmax(this, d, inflections[d]);
       }.bind(this));
       return result;
     },
-    getminmax: function(d, list) {
-      if(!list) return { min:0, max:0 };
-      var min=0xFFFFFFFFFFFFFFFF, max=-min,t,c;
-      if(list.indexOf(0)===-1) { list = [0].concat(list); }
-      if(list.indexOf(1)===-1) { list.push(1); }
-      for(var i=0,len=list.length; i<len; i++) {
-        t = list[i];
-        c = this.get(t);
-        if(c[d] < min) { min = c[d]; }
-        if(c[d] > max) { max = c[d]; }
-      }
-      return { min:min, max:max };
+    overlaps: function(curve) {
+      var lbbox = this.bbox(),
+          tbbox = curve.bbox();
+      return utils.bboxoverlap(lbbox,tbbox);
     },
     offset: function(t, d) {
       var c = this.get(t);
@@ -326,17 +376,18 @@
     },
     reduce: function() {
       var i, t1=0, t2=0, step=0.01, segment, pass1=[], pass2=[];
-
       // first pass: split on inflections
       var inflections = this.inflections().values;
       if(inflections.indexOf(0)===-1) { inflections = [0].concat(inflections); }
       if(inflections.indexOf(1)===-1) { inflections.push(1); }
       for(t1=inflections[0], i=1; i<inflections.length; i++) {
         t2 = inflections[i];
-        pass1.push(this.split(t1,t2));
+        segment = this.split(t1,t2);
+        segment._t1 = t1;
+        segment._t2 = t2;
+        pass1.push(segment);
         t1 = t2;
       }
-
       // second pass: further reduce these segments to simple segments
       pass1.forEach(function(p1) {
         t1=0;
@@ -350,25 +401,33 @@
                 // we can never form a reduction
                 return [];
               }
-              pass2.push(p1.split(t1,t2));
+              segment = p1.split(t1,t2);
+              segment._t1 = utils.map(t1,0,1,p1._t1,p1._t2);
+              segment._t2 = utils.map(t2,0,1,p1._t1,p1._t2);
+              pass2.push(segment);
               t1 = t2;
               break;
             }
           }
         }
-        if(t1<1) { pass2.push(p1.split(t1,1)); }
+        if(t1<1) {
+          segment = p1.split(t1,1);
+          segment._t1 = utils.map(t1,0,1,p1._t1,p1._t2);
+          segment._t2 = p1._t2;
+          pass2.push(segment);
+        }
       });
       return pass2;
     },
     scale: function(d) {
       var v = [ this.offset(0,10), this.offset(1,10) ];
-      var o = lli(v[0],v[1]);
+      var o = utils.lli(v[0],v[1]);
       if(!o) { throw "cannot scale this curve. Try reducing it first."; }
       // move all points by distance 'd' wrt the origin 'o'
       var points=this.points,np=[],p;
       // move end points by fixed distance along normal.
       [0,1].forEach(function(t) {
-        var p = np[t*3] = copy(points[t*3]);
+        var p = np[t*3] = utils.copy(points[t*3]);
         p.x += d * v[t].n.x;
         p.y += d * v[t].n.y;
       }.bind(this));
@@ -380,7 +439,7 @@
         var y = np[t*3].y;
         var ls = { x: x, y: y, c: { x: x + d.x, y: y + d.y }};
         o.c = points[t+1];
-        var o2 = lli(ls, o);
+        var o2 = utils.lli(ls, o);
         np[t+1] = o2;
       }.bind(this));
       return new Bezier(np);
@@ -411,13 +470,55 @@
       }
       coords["-"].push({ p: scaled["-"][0].points[0], c: true });
       return coords;
-    }
+    },
+    intersects: function(curve) {
+      if(!curve) return this.selfintersects();
+      if(curve instanceof Bezier) { curve = curve.reduce(); }
+      return this.curveintersects(this.reduce(), curve);
+    },
+    selfintersects: function() {
+      var reduced = this.reduce();
+      // "simple" curves cannot intersect with their direcet
+      // neighbour, so we can simply split up the curve into
+      // two sets of alternating order, and perform regular
+      // intersection detection between those.
+      var left=[],right=[],i;
+      for(i=0; i<reduced.length; i+=2) {
+        left.push(reduced[i]);
+        if(reduced[i+1]) { right.push(reduced[i+1]); }
+      }
+      var intersections = this.curveintersects(left, right);
+      // console.log(intersections);
+      return intersections;
+    },
+    curveintersects: function(c1,c2) {
+      var pairs = [];
+      // step 1: pair off all overlapping segments
+      c1.forEach(function(l) {
+        c2.forEach(function(r) {
+          if(l.overlaps(r)) {
+            pairs.push({ left: l, right: r });
+          }
+        });
+      });
+      // step 2: for each pairing, run through the convergence algorithm.
+      var intersections = [];
+      pairs.forEach(function(pair) {
+        var result = utils.pairiteration(pair.left, pair.right);
+        if(result.length > 0) {
+          intersections = intersections.concat(result);
+        }
+      });
+      return intersections;
+    },
   };
 
+  // node bindings
   if (typeof module !== "undefined" && module.exports) {
     module.exports = Bezier;
   }
 
+  // browser bindings
   else if (typeof window !== "undefined") {
     window.Bezier = Bezier;
   }
