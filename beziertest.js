@@ -1,7 +1,8 @@
 var cvs = document.querySelector("canvas");
 var lpts = [{x:120,y:160}, {x:32,y:200}, {x:220,y:260}, {x:220,y:40}];
 var curve = new Bezier(lpts);
-var t = 0.5, forward = true;
+// compute the arc length just once, and print it to console for now.
+console.log("arc leng: "+curve.length());
 
 // User interaction
 (function handleInteraction() {
@@ -86,6 +87,9 @@ var drawbbox = function(ctx, bbox, offset) {
   ctx.stroke();
 };
 
+// start at the mid point, and start moving towards t=1 first.
+var t = 0.5, forward = true;
+
 
 // this is where the Bezier object gets used.
 (function drawFrame() {
@@ -103,6 +107,7 @@ var drawbbox = function(ctx, bbox, offset) {
     ctx.strokeStyle = curve.color;
     drawCurve(ctx, curve);
   });
+
 
   //
   // Draw the control points

@@ -40,49 +40,53 @@
     </dl>
 
     <dl>
-      <dt>getLUT(steps)</dt>
+      <dt>.length()</dt>
+      <dd>yields the curve's arc length (this is an expensive operation and as such is not automatically recomputed when you change the curve's coordinates, but is a function you have to call yourself).</dd>
+
+      <dt>.getLUT(steps)</dt>
       <dd>yields array/steps of {x:..., y:..., z:...} coordinates.</dd>
 
-      <dt>get(t)</dt>
+      <dt>.get(t)</dt>
       <dd>alias for compute(t).</dd>
 
-      <dt>compute(t)</dt>
+      <dt>.compute(t)</dt>
       <dd>yields the curve coordinate at 't'.</dd>
 
-      <dt>derivative(t)</dt>
+      <dt>.derivative(t)</dt>
       <dd>yields the curve derivative at 't' as vector.</dd>
 
-      <dt>normal(t)</dt>
+      <dt>.normal(t)</dt>
       <dd>yields the normal vector for the curve at 't'.</dd>
 
-      <dt>split(t)</dt>
+      <dt>.split(t)</dt>
       <dd>split the curve at 't' and return both segments as new curves.</dd>
 
-      <dt>split(t1,t2)</dt>
+      <dt>.split(t1,t2)</dt>
       <dd>split the curve between 't1' and 't2' and return the segment as new curve.</dd>
 
-      <dt>inflections()</dt>
+      <dt>.inflections()</dt>
       <dd>yields all known inflection points on this curve as {x:[...], y:[...], z:[...], values:[...]}, 'values' acting as aggregate for x/y/z.</dd>
 
-      <dt>offset(t, d)</dt>
+      <dt>.offset(t, d)</dt>
       <dd>yields a coordinate that is a point on the curve at 't', offset by distance 'd' alongits normal.</dd>
 
-      <dt>reduce()</dt>
-      <dd>yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.</dd>
+      <dt>.reduce()</dt>
+      <dd>yields an array of 'simple' curve segments that model the curve as poly-simple-beziers. Simple curves have both control points on the same side of the curve, and have an angle between the start/end normals of at most π/6 (60 degrees). A reduced curve is first split on all its inflections, then the resulting segments are further split into
+      simple segments if necessary.</dd>
 
-      <dt>scale(d)</dt>
+      <dt>.scale(d)</dt>
       <dd>yields the curve scaled approximately along its normals by distance 'd'.</dd>
 
-      <dt>outline(d)</dt>
+      <dt>.outline(d)</dt>
       <dd>yields the outline coordinates for the curve offset by 'd' pixels on either side, encoded as as an object of form {"+":[p,...], "-":[p,...]}, where each point 'p' is of the form {p: {x:..., y:..., z:...}, c: true/false}. z is optional, and c:true means on-curve point, with c:false means off-curve point.</dd>
 
-      <dt>outline(d1,d2)</dt>
+      <dt>.outline(d1,d2)</dt>
       <dd>yields the outline coordinates for the curve offset by d1 on its normal, and d2 on its opposite side.</dd>
 
-      <dt>intersect()</dt>
+      <dt>.intersect()</dt>
       <dd>yields the array of self-intersection 't' values, as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places.</dd>
 
-      <dt>intersect(curve)</dt>
+      <dt>.intersect(curve)</dt>
       <dd>yields the array of intersection 't' values between this curve and a target curve, encoded as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places, and each t1 is the 't' value on this curve, and each t2 is the 't' value on the target curve.</dd>
     </dl>
 

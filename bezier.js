@@ -72,27 +72,31 @@
   /**
    * Bezier curve prototype. API:
    *
-   * 1.   getLUT(steps) yields array/steps of {x:..., y:..., z:...} coordinates.
-   * 2.   get(t) alias for compute(t).
-   * 3.   compute(t) yields the curve coordinate at 't'.
-   * 4.   derivative(t) yields the curve derivative at 't' as vector.
-   * 5.   normal(t) yields the normal vector for the curve at 't'.
-   * 6a.  split(t) split the curve at 't' and return both segments as new curves.
-   * 6b.  split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
-   * 7.   inflections() yields all known inflection points on this curve.
-   * 8.   offset(t, d) yields a coordinate that is a point on the curve at 't',
+   * 1.   length() yields the curve's arc length in pixels.
+   * 2.   getLUT(steps) yields array/steps of {x:..., y:..., z:...} coordinates.
+   * 3.   get(t) alias for compute(t).
+   * 4.   compute(t) yields the curve coordinate at 't'.
+   * 5.   derivative(t) yields the curve derivative at 't' as vector.
+   * 6.   normal(t) yields the normal vector for the curve at 't'.
+   * 7a.  split(t) split the curve at 't' and return both segments as new curves.
+   * 7b.  split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
+   * 8.   inflections() yields all known inflection points on this curve.
+   * 9.   offset(t, d) yields a coordinate that is a point on the curve at 't',
    *                 offset by distance 'd' along its normal.
-   * 9.   reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
-   * 10.  scale(d) yields the curve scaled approximately along its normals by distance 'd'.
-   * 11a. outline(d) yields the outline coordinates for the curve offset by 'd' pixels on either side,
+   * 10.   reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
+   * 11.  scale(d) yields the curve scaled approximately along its normals by distance 'd'.
+   * 12a. outline(d) yields the outline coordinates for the curve offset by 'd' pixels on either side,
    *                 encoded as as an object of form {"+":[p,...], "-":[p,...]}, where each point
    *                 'p' is of the form {p: {x:..., y:..., z:...}, c: true/false}. z is optional,
    *                 and c:true means on-curve point, with c:false means off-curve point.
-   * 11b. outline(d1,d2) yields the outline coordinates for the curve offset by d1 on its normal, and
+   * 12b. outline(d1,d2) yields the outline coordinates for the curve offset by d1 on its normal, and
    *                     d2 on its opposite side.
    *
    */
   Bezier.prototype = {
+    length: function() {
+      return utils.length(this.points);
+    },
     getLUT: function(steps) {
       var points = [];
       for(var t=0, step=1/steps; t<=1+step; t+=step) {
@@ -121,28 +125,19 @@
       var dims=this.dims,len=this.dimlen,i,dim,result={};
       for(i=len-1; i>-1;i--) {
         dim = dims[i];
-        result[dim] = this.derivativeDim(dim,t);
+        result[dim] = utils.derivativeDim(this.points, dim,t);
       }
       return result;
     },
-    derivativeDim: function(v,t) {
-      var p = this.points;
-      p = [3*(p[1][v] - p[0][v]), 3*(p[2][v] - p[1][v]), 3*(p[3][v] - p[2][v])];
-      var mt = 1-t,
-          a = mt*mt,
-          b = mt*t*2,
-          c = t*t;
-      return a*p[0] + b*p[1] + c*p[2];
-    },
     normal: function(t) {
-      return this._3d ? this.normal3(t) : this.normal2(t);
+      return this._3d ? this.__normal3(t) : this.__normal2(t);
     },
-    normal2: function(t) {
+    __normal2: function(t) {
       var d = this.derivative(t);
       var q = Math.sqrt(d.x*d.x + d.y*d.y)
       return { x: -d.y/q, y: d.x/q, z: 0 };
     },
-    normal3: function() {
+    __normal3: function() {
       // see http://stackoverflow.com/questions/25453159
       var r1 = this.derivative(t),
           r2 = this.derivative(t+0.01),
@@ -382,7 +377,7 @@
         }
       });
       return intersections;
-    },
+    }
   };
 
   // node bindings
