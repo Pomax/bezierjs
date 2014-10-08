@@ -3,24 +3,7 @@ var lpts = [{x:120,y:160}, {x:32,y:200}, {x:220,y:260}, {x:220,y:40}];
 var curve = new Bezier(lpts);
 var t = 0.5, forward = true;
 
-// helper function for drawing curves
-var drawCurve = function(ctx, curve, offset) {
-  offset = offset || { x:0, y:0 };
-  var ox = offset.x;
-  var oy = offset.y;
-  var points = curve.getLUT(100);
-  ctx.beginPath();
-  var p = points[0], i;
-  ctx.moveTo(p.x + ox, p.y + oy);
-  for(i=1; i<points.length; i++) {
-    p = points[i];
-    ctx.lineTo(p.x + ox, p.y + oy);
-  }
-  ctx.stroke();
-  ctx.closePath();
-};
-
-
+// User interaction
 (function handleInteraction() {
   lpts = curve.points;
   var moving = false, mx = my = ox = oy = 0, cx, cy, mp = false;
@@ -62,13 +45,56 @@ var drawCurve = function(ctx, curve, offset) {
 }());
 
 
+// helper function for drawing curves
+var drawCurve = function(ctx, curve, offset) {
+  offset = offset || { x:0, y:0 };
+  var ox = offset.x;
+  var oy = offset.y;
+  var points = curve.getLUT(100);
+  ctx.beginPath();
+  var p = points[0], i;
+  ctx.moveTo(p.x + ox, p.y + oy);
+  for(i=1; i<points.length; i++) {
+    p = points[i];
+    ctx.lineTo(p.x + ox, p.y + oy);
+  }
+  ctx.stroke();
+  ctx.closePath();
+};
+
+// helper function for drawing points as circles
+var drawPoint = function(ctx, p, offset) {
+  offset = offset || { x:0, y:0 };
+  var ox = offset.x;
+  var oy = offset.y;
+  ctx.beginPath();
+  ctx.arc(p.x + ox, p.y + oy, 5, 0, 2*Math.PI);
+  ctx.stroke();
+};
+
+// helperfunction for drawing bounding boxes
+var drawbbox = function(ctx, bbox, offset) {
+  offset = offset || { x:0, y:0 };
+  var ox = offset.x;
+  var oy = offset.y;
+  ctx.beginPath();
+  ctx.moveTo(bbox.x.min + ox, bbox.y.min + oy);
+  ctx.lineTo(bbox.x.min + ox, bbox.y.max + oy);
+  ctx.lineTo(bbox.x.max + ox, bbox.y.max + oy);
+  ctx.lineTo(bbox.x.max + ox, bbox.y.min + oy);
+  ctx.closePath();
+  ctx.stroke();
+};
+
+
 // this is where the Bezier object gets used.
-(function split() {
+(function drawFrame() {
   cvs.width = cvs.width;
   var ctx = cvs.getContext("2d");
+  var offset = 25;
 
   //
-  // the curve, rendered as two subcurves split at "t"
+  // Draw the curve, rendered as two subcurves split at "t"
   //
   var curves = curve.split(t);
   curves[0].color = "red";
@@ -79,7 +105,7 @@ var drawCurve = function(ctx, curve, offset) {
   });
 
   //
-  // The control points
+  // Draw the control points
   //
   var s = curve.point(0),
       c1 = curve.point(1),
@@ -108,7 +134,6 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
   ctx.stroke();
 
-  var l=25;
 
   //
   // the "normalised" tangent vector at "t"
@@ -118,8 +143,9 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.beginPath();
   ctx.moveTo(c.x, c.y);
   var q = Math.sqrt(d.x*d.x + d.y*d.y)
-  ctx.lineTo(c.x + l * d.x/q, c.y + l * d.y/q);
+  ctx.lineTo(c.x + offset * d.x/q, c.y + offset * d.y/q);
   ctx.stroke();
+
 
   //
   // the normal vector at "t"
@@ -128,54 +154,55 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.strokeStyle = "red";
   ctx.beginPath();
   ctx.moveTo(c.x, c.y);
-  ctx.lineTo(c.x + l * n.x, c.y + l * n.y);
+  ctx.lineTo(c.x + offset * n.x, c.y + offset * n.y);
   ctx.stroke();
 
-  // things involving roots MIGHT fail, so we try/catch wrap them
-  (function() {
-    //
-    // All inflection points for the curve
-    //
-    var inflections = curve.inflections().values;
-    ctx.strokeStyle = "purple";
-    inflections.forEach(function(t) {
-      c = curve.get(t);
-      ctx.beginPath();
-      ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
-      ctx.stroke();
-    });
-    //
-    // The curve's bounding box
-    //
-    ctx.strokeStyle = "rgba(255,0,0," + Math.max(0,t/3) + ")";
-    var bbox = curve.bbox();
+
+  //
+  // All inflection points for the curve
+  //
+  var inflections = curve.inflections().values;
+  ctx.strokeStyle = "purple";
+  inflections.forEach(function(t) {
+    c = curve.get(t);
     ctx.beginPath();
-    ctx.moveTo(bbox.x.min, bbox.y.min);
-    ctx.lineTo(bbox.x.min, bbox.y.max);
-    ctx.lineTo(bbox.x.max, bbox.y.max);
-    ctx.lineTo(bbox.x.max, bbox.y.min);
-    ctx.lineTo(bbox.x.min, bbox.y.min);
+    ctx.arc(c.x, c.y, 5, 0, 2*Math.PI);
     ctx.stroke();
-    //
-    // The "offset curve", which is actually a poly-bezier
-    //
+  });
+
+
+  //
+  // The curve's bounding box
+  //
+  ctx.strokeStyle = "rgba(255,0,0," + Math.max(0,0.5*t) + ")";
+  drawbbox(ctx, curve.bbox());
+
+
+  //
+  // The "offset curve", which is actually a poly-bezier
+  //
+  var reduced = curve.reduce();
+  reduced.forEach(function(segment) {
+    // subcurve bounding boxes!
+    ctx.strokeStyle = "rgba(0,100,50," + (0.81-Math.max(0,0.8*t)) + ")";
+    drawbbox(ctx, segment.bbox());
+
+    // offset curves
     ctx.strokeStyle = "lightgrey";
-    var reduced = curve.reduce();
-    reduced.forEach(function(segment) {
-      [-l/2, l].forEach(function(d) {
-        var scaled = segment.scale(d);
-        drawCurve(ctx, scaled);
-        for(var t=0,p1,p2; t<=1; t++) {
-          p1 = segment.get(t);
-          p2 = scaled.get(t);
-          ctx.beginPath();
-          ctx.moveTo(p1.x,p1.y);
-          ctx.lineTo(p2.x,p2.y);
-          ctx.stroke();
-        }
-      })
-    });
-  }());
+    [-offset/2, offset].forEach(function(d) {
+      var scaled = segment.scale(d);
+      drawCurve(ctx, scaled);
+      for(var t=0,p1,p2; t<=1; t++) {
+        p1 = segment.get(t);
+        p2 = scaled.get(t);
+        ctx.beginPath();
+        ctx.moveTo(p1.x,p1.y);
+        ctx.lineTo(p2.x,p2.y);
+        ctx.stroke();
+      }
+    })
+  });
+
 
   //
   // Show the terminals, for good measure
@@ -192,8 +219,13 @@ var drawCurve = function(ctx, curve, offset) {
   ctx.arc(c.x, c.y, 2, 0, 2*Math.PI);
   ctx.stroke();
 
+
+  //
+  // Draw the offset outline as a filled shape
+  // next to the original curve.
+  //
   (function drawOutline() {
-    var outline = curve.outline(l, l/2),
+    var outline = curve.outline(offset, offset/2),
         forward = outline["+"],
         back = outline["-"];
 
@@ -222,23 +254,21 @@ var drawCurve = function(ctx, curve, offset) {
     ctx.fill();
   }());
 
-  if(false)
-  (function() {
-    // FIXME: code still finds overlaps in bits that should not count as overlapping
-    var intersections = curve.intersects();
-    console.log(intersections);
-    intersections.forEach(function(v) {
-      console.log(v);
-      v.split("/").map(function(v) { return parseFloat(v); }).forEach(function(t) {
-        var c = curve.get(t);
-        console.log(c.x, c.y);
-      });
+
+  //
+  // Check for self-intersection
+  //
+  var intersections = curve.intersects();
+  intersections.forEach(function(v) {
+    v.split("/").map(function(v) { return parseFloat(v); }).forEach(function(t) {
+      var c = curve.get(t);
+      drawPoint(ctx, c, {x:300, y:0});
     });
-  }());
+  });
 
   // and then we just go draw the next frame.
   if (t>1) { forward = false; }
   if (t<0) { forward = true; }
   t = t + (forward? 1 : -1) * 0.01;
-  setTimeout(split, 25);
+  setTimeout(drawFrame, 25);
 }());

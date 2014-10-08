@@ -14,18 +14,32 @@
   <body>
     <h1>Bezier.js, for doing bezier curve things</h1>
 
-    <canvas width="600" height="280"></canvas>
+    <p>A library for performing Bezier curve computation and, if you add in your own drawing code (like the HTML canvas), drawing curves in a useful manner. The following animated, interactive diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really. <strong>Try playing with the curve</strong>: as this is an interactive graphic, you can drag around the start, control, and end points to manipulate the curve.</p>
 
-    <p>This animated, interactive diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really. <strong>Try playing with the curve</strong>: as this is an interactive graphic, you can drag around the start, control, and end points to manipulate the curve.</p>
+    <div style="text-align:center"><canvas width="600" height="280"></canvas></div>
 
-    <p>The diagram shows (1) a curve that's being rendered split at a "t" value that moves between 0 and 1, with (2) the resulting subcurves colours differently so that it's obvious they're different segments. (3) The travelling "t" point is also showing (4) its (scaled to have a sensible length) tangent vector, and (5) its (scaled) normal vector. (6) In pink/purple we see all the inflection points that this curve has, and (7) in grey we see the curve's "offset curve", which is actually a poly-bezier consisting of the curve split up into "simple" segments (defined as control points on the same side of the curve, and the point t=0.5 roughly equidistant to the start and end points), each of which has been scaled to lie (very close to) a fixed distance "d" along the curve's normal field away from the curve.(8) The curve's control points are shown in dark grey, and (9) the bounding box for this curve is shown fading in and out depending on the "t" position.</p>
+    <p>The diagram shows:
+      <b>(1)</b> a curve that's being rendered split at a "t" value that moves between 0 and 1, with
+      <b>(2)</b> the resulting subcurves colours differently so that it's obvious they're different segments.
+      <b>(3)</b> The travelling "t" point is also showing
+      <b>(4)</b> its (scaled to have a sensible length) tangent vector, and
+      <b>(5)</b> its (scaled) normal vector.
+      <b>(6)</b> In pink/purple we see all the inflection points that this curve has, and
+      <b>(7)</b> in grey we see the curve's "offset curve", which is actually a poly-bezier consisting of the curve split up into "simple" segments (defined as sections with an angle of no more than PI/6 between the start and end normals), each of which has been scaled to lie (very close to) a fixed distance "d" along the curve's normal field away from the curve.
+      <b>(8)</b> The curve's control points are shown in dark grey,
+      <b>(9)</b> the bounding box for this curve is shown fading in and out depending on the "t" position, with
+      <b>(10)</b> the bounding boxes for each of the "simple" segments fading in counter-point.
+      <b>(11)</b> On the right we see the path converted to a filled outline shape, with the original curve superimposed.
+    </p>
 
-    <p>The API for this library:</p>
+    <h2>The API for this library:</h2>
 
     <dl>
       <dt>new Bezier(...)</dt>
       <dd>constructor taking either [c,c,c,c] where c is an {x:..., y:..., z:...} coordinate (z optional), or an array of size 8 or 12 ordered x,y,z,x,y,z,x,y,z,x,y,z where z is optional.</dt>
+    </dl>
 
+    <dl>
       <dt>getLUT(steps)</dt>
       <dd>yields array/steps of {x:..., y:..., z:...} coordinates.</dd>
 
@@ -64,11 +78,18 @@
 
       <dt>outline(d1,d2)</dt>
       <dd>yields the outline coordinates for the curve offset by d1 on its normal, and d2 on its opposite side.</dd>
+
+      <dt>intersect()</dt>
+      <dd>yields the array of self-intersection 't' values, as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places.</dd>
+
+      <dt>intersect(curve)</dt>
+      <dd>yields the array of intersection 't' values between this curve and a target curve, encoded as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places, and each t1 is the 't' value on this curve, and each t2 is the 't' value on the target curve.</dd>
     </dl>
 
+    <p>Made by <a href="https://twitter.com/TheRealPomax">Pomax</a>. Based on the work done for <a href="http://pomax.github.io/bezierinfo">A Primer on Bézier Curves</a>. Naturally, the code's open source over on <a href="http://github.com/Pomax/bezierjs">github</a>. Still to do: intersection resolution for outlines with overlapping extrusions.</p>
+
+    <script src="bezierutils.js"></script>
     <script src="bezier.js"></script>
     <script src="beziertest.js"></script>
-
-    <p>Made by <a href="https://twitter.com/TheRealPomax">Pomax</a>. Based on the work done for <a href="http://pomax.github.io/bezierinfo">A Primer on Bézier Curves</a>. Naturally, the code's open source over on <a href="http://github.com/Pomax/bezierjs">github</a>.</p>
   </body>
 </html>
