@@ -1,0 +1,9 @@
+body {
+  background: #444;
+  color: #FFE;
+}
+
+canvas {
+  background: white;
+  cursor: crosshair;
+}

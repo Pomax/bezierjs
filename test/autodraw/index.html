@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+  <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+  <h1>Auto-tracing test</h1>
+
+  <canvas width="400" height="400"></canvas>
+
+  <p>Draw on the canvas with the mouse. When you let go, the code
+    kicks in and reduces the number of coordinates you drew, then
+    tries to connect them in a "sensible" way, which right now is
+    not actually that sensible, just Catmull-Rom spline, with cuts
+    where the angle between three points is acute.</p>
+
+  <script src="http://pomax.github.io/pocketknife/pocketknife.js"></script>
+  <script src="javascript.js"></script>
+</body>
+</html>
