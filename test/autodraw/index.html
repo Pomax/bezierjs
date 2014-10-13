@@ -4,11 +4,15 @@
   <meta charset="utf-8">
   <title>Auto-tracing test</title>
   <link rel="stylesheet" href="stylesheet.css">
+  <style>
+    body { margin:0; padding:0; }
+    canvas { display: block; width: 100%; }
+  </style>
 </head>
 <body>
   <h1>Auto-tracing test</h1>
 
-  <canvas width="400" height="400"></canvas>
+  <canvas height="600"></canvas>
 
   <p>Draw on the canvas with the mouse. When you let go, the code
     kicks in and reduces the number of coordinates you drew, then
@@ -17,6 +21,8 @@
     where the angle between three points is acute.</p>
 
   <script src="http://pomax.github.io/pocketknife/pocketknife.js"></script>
+  <script src="../../bezierutils.js"></script>
+  <script src="../../bezier.js"></script>
   <script src="javascript.js"></script>
 </body>
 </html>

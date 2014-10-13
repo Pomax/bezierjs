@@ -36,7 +36,7 @@
       args = [];
       for(var i=0; i<coords.length; i++) {
         ['x','y','z'].forEach(function(d) {
-          if(coords[i][d]) {
+          if(typeof coords[i][d] !== "undefined") {
             args.push(coords[i][d]);
           }
         });
