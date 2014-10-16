@@ -83,7 +83,7 @@
    * 8.   inflections() yields all known inflection points on this curve.
    * 9.   offset(t, d) yields a coordinate that is a point on the curve at 't',
    *                 offset by distance 'd' along its normal.
-   * 10.   reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
+   * 10.  reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
    * 11.  scale(d) yields the curve scaled approximately along its normals by distance 'd'.
    * 12a. outline(d) yields the outline coordinates for the curve offset by 'd' pixels on either side,
    *                 encoded as as an object of form {"+":[p,...], "-":[p,...]}, where each point
@@ -91,7 +91,15 @@
    *                 and c:true means on-curve point, with c:false means off-curve point.
    * 12b. outline(d1,d2) yields the outline coordinates for the curve offset by d1 on its normal, and
    *                     d2 on its opposite side.
-   *
+   * 13a   intersects() yields the array of self-intersection 't' values, as "t1/t2" string, where t1 and
+   *                    t2 are floating point numbers rounded to six decimal places.
+   * 13b   intersects(line) yields the array of intersection 't' values between this curve and a target line,
+   *                        encoded as "t1/t2" string, where t1 and t2 are floating point numbers rounded to
+   *                        six decimal places. The line must be of the form {p1:{x:.., y:...}, p2:{x:..., y:...}}.
+   * 13c   intersects(curve) yields the array of intersection 't' values between this curve and a target
+   *                         curve, encoded as "t1/t2" string, where t1 and t2 are floating point numbers
+   *                         rounded to six decimal places, and each t1 is the 't' value on this curve,
+   *                         and each t2 is the 't' value on the target curve.
    */
   Bezier.prototype = {
     length: function() {
@@ -341,8 +349,14 @@
     },
     intersects: function(curve) {
       if(!curve) return this.selfintersects();
+      if(curve.p1 && curve.p2) {
+        return this.lineIntersects(curve);
+      }
       if(curve instanceof Bezier) { curve = curve.reduce(); }
       return this.curveintersects(this.reduce(), curve);
+    },
+    lineIntersects: function(line) {
+      return utils.roots(this.points, line);
     },
     selfintersects: function() {
       var reduced = this.reduce();

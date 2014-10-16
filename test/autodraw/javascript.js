@@ -115,10 +115,9 @@ schedule(function() {
       var curves = [];
       var list = split(coords);
       console.log(list.length + " segments");
-      list.forEach(function(list) {
-        curves = curves.concat(convert(list));
+      return list.map(function(list) {
+        return convert(list);
       });
-      return curves;
     };
   }());
 
@@ -158,42 +157,31 @@ schedule(function() {
 
   // curve merging
   var merge = (function() {
-    var fit = function(curve, list) {
-      var LUT = [], b, steps = (1000/list.length)|0;
-      list.forEach(function(c) {
-        b = new Bezier([c.s, c.c1, c.c2, c.e]);
-        LUT = LUT.concat(b.getLUT(steps));
-      });
-      var s = list[0].s,
-          e = list[list.length-1].e,
-          error = 0,
-          len = LUT.length,
-          d = false;
-      // compute the least-squares error.
-      LUT.forEach(function(p) {
-        d = distToSegment(p,s,e);
-        error += d;
-      });
-      error = error / len;
-      // FIXME: this number is arbitrary atm
-      return error < 5;
-    };
+
+    // vector normalisation
+    var normalise = function(v) {
+      var m = Math.sqrt(v.x*v.x + v.y*v.y);
+      return { x: v.x/m, y:v.y/m };
+    }
 
     // Can we merge this list to a single curve?
     // If so, return that curve. Otherwise, false.
-    var trymerge = function(list) {
+    var trymerge = function(list, forced) {
       if (list.length === 1) return list[0];
 
       var last = list.length-1,
-          midl = list.length/2,
-          s = list[0].s;
-          e = list[last].e,
+          l0 = list[0],
+          ll = list[last],
+          s = l0.s;
+          e = ll.e,
           p = false;
 
       // find midpoint naively, for now.
+      // FIXME: the true 'p' will not lie on this line.
       if(list.length % 2 == 0) {
         p = list[list.length/2].s;
       } else {
+        var midl = list.length/2;
         p = {
           x: (list[midl|0].s.x + list[(0.5+midl)|0].s.x)/2,
           y: (list[midl|0].s.y + list[(0.5+midl)|0].s.y)/2
@@ -207,29 +195,66 @@ schedule(function() {
           dy = e.y - ty,
           sin = Math.sin,
           cos = Math.cos,
+          atan2 = Math.atan2,
           a = -atan2(dy,dx),
           B;
-      s  = { x: 0, y: 0 };
-      B  = { x: (p.x-tx)*cos(a) - (p.y-ty)*sin(a), y: (p.x-tx)*sin(a) + (p.y-ty)*cos(a) };
-      e  = { x: (e.x-tx)*cos(a) - (e.y-ty)*sin(a), y: 0 };
 
-      // find the moulding coordinates - see http://pomax.github.io/bezierinfo/#moulding
-      var C = project(s,e,B),
-          d1 = dist(B, C),
-          ratio = 1/3, // given t=0.5
-          d2 = d1 * ratio,
-          A = { x: B.x, y: B.y + d2 };
+      // base points
+      s  = { x: s.x, y: s.y };
+      c1 = { x: l0.c1.x, y: l0.c1.y };  // FIXME: this needs to be aligned with the previous bezier's c2, or there'll be kinks.
+      B  = { x: p.x,     y: p.y };
+      c2 = { x: ll.c2.x, y: ll.c2.y };
+      e  = { x: e.x,     y: e.y };
 
-      // set up the true curves approximation, and use if the fit's decent enough
-      s = list[0].s;
-      e = list[last].e;
-      A = {
-        x: tx + A.x*cos(-a) - A.y*sin(-a),
-        y: ty + A.x*sin(-a) + A.y*cos(-a)
+      // align to axes
+      [s,c1,B,c2,e].forEach(function(v) {
+        var x = (v.x-tx)*cos(a) - (v.y-ty)*sin(a),
+            y = (v.x-tx)*sin(a) + (v.y-ty)*cos(a);
+        v.x=x; v.y=y;
+      });
+
+      // we know that when A--B:B--C is 0.75, the control points c1 and c2 will coincide.
+      // At any ratio lower than that, they will be at a fractional distances along the lines
+      // s--A for c1 and A--e for c2. ration=0.75 is full length, ratio=0.375 is half length,
+      // ratio=0 is 0 length, and it's just a linear interpolation with those values.
+      var o = lli(s,c1,c2,e),
+          C = project(s,e,B);
+
+      // B may not be on the line C--o, so let's make sure it is. If this means we move
+      // it a considerable amount, we can't do a nice approximation and we return failure.
+      var _B = project(o,C,B);
+      if(!forced && dist(B,_B) > 2) {
+        return false;
+      }
+
+      var h1 = dist(B, C),
+          h2 = dist(o, C),
+          ratio = h1 / h2,
+          rh = 1.5 * ratio, // FIXME: why does 1.5 work? The math tells is that this should be 4/3 instead...
+          ds = dist(s,o) * rh,
+          de = dist(e,o) * rh;
+
+      // normalised control vectors:
+      c1 = normalise({ x: (l0.c1.x-l0.s.x), y: (l0.c1.y-l0.s.y) });
+      c2 = normalise({ x: (ll.c2.x-ll.e.x), y: (ll.c2.y-ll.e.y) });
+
+      // new curve control points:
+      c1 = {
+        x: l0.s.x + ds * c1.x,
+        y: l0.s.y + ds * c1.y
       };
-      var newcurve = { s: s, c1: A, c2: A, e: e };
-      if(fit(newcurve,list)) { return newcurve; }
-      return false;
+
+      c2 = {
+        x: ll.e.x + de * c2.x,
+        y: ll.e.y + de * c2.y
+      };
+
+      o = {
+        x: tx + (o.x*cos(-a) - o.y*sin(-a)),
+        y: ty + (o.x*sin(-a) + o.y*cos(-a))
+      };
+
+     return { s: l0.s, c1: c1, c2: c2, e: ll.e, o:o };
     };
 
     /**
@@ -249,7 +274,9 @@ schedule(function() {
         }
         merged = _;
       }
-      ret.push(merged);
+      if(s<len-1) {
+        ret.push(trymerge(curves.slice(s,len), true));
+      }
       return ret;
     };
 
@@ -263,8 +290,8 @@ schedule(function() {
   ctx.strokeStyle = "black";
   var coords, recording, tau = Math.PI*2;
   var point = function(evt) {
-    var x = evt.offsetX;
-    var y = evt.offsetY;
+    var x = evt.offsetX==undefined?evt.layerX:evt.offsetX;
+    var y = evt.offsetY==undefined?evt.layerY:evt.offsetY;
     coords.push({ x:x, y:y });
     ctx.beginPath();
     ctx.arc(x,y,0.1,0,tau);
@@ -295,38 +322,73 @@ schedule(function() {
       ctx.stroke();
     });
 
-    ctx.strokeStyle="red";
     var _coords = rdp(coords);
-    _coords.forEach(function(p) {
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,1,0,tau);
-      ctx.stroke();
-    });
+    var segments = abstract(_coords);
 
-    ctx.strokeStyle = "red";
-    var beziers = abstract(_coords);
+    // How far do we want to go with our curve abstraction?
+    var cm = true;
 
-    beziers.forEach(function(c) {
-      ctx.beginPath();
-      ctx.moveTo(c.s.x, c.s.y);
-      ctx.bezierCurveTo(c.c1.x, c.c1.y, c.c2.x, c.c2.y, c.e.x, c.e.y);
-      ctx.stroke();
-    });
+    // plain catmull-rom fitting
+    if(cm) {
+      ctx.strokeStyle="red";
+      _coords.forEach(function(p) {
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,1,0,tau);
+        ctx.stroke();
+      });
 
-/*
-    ctx.translate(cvs.width/2,0);
-    ctx.strokeStyle = "grey";
-    var reduced = merge(beziers);
-    reduced.forEach(function(c) {
-      ctx.beginPath();
-      ctx.moveTo(c.s.x, c.s.y);
-      ctx.bezierCurveTo(c.c1.x, c.c1.y, c.c2.x, c.c2.y, c.e.x, c.e.y);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(c.s.x,c.s.y,0.5,0,tau);
-      ctx.stroke();
-    });
-*/
+      ctx.strokeStyle = "red";
+      segments.forEach(function(beziers) {
+        beziers.forEach(function(c) {
+          ctx.beginPath();
+          ctx.moveTo(c.s.x, c.s.y);
+          ctx.bezierCurveTo(c.c1.x, c.c1.y, c.c2.x, c.c2.y, c.e.x, c.e.y);
+          ctx.stroke();
+        });
+      });
+    }
+
+    // reduced curve fitting -- FIXME: not quite done yet
+    else {
+      segments.forEach(function(beziers) {
+        // FIXME: merge() may yield gaps in the outline
+        var reduced = merge(beziers);
+
+        reduced.forEach(function(c) {
+          ctx.strokeStyle = "green";
+          ctx.beginPath();
+          ctx.arc(c.s.x,c.s.y,1.5,0,tau);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(c.e.x,c.e.y,1.5,0,tau);
+          ctx.stroke();
+
+          ctx.strokeStyle = "lightgrey";
+          ctx.beginPath();
+          ctx.arc(c.c1.x,c.c1.y,1.5,0,tau);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(c.c2.x,c.c2.y,1.5,0,tau);
+          ctx.stroke();
+
+          if(c.o) {
+            ctx.beginPath();
+            ctx.arc(c.o.x,c.o.y,1.5,0,tau);
+            ctx.stroke();
+          }
+        });
+
+        ctx.strokeStyle = "red";
+        reduced.forEach(function(c,i) {
+          ctx.beginPath();
+          ctx.moveTo(c.s.x, c.s.y);
+          ctx.bezierCurveTo(c.c1.x, c.c1.y, c.c2.x, c.c2.y, c.e.x, c.e.y);
+          ctx.stroke();
+        });
+      });
+    }
   }
 
   cvs.listen("mousedown", md);

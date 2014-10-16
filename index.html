@@ -7,7 +7,7 @@
       body { padding: 0 1em; }
       dl { width: calc(100% - 3em); margin-left: 1em; }
       dt { font-weight: bold; }
-      dd { position: relative; top: -1em; left: 5em; margin-right: 5em; margin-bottom: -1em; }
+      dd { position: relative; top: -1em; left: 5.5em; margin-right: 5em; margin-bottom: -1em; }
       canvas { border: 1px solid rgba(0,0,0,0.2); }
     </style>
   </head>
@@ -17,7 +17,7 @@
     <p>A library for performing Bezier curve computation and, if you add in your own drawing code (like the HTML canvas), drawing curves in a useful manner. The following animated, interactive diagram actually shows off everything currently supported by the library. Have a look at <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/beziertest.js" target="_blank">the drawing code</a> to see how this is drawn, or read the <a href="https://github.com/Pomax/bezierjs/blob/gh-pages/bezier.js#L225">bezier.js source</a> to see how everything works. It's... pretty straight-forward code, really. <strong>Try playing with the curve</strong>: as this is an interactive graphic, you can drag around the start, control, and end points to manipulate the curve.</p>
 
     <div style="text-align:center">
-      <canvas width="900" height="280"></canvas>
+      <canvas width="600" height="280"></canvas>
     </div>
 
     <p>The diagram shows:
@@ -31,7 +31,8 @@
       <b>(8)</b> The curve's control points are shown in dark grey,
       <b>(9)</b> the bounding box for this curve is shown fading in and out depending on the "t" position, with
       <b>(10)</b> the bounding boxes for each of the "simple" segments fading in counter-point.
-      <b>(11)</b> On the right we see the path converted to a filled outline shape, with the original curve superimposed.
+      <b>(11)</b> On the right we see the path converted to a filled outline shape, with the original curve superimposed, with
+      <b>(12)</b> the intersection of a line computed against all the outline curve's Bezier segments.
     </p>
 
     <h2>The API for this library:</h2>
@@ -85,10 +86,13 @@
       <dt>.outline(d1,d2)</dt>
       <dd>yields the outline coordinates for the curve offset by d1 on its normal, and d2 on its opposite side.</dd>
 
-      <dt>.intersect()</dt>
+      <dt>.intersects()</dt>
       <dd>yields the array of self-intersection 't' values, as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places.</dd>
 
-      <dt>.intersect(curve)</dt>
+      <dt>.intersects(line)</dt>
+      <dd>yields the array of intersection 't' values between this curve and a target line, encoded as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places. The line must be of the form {p1:{x:.., y:...}, p2:{x:..., y:...}}.</dd>
+
+      <dt>.intersects(curve)</dt>
       <dd>yields the array of intersection 't' values between this curve and a target curve, encoded as "t1/t2" string, where t1 and t2 are floating point numbers rounded to six decimal places, and each t1 is the 't' value on this curve, and each t2 is the 't' value on the target curve.</dd>
     </dl>
 

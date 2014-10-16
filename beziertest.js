@@ -1,8 +1,10 @@
 var cvs = document.querySelector("canvas");
 var lpts = [{x:120,y:160}, {x:32,y:200}, {x:220,y:260}, {x:220,y:40}];
 var curve = new Bezier(lpts);
+var iroots = [];
+
 // compute the arc length just once, and print it to console for now.
-console.log("arc leng: "+curve.length());
+console.log("arc length: " + ((10*curve.length())|0)/10 +"px");
 
 // User interaction
 (function handleInteraction() {
@@ -21,6 +23,7 @@ console.log("arc leng: "+curve.length());
     });
   });
   cvs.addEventListener("mousemove", function(evt) {
+    iroots = [];
     var found = false;
     lpts.forEach(function(p) {
       var mx = evt.offsetX;
@@ -232,7 +235,9 @@ var t = 0.5, forward = true;
   (function drawOutline() {
     var outline = curve.outline(offset, offset/2),
         forward = outline["+"],
-        back = outline["-"];
+        back = outline["-"],
+        fcurves = [],
+        bcurves = [];
 
     ctx.strokeStyle = "rgb(50,20,0)";
     drawCurve(ctx, curve, {x:300,y:0});
@@ -241,22 +246,52 @@ var t = 0.5, forward = true;
     ctx.fillStyle = "rgba(255,225,0,0.2)";
     ctx.beginPath();
     ctx.moveTo(300 + forward[0].p.x, forward[0].p.y);
-    for(var i=1, p1, p2, p3; i<forward.length; i+=3) {
-      p1 = forward[i+0].p;
+    for(var i=1, p0, p1, p2, p3; i<forward.length; i+=3) {
+      p0 = forward[i-1].p;
+      p1 = forward[i].p;
       p2 = forward[i+1].p;
       p3 = forward[i+2].p;
       ctx.bezierCurveTo(300 + p1.x, p1.y, 300 + p2.x, p2.y, 300 + p3.x, p3.y);
+      fcurves.push(new Bezier(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,p3.x,p3.y));
     }
     ctx.lineTo(300 + back[0].p.x, back[0].p.y);
-    for(var i=1, p1, p2, p3; i<back.length; i+=3) {
+    for(var i=1, p0, p1, p2, p3; i<back.length; i+=3) {
+      p0 = back[i-1].p,
       p1 = back[i].p;
       p2 = back[i+1].p;
       p3 = back[i+2].p;
       ctx.bezierCurveTo(300 + p1.x, p1.y, 300 + p2.x, p2.y, 300 + p3.x, p3.y);
+      bcurves.push(new Bezier(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,p3.x,p3.y));
     }
     ctx.closePath();
     ctx.stroke();
     ctx.fill();
+
+    // also show a line intersection
+    var line = { p1: {x:20, y:225}, p2: {x:280, y:120} };
+    ctx.beginPath();
+    ctx.moveTo(300 + line.p1.x, line.p1.y);
+    ctx.lineTo(300 + line.p2.x, line.p2.y);
+    ctx.stroke();
+
+    if(iroots.length===0) {
+      var findis = function(c) {
+        var roots = c.intersects(line);
+        if (roots.length === 0) return;
+        roots.forEach(function(t) {
+          var p = c.get(t);
+          iroots.push(p);
+        });
+      }
+      fcurves.forEach(function(c) { findis(c); });
+      bcurves.forEach(function(c) { findis(c); });
+    }
+
+    iroots.forEach(function(p) {
+      ctx.beginPath();
+      ctx.arc(300 + p.x,p.y,2,0,2*Math.PI);
+      ctx.stroke();
+    });
   }());
 
 

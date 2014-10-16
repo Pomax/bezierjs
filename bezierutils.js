@@ -1,3 +1,16 @@
+// Math functions. I have the Math object with a passion.
+var abs = Math.abs,
+    cos = Math.cos,
+    sin = Math.sin,
+    acos = Math.acos,
+    asin = Math.asin,
+    atan2 = Math.atan2,
+    sqrt = Math.sqrt,
+    crt = function(v) { if(v<0) return -Math.pow(-v,1/3); return Math.pow(v,1/3); },
+    pi = Math.PI,
+    tau = 2*pi;
+
+
 /**
  * Utility functions for doing Bezier-related things
  */
@@ -61,7 +74,7 @@ var BezierUtils = {
     var xbase = this.derivativeDim(p,'x',t);
     var ybase = this.derivativeDim(p,'y',t);
     var combined = xbase*xbase + ybase*ybase;
-    return Math.sqrt(combined);
+    return sqrt(combined);
   },
   length: function(p) {
     var z=0.5,sum=0,len=this.Tvalues.length,i,t;
@@ -139,13 +152,70 @@ var BezierUtils = {
     }
     return { min:min, mid:(min+max)/2, max:max, size:max-min };
   },
+  align: function(points, line) {
+    var tx = line.p1.x,
+        ty = line.p1.y,
+        a = -atan2(line.p2.y-ty, line.p2.x-tx),
+        d = function(v) {
+          return {
+            x: (v.x-tx)*cos(a) - (v.y-ty)*sin(a),
+            y: (v.x-tx)*sin(a) + (v.y-ty)*cos(a)
+          };
+        };
+    return points.map(d);
+  },
+  roots: function(points, line) {
+    // see http://www.trans4mind.com/personal_development/mathematics/polynomials/cubicAlgebra.htm
+    line = line || {p1:{x:0,y:0},p2:{x:1,y:0}};
+    var a = this.align(points, line),
+        pa = a[0].y,
+        pb = a[1].y,
+        pc = a[2].y,
+        pd = a[3].y,
+        d = (-pa + 3*pb - 3*pc + pd),
+        a = (3*pa - 6*pb + 3*pc) / d,
+        b = (-3*pa + 3*pb) / d,
+        c = pa / d,
+        p = (3*b - a*a)/3,
+        p3 = p/3,
+        q = (2*a*a*a - 9*a*b + 27*c)/27,
+        q2 = q/2,
+        discriminant = q2*q2 + p3*p3*p3,
+        u1,v1,x1,x2,x3,
+        reduce = function(t) { return 0<=t && t <=1; };
+     if (discriminant < 0) {
+      var mp3 = -p/3,
+          mp33 = mp3*mp3*mp3,
+          r = sqrt( mp33 ),
+          t = -q/(2*r),
+          cosphi = t<-1 ? -1 : t>1 ? 1 : t,
+          phi = acos(cosphi),
+          crtr = crt(r),
+          t1 = 2*crtr;
+      x1 = t1 * cos(phi/3) - a/3;
+      x2 = t1 * cos((phi+tau)/3) - a/3;
+      x3 = t1 * cos((phi+2*tau)/3) - a/3;
+      return [x1, x2, x3].filter(reduce);
+    } else if(discriminant === 0) {
+      u1 = q2 < 0 ? crt(-q2) : -crt(q2);
+      x1 = 2*u1-a/3;
+      x2 = -u1 - a/3;
+      return [x1,x2].filter(reduce);
+    } else {
+      var sd = sqrt(discriminant);
+      u1 = crt(-q2+sd);
+      v1 = crt(q2+sd);
+      return [u1-v1-a/3].filter(reduce);;
+    }
+  },
   rootsd1: function(p) {
+    // quadratic roots are easy
     var a = 3*(p[1]-p[0]),
         b = 3*(p[2]-p[1]),
         c = 3*(p[3]-p[2]),
         d = a - 2*b + c;
     if(d!==0) {
-      var m1 = -Math.sqrt(b*b-a*c),
+      var m1 = -sqrt(b*b-a*c),
           m2 = -a+b,
           v1 = -( m1+m2)/d,
           v2 = -(-m1+m2)/d;
@@ -157,6 +227,7 @@ var BezierUtils = {
     return [];
   },
   rootsd2: function(p) {
+    // the second derivative is a line
     var a = 3*(p[1]-p[0]),
         b = 3*(p[2]-p[1]),
         c = 3*(p[3]-p[2]);
@@ -172,7 +243,7 @@ var BezierUtils = {
       l = b1[dim].mid;
       t = b2[dim].mid;
       d = (b1[dim].size + b2[dim].size)/2;
-      if(Math.abs(l-t) >= d) return false;
+      if(abs(l-t) >= d) return false;
     }
     return true;
   },
