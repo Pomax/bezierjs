@@ -3,7 +3,7 @@ var cvs = document.querySelector("canvas");
 // var lpts = [{x:117,y:42}, {x:341,y:123}, {x:127,y:271}, {x:48,y:155}];
 var lpts = [238, 52, 307, 266, 11, 22, 80, 221];
 var curve = new Bezier(lpts);
-var iroots = [];
+var iroots = [], intersections = false;
 
 // compute the arc length just once, and print it to console for now.
 var showArcLength = function() {
@@ -12,11 +12,23 @@ var showArcLength = function() {
 
 showArcLength();
 
+
 // User interaction
 (function handleInteraction() {
+
+  var fix = function(e) {
+    e = e || window.event;
+    if(e.offsetX) return;
+    var target = e.target || e.srcElement,
+        rect = target.getBoundingClientRect();
+    e.offsetX = e.clientX - rect.left;
+    e.offsetY = e.clientY - rect.top;
+  };
+
   lpts = curve.points;
   var moving = false, mx = my = ox = oy = 0, cx, cy, mp = false;
   cvs.addEventListener("mousedown", function(evt) {
+    fix(evt);
     mx = evt.offsetX;
     my = evt.offsetY;
     lpts.forEach(function(p) {
@@ -29,7 +41,7 @@ showArcLength();
     });
   });
   cvs.addEventListener("mousemove", function(evt) {
-    iroots = [];
+    fix(evt);
     var found = false;
     lpts.forEach(function(p) {
       var mx = evt.offsetX;
@@ -41,6 +53,7 @@ showArcLength();
     cvs.style.cursor = found ? "pointer" : "default";
 
     if(!moving) return;
+    iroots = [];
     ox = evt.offsetX - mx;
     oy = evt.offsetY - my;
     mp.x = cx + ox;
@@ -52,6 +65,7 @@ showArcLength();
     showArcLength();
     moving = false;
     mp = false;
+    intersections = false;
   });
 }());
 
@@ -102,7 +116,7 @@ var t = 0.5, forward = true;
 
 
 // this is where the Bezier object gets used.
-(function drawFrame() {
+function drawFrame() {
   cvs.width = cvs.width;
   var ctx = cvs.getContext("2d");
   var offset = 25;
@@ -246,13 +260,15 @@ var t = 0.5, forward = true;
         back = outline["-"],
         fcurves = [],
         bcurves = [],
-        ofs = 600;
+        ofs = 600,
+        i,j,roots,
+        p,p0,p1,p2,p3;
 
     ctx.strokeStyle = "grey";
     ctx.fillStyle = "rgba(255,225,0,0.2)";
     ctx.beginPath();
     ctx.moveTo(ofs + forward[0].p.x, forward[0].p.y);
-    for(var i=1, p0, p1, p2, p3; i<forward.length; i+=3) {
+    for(i=1, p0, p1, p2, p3; i<forward.length; i+=3) {
       p0 = forward[i-1].p;
       p1 = forward[i].p;
       p2 = forward[i+1].p;
@@ -261,7 +277,7 @@ var t = 0.5, forward = true;
       fcurves.push(new Bezier(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,p3.x,p3.y));
     }
     ctx.lineTo(ofs + back[0].p.x, back[0].p.y);
-    for(var i=1, p0, p1, p2, p3; i<back.length; i+=3) {
+    for(i=1, p0, p1, p2, p3; i<back.length; i+=3) {
       p0 = back[i-1].p,
       p1 = back[i].p;
       p2 = back[i+1].p;
@@ -273,6 +289,40 @@ var t = 0.5, forward = true;
     ctx.stroke();
     ctx.fill();
 
+/*
+    // show outline intersections
+    if(!intersections) {
+      var segments = fcurves.concat(bcurves);
+      for(var i=0, si; i<segments.length-1; i++) {
+        si = segments[i];
+        for(var j=i+1, sj; j<segments.length; j++) {
+          sj = segments[j];
+          (function(si,sj) {
+            var roots = si.intersects(sj);
+            if(roots.length>0) {
+              intersections = roots.map(function(v) {
+                var s = v.split("/");
+                return [{c:si, t:s[0]}, {c:sj, t:s[1]}];
+              });
+            }
+          }(si,sj));
+        }
+      }
+    }
+*/
+
+    if(intersections) {
+      console.log(intersections);
+      intersections.forEach(function(pair) {
+        for(var i=0; i<2; i++) {
+          p = pair[i].c.get(pair[i].t);
+          ctx.beginPath();
+          ctx.arc(ofs + p.x,p.y,12,0,2*Math.PI);
+          ctx.stroke();
+        }
+      });
+    }
+
     // also show a line intersection
     var line = { p1: {x:20, y:225}, p2: {x:280, y:120} };
     ctx.beginPath();
@@ -282,10 +332,10 @@ var t = 0.5, forward = true;
 
     if(iroots.length===0) {
       var findis = function(c) {
-        var roots = c.intersects(line);
+        roots = c.intersects(line);
         if (roots.length === 0) return;
         roots.forEach(function(t) {
-          var p = c.get(t);
+          p = c.get(t);
           iroots.push(p);
         });
       }
@@ -304,8 +354,8 @@ var t = 0.5, forward = true;
   //
   // Check for self-intersection
   //
-  var intersections = curve.intersects();
-  intersections.forEach(function(v) {
+  var self_intersections = curve.intersects();
+  self_intersections.forEach(function(v) {
     v.split("/").map(function(v) { return parseFloat(v); }).forEach(function(t) {
       var c = curve.get(t);
       drawPoint(ctx, c, {x:300, y:0});
@@ -317,4 +367,6 @@ var t = 0.5, forward = true;
   if (t<0) { forward = true; }
   t = t + (forward? 1 : -1) * 0.01;
   setTimeout(drawFrame, 25);
-}());
+}
+
+drawFrame();
