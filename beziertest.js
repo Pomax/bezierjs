@@ -1,10 +1,16 @@
 var cvs = document.querySelector("canvas");
-var lpts = [{x:120,y:160}, {x:32,y:200}, {x:220,y:260}, {x:220,y:40}];
+// var lpts = [{x:120,y:160}, {x:32,y:200}, {x:220,y:260}, {x:220,y:40}];
+// var lpts = [{x:117,y:42}, {x:341,y:123}, {x:127,y:271}, {x:48,y:155}];
+var lpts = [238, 52, 307, 266, 11, 22, 80, 221];
 var curve = new Bezier(lpts);
 var iroots = [];
 
 // compute the arc length just once, and print it to console for now.
-console.log("arc length: " + ((10*curve.length())|0)/10 +"px");
+var showArcLength = function() {
+  document.querySelector("#arclength").textContent = ((100000*curve.length())|0)/100000;
+};
+
+showArcLength();
 
 // User interaction
 (function handleInteraction() {
@@ -42,7 +48,8 @@ console.log("arc length: " + ((10*curve.length())|0)/10 +"px");
   });
   cvs.addEventListener("mouseup", function(evt) {
     if(!moving) return;
-
+    //console.log(curve.points.map(function(p) { return p.x+", "+p.y; }).join(", "));
+    showArcLength();
     moving = false;
     mp = false;
   });
@@ -189,28 +196,29 @@ var t = 0.5, forward = true;
   //
   // The "offset curve", which is actually a poly-bezier
   //
+  var ofs = 300;
+  ctx.strokeStyle = "rgb(50,20,0)";
+  drawCurve(ctx, curve, {x:ofs,y:0});
   var reduced = curve.reduce();
   reduced.forEach(function(segment) {
     // subcurve bounding boxes!
     ctx.strokeStyle = "rgba(0,100,50," + (0.81-Math.max(0,0.8*t)) + ")";
     drawbbox(ctx, segment.bbox());
 
-    // offset curves
     ctx.strokeStyle = "lightgrey";
     [-offset/2, offset].forEach(function(d) {
       var scaled = segment.scale(d);
-      drawCurve(ctx, scaled);
+      drawCurve(ctx, scaled, {x:ofs,y:0});
       for(var t=0,p1,p2; t<=1; t++) {
         p1 = segment.get(t);
         p2 = scaled.get(t);
         ctx.beginPath();
-        ctx.moveTo(p1.x,p1.y);
-        ctx.lineTo(p2.x,p2.y);
+        ctx.moveTo(ofs + p1.x,p1.y);
+        ctx.lineTo(ofs + p2.x,p2.y);
         ctx.stroke();
       }
     })
   });
-
 
   //
   // Show the terminals, for good measure
@@ -237,30 +245,28 @@ var t = 0.5, forward = true;
         forward = outline["+"],
         back = outline["-"],
         fcurves = [],
-        bcurves = [];
-
-    ctx.strokeStyle = "rgb(50,20,0)";
-    drawCurve(ctx, curve, {x:300,y:0});
+        bcurves = [],
+        ofs = 600;
 
     ctx.strokeStyle = "grey";
     ctx.fillStyle = "rgba(255,225,0,0.2)";
     ctx.beginPath();
-    ctx.moveTo(300 + forward[0].p.x, forward[0].p.y);
+    ctx.moveTo(ofs + forward[0].p.x, forward[0].p.y);
     for(var i=1, p0, p1, p2, p3; i<forward.length; i+=3) {
       p0 = forward[i-1].p;
       p1 = forward[i].p;
       p2 = forward[i+1].p;
       p3 = forward[i+2].p;
-      ctx.bezierCurveTo(300 + p1.x, p1.y, 300 + p2.x, p2.y, 300 + p3.x, p3.y);
+      ctx.bezierCurveTo(ofs + p1.x, p1.y, ofs + p2.x, p2.y, ofs + p3.x, p3.y);
       fcurves.push(new Bezier(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,p3.x,p3.y));
     }
-    ctx.lineTo(300 + back[0].p.x, back[0].p.y);
+    ctx.lineTo(ofs + back[0].p.x, back[0].p.y);
     for(var i=1, p0, p1, p2, p3; i<back.length; i+=3) {
       p0 = back[i-1].p,
       p1 = back[i].p;
       p2 = back[i+1].p;
       p3 = back[i+2].p;
-      ctx.bezierCurveTo(300 + p1.x, p1.y, 300 + p2.x, p2.y, 300 + p3.x, p3.y);
+      ctx.bezierCurveTo(ofs + p1.x, p1.y, ofs + p2.x, p2.y, ofs + p3.x, p3.y);
       bcurves.push(new Bezier(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,p3.x,p3.y));
     }
     ctx.closePath();
@@ -270,8 +276,8 @@ var t = 0.5, forward = true;
     // also show a line intersection
     var line = { p1: {x:20, y:225}, p2: {x:280, y:120} };
     ctx.beginPath();
-    ctx.moveTo(300 + line.p1.x, line.p1.y);
-    ctx.lineTo(300 + line.p2.x, line.p2.y);
+    ctx.moveTo(ofs + line.p1.x, line.p1.y);
+    ctx.lineTo(ofs + line.p2.x, line.p2.y);
     ctx.stroke();
 
     if(iroots.length===0) {
@@ -289,7 +295,7 @@ var t = 0.5, forward = true;
 
     iroots.forEach(function(p) {
       ctx.beginPath();
-      ctx.arc(300 + p.x,p.y,2,0,2*Math.PI);
+      ctx.arc(ofs + p.x,p.y,2,0,2*Math.PI);
       ctx.stroke();
     });
   }());

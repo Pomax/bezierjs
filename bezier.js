@@ -356,7 +356,15 @@
       return this.curveintersects(this.reduce(), curve);
     },
     lineIntersects: function(line) {
-      return utils.roots(this.points, line);
+      var mx = Math.min(line.p1.x, line.p2.x),
+          my = Math.min(line.p1.y, line.p2.y),
+          MX = Math.max(line.p1.x, line.p2.x),
+          MY = Math.max(line.p1.y, line.p2.y),
+          self=this;
+      return utils.roots(this.points, line).filter(function(t) {
+        var p = self.get(t);
+        return (mx <= p.x && p.x <= MX && my <= p.y && p.y <= MY);
+      });
     },
     selfintersects: function() {
       var reduced = this.reduce();
