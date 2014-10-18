@@ -268,7 +268,7 @@ function drawFrame() {
     ctx.fillStyle = "rgba(255,225,0,0.2)";
     ctx.beginPath();
     ctx.moveTo(ofs + forward[0].p.x, forward[0].p.y);
-    for(i=1, p0, p1, p2, p3; i<forward.length; i+=3) {
+    for(i=1; i<forward.length; i+=3) {
       p0 = forward[i-1].p;
       p1 = forward[i].p;
       p2 = forward[i+1].p;
@@ -277,7 +277,7 @@ function drawFrame() {
       fcurves.push(new Bezier(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,p3.x,p3.y));
     }
     ctx.lineTo(ofs + back[0].p.x, back[0].p.y);
-    for(i=1, p0, p1, p2, p3; i<back.length; i+=3) {
+    for(i=1; i<back.length; i+=3) {
       p0 = back[i-1].p,
       p1 = back[i].p;
       p2 = back[i+1].p;
@@ -289,35 +289,46 @@ function drawFrame() {
     ctx.stroke();
     ctx.fill();
 
-/*
+    var makeLine = function(x1,y1,x2,y2) {
+      var dx = (x2-x1)/3, dy = (y2-y1)/3;
+      return new Bezier(x1, y1, x1+dx, y1+dy, x1+2*dx, y1+2*dy, x2, y2);
+    };
+    var fp = fcurves[0].points,
+        bp = bcurves[bcurves.length-1].points,
+        ls = makeLine(fp[0].x, fp[0].y, bp[3].x, bp[3].y);
+    fp = fcurves[fcurves.length-1].points;
+    bp = bcurves[0].points;
+    var le = makeLine(fp[3].x, fp[3].y, bp[0].x, bp[0].y);
+    var segments = [ls].concat(fcurves).concat(bcurves).concat([le]);
+
     // show outline intersections
     if(!intersections) {
-      var segments = fcurves.concat(bcurves);
+      intersections = [];
       for(var i=0, si; i<segments.length-1; i++) {
         si = segments[i];
-        for(var j=i+1, sj; j<segments.length; j++) {
+        for(var j=i+2, sj; j<segments.length; j++) {
+          // note: we want +2, not +1, because otherwise we'll find
+          // intersections where two simple curves meet, and that's
+          // easily over a hundred false positives O_O!
           sj = segments[j];
-          (function(si,sj) {
-            var roots = si.intersects(sj);
-            if(roots.length>0) {
-              intersections = roots.map(function(v) {
-                var s = v.split("/");
-                return [{c:si, t:s[0]}, {c:sj, t:s[1]}];
-              });
-            }
-          }(si,sj));
+          var roots = si.intersects(sj);
+          if(roots.length > 0) {
+            intersections = intersections.concat(roots.map(function(v) {
+              var s = v.split("/");
+              return [{c:si, t:s[0]}, {c:sj, t:s[1]}];
+            }));
+          }
         }
       }
     }
-*/
 
     if(intersections) {
-      console.log(intersections);
+      ctx.strokeStyle = "rgba(100,0,100,0.5)";
       intersections.forEach(function(pair) {
         for(var i=0; i<2; i++) {
           p = pair[i].c.get(pair[i].t);
           ctx.beginPath();
-          ctx.arc(ofs + p.x,p.y,12,0,2*Math.PI);
+          ctx.arc(ofs + p.x,p.y,2,0,2*Math.PI);
           ctx.stroke();
         }
       });
@@ -325,6 +336,7 @@ function drawFrame() {
 
     // also show a line intersection
     var line = { p1: {x:20, y:225}, p2: {x:280, y:120} };
+    ctx.strokeStyle = "darkgrey";
     ctx.beginPath();
     ctx.moveTo(ofs + line.p1.x, line.p1.y);
     ctx.lineTo(ofs + line.p2.x, line.p2.y);
@@ -339,10 +351,10 @@ function drawFrame() {
           iroots.push(p);
         });
       }
-      fcurves.forEach(function(c) { findis(c); });
-      bcurves.forEach(function(c) { findis(c); });
+      segments.forEach(function(c) { findis(c); });
     }
 
+    ctx.strokeStyle = "black";
     iroots.forEach(function(p) {
       ctx.beginPath();
       ctx.arc(ofs + p.x,p.y,2,0,2*Math.PI);
