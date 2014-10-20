@@ -41,6 +41,7 @@
     if(!moving) return;
     iroots = [];
     outline = false;
+    shapes = false;
     ox = evt.offsetX - mx;
     oy = evt.offsetY - my;
     mp.x = cx + ox;

@@ -7,55 +7,15 @@ var lpts = [238, 52, 248, 253, 11, 22, 243, 52 ],
     iroots = [],
     intersections = false,
     outline = false,
+    shapes = false;
     t = 0.5,
     tstep = 0.01,
     forward = true,
     offset = 25,
     cvs = document.querySelector("canvas"),
     ctx = cvs.getContext("2d"),
+
     loop = true;
-
-function above(p1,p2,p) {
-  return ((p2.x-p1.x)*(p.y-p1.y)-(p.x-p1.x)*(p2.y-p1.y));
-}
-
-function intersects(line1,line2) {
-  var o = BezierUtils.lli(line1, line2);
-  var mx = Math.min(line1.x, line1.c.x),
-      my = Math.min(line1.y, line1.c.y),
-      MX = Math.max(line1.x, line1.c.x),
-      MY = Math.max(line1.y, line1.c.y),
-      on1 = (mx <= o.x && o.x <= MX && my <= o.y && o.y <= MY);
-  mx = Math.min(line2.x, line2.c.x);
-  my = Math.min(line2.y, line2.c.y);
-  MX = Math.max(line2.x, line2.c.x);
-  MY = Math.max(line2.y, line2.c.y);
-  var on2 = (mx <= o.x && o.x <= MX && my <= o.y && o.y <= MY);
-  return on1 && on2;
-}
-
-/**
- * winding number for a point in a poly-bezier outline shape
- */
-function windingnumber(p, outline) {
-  var windings = 0,
-      start = outline[0],
-      segment = start,
-      line1 = {x:0,y:0,c:p},
-      line2,p1,p2,o;
-  do {
-    p1 = segment.points[0];
-    p2 = segment.points[3];
-    line2 = {x:p1.x,y:p1.y,c:p2};
-    o = intersects(line1,line2);
-    if(o) {
-      console.log(p.x,"/",p.y,",",p1.x,"/",p1.y,",",p2.x,"/",p2.y, above(p1,p2,p))
-      windings += above(p1,p2,p) > 0 ? 1 : -1;
-    }
-    segment = segment.next;
-  } while (segment !== start);
-  return windings < 0 ? -windings : windings;
-}
 
 /**
  * compute and show the arc length of a curve
@@ -180,102 +140,108 @@ function drawFrame() {
   drawCircle(c,2);
 
 
+  var ofs = 600,
+      i,j,roots,p,
+
+  // get the global outline
   outline = outline || curve.outline(offset, offset/2);
 
-  var ofs = 600,
-      i,j,roots,p;
+  // convert outline to a series of simple-offset shapes instead
+  shapes = shapes || (function(outline) {
+    var makeline = function(p1,p2) {
+      var x1 = p1.x, y1=p1.y, x2=p2.x, y2=p2.y,
+          dx = (x2-x1)/3, dy = (y2-y1)/3;
+      return new Bezier(x1, y1, x1+dx, y1+dy, x1+2*dx, y1+2*dy, x2, y2);
+    };
+    var shapes = [];
+    for(var i=1,len=outline.length; i<len/2; i++) {
+      var shape = {
+        forward: outline[i],
+        back: outline[len-i]
+      };
+      shape.caps = {
+        start: makeline(shape.back.points[3], shape.forward.points[0]),
+        end: makeline(shape.forward.points[3], shape.back.points[0])
+      };
+      shape.caps.start.virtual = (i > 1);
+      shape.caps.end.virtual = (i < len/2-1);
+      shape.bbox = (function() {
+        var mx=9999,my=mx,MX=-99999,MY=MX;
+        var sections = [shape.caps.start, shape.forward, shape.back, shape.caps.end];
+        sections.forEach(function(s) {
+          var bbox = s.bbox();
+          if(mx > bbox.x.min) mx = bbox.x.min;
+          if(my > bbox.y.min) my = bbox.y.min;
+          if(MX < bbox.x.max) MX = bbox.x.max;
+          if(MY < bbox.y.max) MY = bbox.y.max;
+        });
+        return {
+          x: { min: mx, mid:(mx+MX)/2, max: MX, size:MX-mx },
+          y: { min: my, mid:(my+MY)/2, max: MY, size:MY-my }
+        }
+      }());
+      shapes.push(shape);
+    }
+    return shapes;
+  }(outline));
 
   //
-  // Draw "self"-intersections in the outline shape
+  // Draw the offset outline as a filled shape
+  // next to the original curve.
   //
-  if(!intersections) {
-    // find al the self intersection points
-    intersections = [];
-    for(var i=0, si; i<outline.length-1; i++) {
-      si = outline[i];
-      for(var j=i+2, sj; j<outline.length; j++) {
-        // note: we want +2, not +1, because otherwise we'll find
-        // intersections where two simple curves meet, and that's
-        // easily over a hundred false positives O_O!
-        sj = outline[j];
-        var roots = si.intersects(sj);
-        if(roots.length > 0) {
-          intersections = intersections.concat(roots.map(function(v) {
-            var s = v.split("/");
-            si.addIS(sj, s[0]);
-            sj.addIS(si, s[1]);
-            return [{c:si, t:s[0]}, {c:sj, t:s[1]}];
-          }));
-        }
-      }
+  ctx.strokeStyle = "grey";
+  ctx.fillStyle = "rgba(255,225,0,0.2)";
+  shapes.forEach(function(shape) {
+    drawShape(shape, {x:ofs, y:0});
+    //drawbbox(shape.bbox, {x:ofs, y:0});
+  });
+
+  function shapeintersection(s1, bbox1, s2, bbox2) {
+    if(!BezierUtils.bboxoverlap(bbox1, bbox2)) {
+      return [];
     }
-
-    // Resolve intersections (as union).
-    if(intersections && intersections.length > 0) {
-      // step 1: find all segments with intersections and
-      // replace them with "involved in intersections" equivalents.
-      for(var i=outline.length-1; i>=0; i--) {
-        var segment = outline[i];
-        if(segment.intersections) {
-          var segments = segment.splitintersections();
-          outline.splice(i,1);
-          segments.forEach(function(segment,j) {
-            outline.splice(i+j,0,segment);
-          });
+    var intersections = [];
+    var a1 = [s1.caps.start, s1.forward, s1.back, s1.caps.end];
+    var a2 = [s2.caps.start, s2.forward, s2.back, s2.caps.end];
+    a1.forEach(function(l1) {
+      if(l1.virtual) return;
+      a2.forEach(function(l2) {
+        if(l2.virtual) return;
+        var iss = l1.intersects(l2);
+        if(iss.length>0) {
+          iss.c1 = l1;
+          iss.c2 = l2;
+          intersections.push(iss);
         }
-      }
-
-      function add(p1,p2,f) {
-        return {x:p1.x+f*p2.x,y:p1.y+f*p2.y};
-      }
-
-      function lerp(p1,p2) {
-        return {x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2};
-      }
-
-      // For all intersecting segments, also whether offset
-      // points just above/below the curve are both inside
-      // our shape. If so, this edge needs to go. If only
-      // one of them's inside the shape, it's a true edge.
-      var start = outline[0], segment = start;
-      do {
-        if(segment.intersecting) {
-          var op = segment.get(0.5);
-          var op1 = add(lerp(segment.points[0],segment.points[3]), segment.normal(0.5), 3);
-          var i1 = windingnumber(op1, outline, segment);
-          var op2 = add(lerp(segment.points[0],segment.points[3]), segment.normal(0.5), -3);
-          var i2 = windingnumber(op2, outline, segment);
-          console.log("winding for ", op1, ":", i1);
-          if(i1 > 0 && i2 > 0) {
-            segment.enclosed = true;
-          }
-        }
-        segment = segment.next;
-      } while (segment !== start);
-    }
-  }
-
-  if(intersections && intersections.length>0) {
-    ctx.strokeStyle = "rgba(100,0,100,0.5)";
-    intersections.forEach(function(pair) {
-      p = pair[0].c.get(pair[0].t);
-      drawCircle(p,2,{x:ofs,y:0});
-
-
+      });
     });
-
-    outline.forEach(function(s) {
-      if(s.intersecting) {
-        ctx.strokeStyle="green";
-        drawCurve(s, {x:ofs, y:0});
-      }
-      if(s.enclosed) {
-        ctx.strokeStyle="red";
-        drawCurve(s, {x:ofs, y:0});
-      }
-    })
+    return intersections;
   }
 
+  //
+  // find intersections between individual shapes
+  //
+  for(var i=0; i<shapes.length-1; i++) {
+    var si = shapes[i];
+    for(var j=i+2; j<shapes.length; j++) {
+      var sj = shapes[j];
+      var sis = shapeintersection(si,si.bbox,sj,sj.bbox);
+      if(sis.length>0) {
+        ctx.fillStyle = "rgba(255,0,0,0.2)";
+        drawShape(si, {x:ofs, y:0});
+        drawShape(sj, {x:ofs, y:0});
+        // TODO: and actually resolve these.
+        sis.forEach(function(s) {
+          s.forEach(function(str) {
+            var p = s.c1.get(str.split("/")[0]);
+            drawPoint(p, {x:ofs, y:0});
+          });
+        });
+      }
+    }
+  }
+
+/*
   //
   // Draw the offset outline as a filled shape
   // next to the original curve.
@@ -293,6 +259,7 @@ function drawFrame() {
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
+*/
 
   //
   // Show intersections with a line
@@ -311,18 +278,6 @@ function drawFrame() {
 
   ctx.strokeStyle = "black";
   iroots.forEach(function(p) { drawCircle(p,2,{x:ofs,y:0}); });
-
-
-  //
-  // Check for self-intersection
-  //
-  var self_intersections = curve.intersects();
-  self_intersections.forEach(function(v) {
-    v.split("/").map(function(v) { return parseFloat(v); }).forEach(function(t) {
-      var c = curve.get(t);
-      drawPoint(c, {x:300, y:0});
-    });
-  });
 
   // and then we just go draw the next frame.
   (function nextFrame() {

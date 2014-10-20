@@ -59,3 +59,24 @@ var drawbbox = function(bbox, offset) {
   ctx.closePath();
   ctx.stroke();
 };
+
+var drawShape = function(shape, offset) {
+  offset = offset || { x:0, y:0 };
+  ctx.beginPath();
+  ctx.moveTo(offset.x + shape.caps.start.points[0].x, offset.y + shape.caps.start.points[0].y);
+  ctx.lineTo(offset.x + shape.caps.start.points[3].x, offset.y + shape.caps.start.points[3].y);
+  ctx.bezierCurveTo(
+    offset.x + shape.forward.points[1].x, offset.y + shape.forward.points[1].y,
+    offset.x + shape.forward.points[2].x, offset.y + shape.forward.points[2].y,
+    offset.x + shape.forward.points[3].x, offset.y + shape.forward.points[3].y
+  );
+  ctx.lineTo(offset.x + shape.caps.end.points[3].x, offset.y + shape.caps.end.points[3].y);
+  ctx.bezierCurveTo(
+    offset.x + shape.back.points[1].x, offset.y + shape.back.points[1].y,
+    offset.x + shape.back.points[2].x, offset.y + shape.back.points[2].y,
+    offset.x + shape.back.points[3].x, offset.y + shape.back.points[3].y
+  );
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+};
