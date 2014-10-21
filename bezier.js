@@ -14,6 +14,10 @@
 (function() {
   "use strict";
 
+  // FIXME: add in caching of values that aren't going to change until the
+  //        curve itself is changed, like bbox, reduction, outline, outlineshape,
+  //        etc, while making sure not to cache until a function is called for it.
+
   var utils = (function() {
     if(typeof module !== "undefined" && module.exports && typeof require !== "undefined")
       return require("./bezierutils");
@@ -70,38 +74,28 @@
 
 
   /**
-   * Bezier curve prototype. API:
-   *
-   * 1.   length() yields the curve's arc length in pixels.
-   * 2.   getLUT(steps) yields array/steps of {x:..., y:..., z:...} coordinates.
-   * 3.   get(t) alias for compute(t).
-   * 4.   compute(t) yields the curve coordinate at 't'.
-   * 5.   derivative(t) yields the curve derivative at 't' as vector.
-   * 6.   normal(t) yields the normal vector for the curve at 't'.
-   * 7a.  split(t) split the curve at 't' and return both segments as new curves.
-   * 7b.  split(t1,t2) split the curve between 't1' and 't2' and return the segment as new curve.
-   * 8.   inflections() yields all known inflection points on this curve.
-   * 9.   offset(t, d) yields a coordinate that is a point on the curve at 't',
-   *                 offset by distance 'd' along its normal.
-   * 10.  reduce() yields an array of 'simple' curve segments that model the curve as poly-simple-beziers.
-   * 11.  scale(d) yields the curve scaled approximately along its normals by distance 'd'.
-   * 12a. outline(d) yields the outline coordinates for the curve offset by 'd' pixels on either side,
-   *                 encoded as as an object of form {"+":[p,...], "-":[p,...]}, where each point
-   *                 'p' is of the form {p: {x:..., y:..., z:...}, c: true/false}. z is optional,
-   *                 and c:true means on-curve point, with c:false means off-curve point.
-   * 12b. outline(d1,d2) yields the outline coordinates for the curve offset by d1 on its normal, and
-   *                     d2 on its opposite side.
-   * 13a   intersects() yields the array of self-intersection 't' values, as "t1/t2" string, where t1 and
-   *                    t2 are floating point numbers rounded to six decimal places.
-   * 13b   intersects(line) yields the array of intersection 't' values between this curve and a target line,
-   *                        encoded as "t1/t2" string, where t1 and t2 are floating point numbers rounded to
-   *                        six decimal places. The line must be of the form {p1:{x:.., y:...}, p2:{x:..., y:...}}.
-   * 13c   intersects(curve) yields the array of intersection 't' values between this curve and a target
-   *                         curve, encoded as "t1/t2" string, where t1 and t2 are floating point numbers
-   *                         rounded to six decimal places, and each t1 is the 't' value on this curve,
-   *                         and each t2 is the 't' value on the target curve.
+   * Bezier curve prototype.
    */
   Bezier.prototype = {
+    addIS: function(curve, t) {
+      var intersect = { other: curve, t: t };
+      if(!this.intersections) { this.intersections = []; }
+      if(this.type === "outline" && curve.type === "outline") {
+        // we cannot intersect this curve more than once.
+        var found = false;
+        for(var i=this.intersections.length-1; i>=0; i--) {
+          var o = this.intersections[i];
+          if(o.other === curve) {
+            found = true;
+            break;
+          }
+        }
+        if(!found) {
+          this.intersections.push(intersect);
+        }
+      }
+      else { this.intersections.push(intersect); }
+    },
     length: function() {
       return utils.length(this.points);
     },
@@ -205,6 +199,33 @@
       }
       return curves;
     },
+    splitintersections: function() {
+      var ts = this.intersections.map(function(i) { return i.t; });
+      ts = [0].concat(ts).concat([1]);
+      var segments = [];
+      for(var i=0; i<ts.length-1; i++) {
+        segments.push(this.split(ts[i], ts[i+1]));
+      }
+      var slen = segments.length;
+
+      segments[0].prev = this.prev;
+      this.prev.next = segments[0];
+
+      segments[slen-1].next = this.next;
+      this.next.prev = segments[slen-1];
+
+      segments.forEach(function(s,i) {
+        s.intersecting = true;
+        if(i<slen-1) {
+          s.next = segments[i+1];
+        }
+        if(i>0) {
+          s.prev = segments[i-1];
+        }
+      });
+
+      return segments;
+    },
     inflections: function() {
       var dims=this.dims,len=this.dimlen,i,dim,p,result={},roots=[];
       for(i=len-1; i>-1;i--) {
@@ -247,6 +268,8 @@
       var n1 = this.normal(0);
       var n2 = this.normal(1);
       var s = n1.x*n2.x + n1.y*n2.y + n1.z*n2.z;
+      if(s<-1) { s=-1; }
+      if(s>1) { s=1; }
       var angle = Math.abs(Math.acos(s));
       return angle < Math.PI/3;
     },
@@ -270,6 +293,7 @@
         t2=0;
         while(t2 <= 1) {
           for(t2=t1+step; t2<=1+step; t2+=step) {
+
             segment = p1.split(t1,t2);
             if(!segment.simple()) {
               t2 -= step;
@@ -322,40 +346,66 @@
     },
     outline: function(d1, d2) {
       d2 = d2 || d1;
-      var reduced = this.reduce();
-      var scaled = { "-": [], "+": [] };
+      var reduced = this.reduce(),
+          len = reduced.length,
+          fcurves = [],
+          bcurves = [],
+          i, p, last;
+
+      // form curve oulines
       reduced.forEach(function(segment) {
-        scaled["+"].push(segment.scale(d1));
-        scaled["-"].push(segment.scale(-d2));
+        fcurves.push(segment.scale(d1));
+        bcurves.push(segment.scale(-d2));
       });
-      var coords = { "-": [], "+": [] }, i, last, segment, points;
-      for(i=0, last=scaled["+"].length; i<last; i++) {
-        segment = scaled["+"][i];
-        points = segment.points;
-        coords["+"].push({ p: points[0], c: true });
-        coords["+"].push({ p: points[1], c: false });
-        coords["+"].push({ p: points[2], c: false });
+
+      // reverse the "return" outline
+      bcurves = bcurves.map(function(s) {
+        p = s.points;
+        s.points = [p[3],p[2],p[1],p[0]];
+        return s;
+      }).reverse();
+
+      // form the endcaps as lines
+      var fs = fcurves[0].points[0],
+          fe = fcurves[len-1].points[3],
+          bs = bcurves[len-1].points[3],
+          be = bcurves[0].points[0],
+          ls = utils.makeline(bs,fs),
+          le = utils.makeline(fe,be),
+          segments = [ls].concat(fcurves).concat([le]).concat(bcurves),
+          slen = segments.length;
+
+      segments.forEach(function(c,idx) {
+        c.type = "outline";
+        c.prev = segments[(idx-1+slen)%slen];
+        c.next = segments[(idx+1)%slen];
+      });
+
+      return segments;
+    },
+    outlineshapes: function(d1,d2) {
+      d2 = d2 || d1;
+      var outline = this.outline(d1,d2);
+      var shapes = [];
+      for(var i=1, len=outline.length; i < len/2; i++) {
+        var shape = utils.makeshape(outline[i], outline[len-i]);
+        shape.startcap.virtual = (i > 1);
+        shape.endcap.virtual = (i < len/2-1);
+        shapes.push(shape);
       }
-      coords["+"].push({ p: scaled["+"][last-1].points[3], c: true });
-      for(i=i-1; i>=0; i--) {
-        segment = scaled["-"][i];
-        points = segment.points;
-        coords["-"].push({ p: points[3], c: true });
-        coords["-"].push({ p: points[2], c: false });
-        coords["-"].push({ p: points[1], c: false });
-      }
-      coords["-"].push({ p: scaled["-"][0].points[0], c: true });
-      return coords;
+      return shapes;
     },
     intersects: function(curve) {
       if(!curve) return this.selfintersects();
       if(curve.p1 && curve.p2) {
-        return this.lineIntersects(curve);
+        return this.lineintersects(curve);
       }
-      if(curve instanceof Bezier) { curve = curve.reduce(); }
+      if(curve instanceof Bezier) {
+        curve = curve.reduce();
+      }
       return this.curveintersects(this.reduce(), curve);
     },
-    lineIntersects: function(line) {
+    lineintersects: function(line) {
       var mx = Math.min(line.p1.x, line.p2.x),
           my = Math.min(line.p1.y, line.p2.y),
           MX = Math.max(line.p1.x, line.p2.x),
