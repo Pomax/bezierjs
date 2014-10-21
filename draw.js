@@ -60,17 +60,18 @@ var drawbbox = function(bbox, offset) {
   ctx.stroke();
 };
 
+// helperfunction for drawing outline shapes
 var drawShape = function(shape, offset) {
   offset = offset || { x:0, y:0 };
   ctx.beginPath();
-  ctx.moveTo(offset.x + shape.caps.start.points[0].x, offset.y + shape.caps.start.points[0].y);
-  ctx.lineTo(offset.x + shape.caps.start.points[3].x, offset.y + shape.caps.start.points[3].y);
+  ctx.moveTo(offset.x + shape.startcap.points[0].x, offset.y + shape.startcap.points[0].y);
+  ctx.lineTo(offset.x + shape.startcap.points[3].x, offset.y + shape.startcap.points[3].y);
   ctx.bezierCurveTo(
     offset.x + shape.forward.points[1].x, offset.y + shape.forward.points[1].y,
     offset.x + shape.forward.points[2].x, offset.y + shape.forward.points[2].y,
     offset.x + shape.forward.points[3].x, offset.y + shape.forward.points[3].y
   );
-  ctx.lineTo(offset.x + shape.caps.end.points[3].x, offset.y + shape.caps.end.points[3].y);
+  ctx.lineTo(offset.x + shape.endcap.points[3].x, offset.y + shape.endcap.points[3].y);
   ctx.bezierCurveTo(
     offset.x + shape.back.points[1].x, offset.y + shape.back.points[1].y,
     offset.x + shape.back.points[2].x, offset.y + shape.back.points[2].y,

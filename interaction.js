@@ -55,6 +55,7 @@
     moving = false;
     mp = false;
     intersections = false;
+    shapeiss = false;
   });
 
   cvs.addEventListener("click", function(evt) {

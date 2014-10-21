@@ -14,6 +14,10 @@
 (function() {
   "use strict";
 
+  // FIXME: add in caching of values that aren't going to change until the
+  //        curve itself is changed, like bbox, reduction, outline, outlineshape,
+  //        etc, while making sure not to cache until a function is called for it.
+
   var utils = (function() {
     if(typeof module !== "undefined" && module.exports && typeof require !== "undefined")
       return require("./bezierutils");
@@ -361,29 +365,13 @@
         return s;
       }).reverse();
 
-      // linear cubic curve generator
-      var makeLine = function(p1,p2) {
-        var x1 = p1.x, y1=p1.y, x2=p2.x, y2=p2.y,
-            dx = (x2-x1)/3, dy = (y2-y1)/3;
-        return new Bezier(x1, y1, x1+dx, y1+dy, x1+2*dx, y1+2*dy, x2, y2);
-      };
-
-      // reverse an outline
-      var reverse = function(list) {
-        return list.map(function(s) {
-          p = s.points;
-          s.points = [p[3],p[2],p[1],p[0]];
-          return s;
-        }).reverse();
-      }
-
       // form the endcaps as lines
       var fs = fcurves[0].points[0],
           fe = fcurves[len-1].points[3],
           bs = bcurves[len-1].points[3],
           be = bcurves[0].points[0],
-          ls = makeLine(bs,fs),
-          le = makeLine(fe,be),
+          ls = utils.makeline(bs,fs),
+          le = utils.makeline(fe,be),
           segments = [ls].concat(fcurves).concat([le]).concat(bcurves),
           slen = segments.length;
 
@@ -394,6 +382,18 @@
       });
 
       return segments;
+    },
+    outlineshapes: function(d1,d2) {
+      d2 = d2 || d1;
+      var outline = this.outline(d1,d2);
+      var shapes = [];
+      for(var i=1, len=outline.length; i < len/2; i++) {
+        var shape = utils.makeshape(outline[i], outline[len-i]);
+        shape.startcap.virtual = (i > 1);
+        shape.endcap.virtual = (i < len/2-1);
+        shapes.push(shape);
+      }
+      return shapes;
     },
     intersects: function(curve) {
       if(!curve) return this.selfintersects();
