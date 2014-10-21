@@ -36,7 +36,7 @@
       <b>(11)</b> On the right we see the path converted to a filled outline shape, with
       <b>(12)</b> the intersection of a line computed against all the outline curve's Bezier segments.
       <b>(13)</b> If, by manipulating the curve, you get outline intersections, these are show on the right, with
-      <b>(14)</b> all subsections involved in the intersection(s) highlighed. Note that only the endcaps are "real", and no intersections will be seen when a subsection's edge curves cross a subsection separator.
+      <b>(14)</b> all subsections involved in the intersection(s) highlighed. Note that only the endcaps are "real", and no intersections will be seen when a subsection's edge curve crosses a subsection separator. The reason for this is that any boolean operator will lead to orphaned edges getting cleaned up anyway, so there is no need for these intersections to be found.
     </p>
 
     <h2>The API for this library:</h2>
