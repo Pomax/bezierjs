@@ -319,7 +319,7 @@
       });
       return pass2;
     },
-    scale: function(d) {
+    scale: function(d0, d1) {
       var v = [ this.offset(0,10), this.offset(1,10) ];
       var o = utils.lli(v[0],v[1]);
       if(!o) { throw "cannot scale this curve. Try reducing it first."; }
@@ -328,8 +328,13 @@
       // move end points by fixed distance along normal.
       [0,1].forEach(function(t) {
         var p = np[t*3] = utils.copy(points[t*3]);
-        p.x += d * v[t].n.x;
-        p.y += d * v[t].n.y;
+        if ( t === 1 && d1 !== undefined ) {
+          p.x += d1 * v[t].n.x;
+          p.y += d1 * v[t].n.y;
+        } else {
+          p.x += d0 * v[t].n.x;
+          p.y += d0 * v[t].n.y;
+        }
       }.bind(this));
       // move control points by "however much necessary to ensure
       // the correct tangent to endpoint".
@@ -344,18 +349,32 @@
       }.bind(this));
       return new Bezier(np);
     },
-    outline: function(d1, d2) {
+    outline: function(d1, d2, d3, d4) {
       d2 = d2 || d1;
+
       var reduced = this.reduce(),
           len = reduced.length,
           fcurves = [],
           bcurves = [],
-          i, p, last;
+          i, p, last, d31, d42;
+
+      if ( d3 !== undefined && d4 !== undefined ) {
+        d31 = d3 - d1;
+        d42 = d4 - d2;
+      }
 
       // form curve oulines
-      reduced.forEach(function(segment) {
-        fcurves.push(segment.scale(d1));
-        bcurves.push(segment.scale(-d2));
+      reduced.forEach(function(segment, i) {
+        var nextT1 = i < len -1 ? reduced[i+1]._t1 : 1;
+
+        fcurves.push( d31 ?
+          segment.scale(  d1 + segment._t1 * d31,  d1 + nextT1 * d31 ):
+          segment.scale(  d1 )
+        );
+        bcurves.push( d42 ?
+          segment.scale( -d2 - segment._t1 * d42, -d2 - nextT1 * d42 ):
+          segment.scale( -d2 )
+        );
       });
 
       // reverse the "return" outline
@@ -383,9 +402,8 @@
 
       return segments;
     },
-    outlineshapes: function(d1,d2) {
-      d2 = d2 || d1;
-      var outline = this.outline(d1,d2);
+    outlineshapes: function(d1, d2) {
+      var outline = this.outline.apply( this, arguments );
       var shapes = [];
       for(var i=1, len=outline.length; i < len/2; i++) {
         var shape = utils.makeshape(outline[i], outline[len-i]);
