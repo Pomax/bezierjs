@@ -146,7 +146,7 @@ var ofs = {x:300, y:0};
   //
   // The "offset curve", which is actually a poly-bezier, offset on both sides.
   //
-  outline = outline || curve.outline(offset, offset/2);
+  outline = outline || curve.outline(offset, offset/2, offset/3, offset/4);
   ctx.strokeStyle = "lightgrey";
   for(var i=0, len=outline.length; i<len; i++) {
     drawCurve(outline[i], ofs)
@@ -163,7 +163,7 @@ var ofs = {x:600, y:0};
 
 
   // convert outline to a series of simple-offset shapes instead
-  var shapes = shapes || curve.outlineshapes(offset, offset/2);
+  var shapes = shapes || curve.outlineshapes(offset, offset/2, offset/3, offset/4);
 
   //
   // Draw the offset outline as a filled shape
