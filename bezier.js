@@ -15,12 +15,12 @@
 (function (root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
-    define(["BezierUtils"], factory);
+    define(["./bezierutils"], factory);
   } else if (typeof exports === "object") {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("BezierUtils"));
+    module.exports = factory(require("bezierutils"));
   } else {
     // Browser globals (root is window)
     root.Bezier = factory(root.BezierUtils);
@@ -29,8 +29,8 @@
   "use strict";
 
   // FIXME: add in caching of values that aren't going to change until the
-  // curve itself is changed, like bbox, reduction, outline, outlineshape,
-  // etc, while making sure not to cache until a function is called for it.
+  //        curve itself is changed, like bbox, reduction, outline, outlineshape,
+  //        etc, while making sure not to cache until a function is called for it.
 
   /**
    * Bezier curve constructor. The constructor argument can be one of three things:
