@@ -28,6 +28,10 @@
 }(this, function (utils) {
   "use strict";
 
+  // FIXME: add in caching of values that aren't going to change until the
+  // curve itself is changed, like bbox, reduction, outline, outlineshape,
+  // etc, while making sure not to cache until a function is called for it.
+
   /**
    * Bezier curve constructor. The constructor argument can be one of three things:
    *
