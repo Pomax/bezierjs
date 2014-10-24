@@ -11,20 +11,22 @@
   domain, this code is MIT licensed. Also your country has a
   terribly legal system where my disclaim is not respected.
 **/
-(function() {
+// AMD/Node definition from https://github.com/umdjs/umd/blob/master/returnExports.js
+(function (root, factory) {
+  if (typeof define === "function" && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(["BezierUtils"], factory);
+  } else if (typeof exports === "object") {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require("BezierUtils"));
+  } else {
+    // Browser globals (root is window)
+    root.Bezier = factory(root.BezierUtils);
+  }
+}(this, function (utils) {
   "use strict";
-
-  // FIXME: add in caching of values that aren't going to change until the
-  //        curve itself is changed, like bbox, reduction, outline, outlineshape,
-  //        etc, while making sure not to cache until a function is called for it.
-
-  var utils = (function() {
-    if(typeof module !== "undefined" && module.exports && typeof require !== "undefined")
-      return require("./bezierutils");
-    if(typeof window !== "undefined" && window.BezierUtils)
-      return window.BezierUtils;
-    throw "We don't have BezierUtils available, so I'm giving up.";
-   }());
 
   /**
    * Bezier curve constructor. The constructor argument can be one of three things:
@@ -452,14 +454,5 @@
     }
   };
 
-  // node bindings
-  if (typeof module !== "undefined" && module.exports) {
-    module.exports = Bezier;
-  }
-
-  // browser bindings
-  else if (typeof window !== "undefined") {
-    window.Bezier = Bezier;
-  }
-
-}());
+  return Bezier;
+}));

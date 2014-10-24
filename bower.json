@@ -1,0 +1,17 @@
+{
+  "name": "bezierjs",
+  "version": "0.0.0",
+  "description": "A nodejs and client-side library for (cubic) Bezier curve work",
+  "homepage": "https://github.com/Pomax/bezierjs",
+  "authors": [
+    "Pomax <pomax@nihongoresources.com>"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "geometry",
+    "bezier"
+  ],
+  "license": "public domain, MIT"
+}
