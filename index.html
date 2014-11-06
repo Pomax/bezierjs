@@ -99,7 +99,7 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              var arclength = ((100*curve.length())|0)/100 + "px";
+              var arclength = curve.length();
               var offset = curve.offset(-10), last=offset.length-1;
               offset.forEach(function(c,idx) {
                 drawCurve(c);
@@ -109,7 +109,8 @@
                   var p3 = curve.offset(0.95, -5);
                   drawLine(p1,p2);
                   drawLine(p2,p3);
-                  drawText(arclength, {x:p2.x+7,y:p2.y-3});
+                  var label = ((100*arclength)|0)/100 + "px";
+                  drawText(label, {x:p2.x+7,y:p2.y-3});
                 }
               });
             }
@@ -121,7 +122,7 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              var arclength = ((100*curve.length())|0)/100 + "px";
+              var arclength = curve.length();
               var offset = curve.offset(-10), last=offset.length-1;
               offset.forEach(function(c,idx) {
                 drawCurve(c);
@@ -131,7 +132,8 @@
                   var p3 = curve.offset(0.95, -5);
                   drawLine(p1,p2);
                   drawLine(p2,p3);
-                  drawText(arclength, {x:p2.x+7,y:p2.y-3});
+                  var label = ((100*arclength)|0)/100 + "px";
+                  drawText(label, {x:p2.x+7,y:p2.y-3});
                 }
               });
             }
@@ -517,21 +519,27 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              curve.outline(25).forEach(function(c) {
-                drawCurve(c);
-              });
+              var doc = function(c) { drawCurve(c); };
+              var outline = curve.outline(25);
+              outline.curves.forEach(doc);
+              setColor("rgba(0,0,255,0.3)");
+              outline.offset(10).curves.forEach(doc);
+              outline.offset(-10).curves.forEach(doc);
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
-            new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+            new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
             var draw = function() {
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              curve.outline(25).forEach(function(c) {
-                drawCurve(c);
-              });
+              var doc = function(c) { drawCurve(c); };
+              var outline = curve.outline(25);
+              outline.curves.forEach(doc);
+              setColor("rgba(0,0,255,0.3)");
+              outline.offset(10).curves.forEach(doc);
+              outline.offset(-10).curves.forEach(doc);
             }
           </script></figure>
         </figures>
@@ -540,9 +548,25 @@
           The result is an array of curves that taken together form the outline path for this curve. The caps
           are cubic beziers with the control points oriented to form a straight line.</p>
 
+        <p>This function yields a <code>PolyBezier</code> object, which has a property <code>.curves</code> that
+          houses all the outline segments in sequence, and has a partial Bezier API:</p>
+
+        <ul>
+          <li><code>length()</code> - aggregate sum of all segment lenghts.</li>
+          <li><code>bbox()</code> - aggregate bounding box fitting all segments.</li>
+          <li><code>offset(d)</code> - aggregate offset function yielding a new <code>PolyBezier</code>.</li>
+        </ul>
+
         <p>When only one distance value is given, the outline is generated at distance <code>d</code> on both
           the normal and anti-normal. If two distance values are given, the outline is generated at distance
           <code>d1</code> on along the normal, and <code>d2</code> along the anti-normal.</p>
+
+        <p>Both graphics show the plain outline in red, with the result of calling the PolyBezier's
+          <code>outline.offset()</code> with values 10 and -10 in light blue. Note that the PolyBezier
+          offset yields "gaps" between discontinuities. How to deal with these gaps is up to you, and
+          options involve arc connections with the original outline's connecting vertex as center,
+          Bezier connections with controls along the line segments, linear extensions of the segments
+          along the tangents, etc.</p>
       </section>
 
       <section scale="outlineshapes">
