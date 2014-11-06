@@ -6,6 +6,8 @@ function bindDrawFunctions(idx) {
   cvs.height = 200;
   var ctx = cvs.getContext("2d");
   figure.appendChild(cvs);
+  var button = figure.querySelector("button");
+  if(button) { figure.appendChild(button); }
 
   return {
     getCanvas: function() { return cvs; },
@@ -151,5 +153,4 @@ function bindDrawFunctions(idx) {
       ctx.fillText(text, offset.x, offset.y);
     }
   };
-
 }

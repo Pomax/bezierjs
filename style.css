@@ -7,7 +7,7 @@ body {
   font-size: 16px;
 }
 head {
-  display: hidden;
+  display: none;
 }
 header h1 {
   margin-top: 0;
@@ -26,9 +26,9 @@ figure.cubic {
   margin-left: 1em;
 }
 figure {
-  widht: 200px;
+  width: 200px;
   height: 200px;
-  dispay: block;
+  display: block;
   margin:0;
   padding: 0;
   position: relative;
@@ -40,9 +40,9 @@ figure canvas {
   z-index: 3;
 }
 figure button {
-  position: absolute;
+  position: relative;
   display: block;
-  width: 100%;
+  width: calc(100% + 2px);
   margin: 0;
   padding: 0;
   color: white;
@@ -117,7 +117,7 @@ h2 {
   color: rgb(90, 134, 255);
 }
 section {
-  min-height: calc(250px + 4em);
+  min-height: calc(300px);
   margin-bottom: 1em;
 }
 footer {
@@ -126,7 +126,6 @@ footer {
   padding: 4px 0px;
   text-align: center;
   font-family: Helvetica;
-  margin-top: 200px;
 }
 footer a {
   color: rgb(0,0,0);

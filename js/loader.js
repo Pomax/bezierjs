@@ -6,14 +6,14 @@ function find(qs) {
   return document.querySelectorAll(qs).array();
 }
 
-document.head = document.querySelector("head");
-
 var open = false;
 
 function loadAll() {
-  find("figure script[type='text/beziercode']").forEach(function(e, idx) {
+  var list = find("figure script[type='text/beziercode']");
+  list.forEach(function(e, idx) {
     var figure = e.parentNode;
     var code = e.textContent.substring(1).split("\n");
+    e.parentNode.removeChild(e);
     var indent = "";
     code[0].replace(/^(\s+)/, function(a,b) { indent = b; });
     var len = code.length;
@@ -24,9 +24,6 @@ function loadAll() {
     content = "\n    with(Math) { " + content + "\n    }";
     content = "\n  with(drawfunctions) { " + content + "\n  }";
     content = "(function(drawfunctions) { " + content + "\n} (bindDrawFunctions( " + idx + " )) );\n";
-    e.textContent = content;
-    e.setAttribute("type", "text/javascript");
-    document.head.appendChild(e);
 
     var codearea = document.createElement("textarea");
     codearea.textContent = code;
@@ -35,6 +32,7 @@ function loadAll() {
     var button = document.createElement("button");
     button.textContent = "view source";
     figure.appendChild(button);
+
     button.onclick = function(evt) {
       if(open && open!==codearea) { open.classList.remove("showcode"); }
       if(codearea.classList.contains("showcode")) {
@@ -45,11 +43,16 @@ function loadAll() {
       }
       evt.stopPropagation();
     };
+
     document.addEventListener("click", function() {
       if(codearea.classList.contains("showcode")) {
         codearea.classList.remove("showcode");
       }
     });
+
+    var ns = document.createElement("script");
+    ns.textContent = content;
+    document.querySelector("head").appendChild(ns);
   });
 }
 

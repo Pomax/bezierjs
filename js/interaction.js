@@ -63,4 +63,3 @@ function handleInteraction(cvs, curve) {
 
   return handler;
 }
-

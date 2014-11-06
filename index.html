@@ -11,9 +11,11 @@
     </header>
 
     <main>
-      <p>A library for performing Bezier curve computation and, if you add in your own drawing code (like the HTML canvas), drawing curves in a useful manner.></p>
+      <p>A library for performing Bezier curve computation and, if you add in your own drawing code (like the HTML canvas), drawing curves in a useful manner.</p>
 
-      <p>Download it <a href="lib/bezier.js">here</a> or head over to <a href="http://github.com/Pomax/bezierjs">github</a> for the project page.</p>
+      <p><strong>NOTE</strong>: all the graphs are interactive, because what's the point of them being just images? You can click-drag all the points to see how the curves behave under the different functions that can act on them.</p>
+
+      <p>Download the library <a href="lib/bezier.js">here</a>, or head over to <a href="http://github.com/Pomax/bezierjs">github</a> for the project page.</p>
 
 
       <section id="constructor">
@@ -601,7 +603,9 @@
           way to draw a line"). Intersections are yielded as an array of <code>float/float</code> strings,
           where the two floats are separated by the character <code>/</code> and both floats corresponding
           to <code>t</code> values on the curve at which the intersection is found.</p>
+      </section>
 
+      <section>
         <h2>.intersects(line)</h2>
 
         <figures>
@@ -637,7 +641,9 @@
 
         <p>Finds the intersections between this curve an some line <code>{p1: {x:... ,y:...}, p2: ... }</code>.
           The intersections are an array of <code>t</code> values on this curve.</p>
+      </section>
 
+      <section>
         <h2>.intersects(curve)</h2>
 
         <figures>
