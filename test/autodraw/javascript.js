@@ -167,6 +167,8 @@ schedule(function() {
     // Can we merge this list to a single curve?
     // If so, return that curve. Otherwise, false.
     var trymerge = function(list, forced) {
+      console.log(list.length);
+
       if (list.length === 1) return list[0];
 
       var last = list.length-1,
@@ -224,13 +226,15 @@ schedule(function() {
       // it a considerable amount, we can't do a nice approximation and we return failure.
       var _B = project(o,C,B);
       if(!forced && dist(B,_B) > 2) {
+        console.log("nope");
         return false;
       }
+      console.log("yep");
 
       var h1 = dist(B, C),
           h2 = dist(o, C),
           ratio = h1 / h2,
-          rh = 1.5 * ratio, // FIXME: why does 1.5 work? The math tells is that this should be 4/3 instead...
+          rh = 1.5 * ratio, // FIXME: why does 1.5 work? The math tells us that this should be 4/3 instead...
           ds = dist(s,o) * rh,
           de = dist(e,o) * rh;
 
@@ -269,7 +273,7 @@ schedule(function() {
         if(!_) {
           // previous attempt worked. Store that, and then keep going.
           ret.push(merged);
-          s = i - 1;
+          s = i;
           continue;
         }
         merged = _;
@@ -326,7 +330,7 @@ schedule(function() {
     var segments = abstract(_coords);
 
     // How far do we want to go with our curve abstraction?
-    var cm = true;
+    var cm = false;
 
     // plain catmull-rom fitting
     if(cm) {
