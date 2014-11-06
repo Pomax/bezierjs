@@ -41,6 +41,7 @@ figure canvas {
 }
 figure button {
   position: relative;
+  z-index: 2;
   display: block;
   width: calc(100% + 2px);
   margin: 0;
