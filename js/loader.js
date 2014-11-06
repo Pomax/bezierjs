@@ -25,7 +25,8 @@ function loadAll() {
     content = "\n  with(drawfunctions) { " + content + "\n  }";
     content = "(function(drawfunctions) { " + content + "\n} (bindDrawFunctions( " + idx + " )) );\n";
 
-    var codearea = document.createElement("textarea");
+    var codearea = document.createElement("div");
+    codearea.classList.add("textarea");
     codearea.textContent = code;
     codearea.setAttribute("style", "height: " + (16*(len-1)) + "px!important;");
     figure.appendChild(codearea);

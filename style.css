@@ -62,13 +62,13 @@ figure.quadratic button {
 figure.cubic button {
   right: 0;
 }
-figure.quadratic textarea {
+figure.quadratic .textarea {
   left: calc(100% - 1px);
 }
-figure.cubic textarea {
+figure.cubic .textarea {
   right: calc(100% - 1px);
 }
-figure textarea {
+figure .textarea {
   position: absolute;
   z-index: 2;
   background: white;
@@ -82,9 +82,12 @@ figure textarea {
   bottom: -1px;
   line-height: 16px;
   background: rgb(220, 225, 237);
+  white-space: pre;
+  font-family: monospace;
+  font-size: 14px;
   transition: width 0.2s, height 0.2s;
 }
-figure textarea.showcode {
+figure .textarea.showcode {
   width: 600px;
   height: 200px;
   padding: 2px;
