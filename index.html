@@ -510,7 +510,7 @@
       </section>
 
       <section scale="outline">
-        <h1>.outline(d) and .outline(d1,d2)</h1>
+        <h1>.outline(d), .outline(d1,d2), and .outline(d1,d2,d3,d4)</h1>
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
@@ -567,6 +567,46 @@
           options involve arc connections with the original outline's connecting vertex as center,
           Bezier connections with controls along the line segments, linear extensions of the segments
           along the tangents, etc.</p>
+
+        <h2>graduated outlines, using .outline(d1,d2,d3,d4)</h2>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(150,40 , 80,30 , 105,150);
+            var draw = function() {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("red");
+              var doc = function(c) { drawCurve(c); };
+              var outline = curve.outline(5,5,25,25);
+              outline.curves.forEach(doc);
+            }
+          </script></figure>
+
+          <figure class="cubic"><script type="text/beziercode">
+            new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
+            var draw = function() {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("red");
+              var doc = function(c, idx) { drawCurve(c); };
+              var outline = curve.outline(5,5,25,25);
+              outline.curves.forEach(doc);
+            }
+          </script></figure>
+        </figures>
+
+        <p>Graduated offsetting is achieved by using four distances measures, where <code>d1</code>
+          is the initial offset along the normal, <code>d2</code> the initial distance along the
+          anti-normal, <code>d3</code> the final offset along the normal, and <code>d4</code> the
+          final offset along the anti-normal.</p>
+
+        </p>The offsets are graduated (near-)linearly with distance along the curve, and it should
+          be noted that quadratic curves can only be offset as graduated curve by first raising
+          it to a cubic curve and then running through the offsetting algorithm. While the code
+          does this automatically, be aware that quadratic curves come with limitations on their
+          expressiveness.</p>
+
       </section>
 
       <section scale="outlineshapes">
@@ -671,6 +711,12 @@
 
         <p>Finds the intersections between this curve an some line <code>{p1: {x:... ,y:...}, p2: ... }</code>.
           The intersections are an array of <code>t</code> values on this curve.</p>
+        <p>Curves are first aligned (translation/rotation) such that the curve's first coordinate is (0,0),
+          and the curve is rotated so that the intersecting line coincides with the x-axis. Doing so turns
+          "intersection finding" into plain "root finding".</p>
+        <p>As a root finding solution, the roots are computed symbolically for both quadratic and cubic curves,
+          using the standard square root function which you might remember from high school, and the absolutely
+          not standard Cardano's algorithm for solving the cubic root function.</p>
       </section>
 
       <section>
@@ -713,6 +759,13 @@
           of <code>float/float</code> strings, where the two floats are separated by the character <code>/</code>,
           the first floats corresponds to the <code>t</code> value on this curve, and the second float corresponds
           to the <code>t</code> value on the other curve.</p>
+        <p>Curve/curve intersection uses an interative process, where curves are subdivided at the midpoint, and
+        bounding box overlap checks are performed between the resulting smaller curves. Any overlap is marked as
+        a pair to resolve, and the "divide and check overlap" step is repeated. Doing this enough times
+        "homes in" on the actual intersections, such that with infinite divisions, we can get an arbitrarily
+        close approximation of the <code>t</code> values involved. Thankfully, repeating the process a low number
+        of steps is generally good enough to get reliable values (typically 10 steps yields more than acceptable
+        precision).</p>
 
       </section>
 
