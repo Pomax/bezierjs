@@ -1,0 +1,1 @@
+global.Bezier = require("./bezier");

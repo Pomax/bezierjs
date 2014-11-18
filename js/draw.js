@@ -11,25 +11,32 @@ function bindDrawFunctions(idx) {
 
   return {
     getCanvas: function() { return cvs; },
+
     reset: function() {
       cvs.width = cvs.width;
       ctx.strokeStyle = "black";
       ctx.fillStyle = "none";
     },
+
     setColor: function(c) { ctx.strokeStyle = c; },
+
     setRandomColor: function() {
       var r = ((255*Math.random())|0),
           g = ((255*Math.random())|0),
           b = ((255*Math.random())|0);
       ctx.strokeStyle = "rgb("+r+","+g+","+b+")";
     },
+
     setRandomFill: function(a) {
+      if (typeof a === "undefined") a=0.5;
       var r = ((255*Math.random())|0),
           g = ((255*Math.random())|0),
           b = ((255*Math.random())|0);
       ctx.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
     },
+
     setFill: function(c) { ctx.fillStyle = c; },
+
     drawSkeleton: function(curve, offset) {
       offset = offset || { x:0, y:0 };
       var pts = curve.points;
@@ -40,6 +47,7 @@ function bindDrawFunctions(idx) {
       ctx.strokeStyle = "black";
       this.drawPoints(pts, offset);
     },
+
     drawCurve: function(curve, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
@@ -61,6 +69,37 @@ function bindDrawFunctions(idx) {
         );
       }
       ctx.stroke();
+      ctx.closePath();
+    },
+
+    drawPolyCurve: function(curve, offset) {
+      offset = offset || { x:0, y:0 };
+      var ox = offset.x;
+      var oy = offset.y;
+      var curves = curve.curves;
+      var c = s = curves[0];
+      ctx.beginPath();
+      ctx.moveTo(c.points[0].x + ox, c.points[0].y + oy);
+      while(c.next) {
+        p = c.points;
+        if(p.length === 3) {
+          ctx.quadraticCurveTo(
+            p[1].x + ox, p[1].y + oy,
+            p[2].x + ox, p[2].y + oy
+          );
+        }
+        if(p.length === 4) {
+          ctx.bezierCurveTo(
+            p[1].x + ox, p[1].y + oy,
+            p[2].x + ox, p[2].y + oy,
+            p[3].x + ox, p[3].y + oy
+          );
+        }
+        c = c.next;
+        if(c===s) break;
+      }
+      ctx.stroke();
+      ctx.fill();
       ctx.closePath();
     },
 

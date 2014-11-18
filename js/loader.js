@@ -10,7 +10,7 @@ var open = false;
 
 function loadAll() {
   var list = find("figure script[type='text/beziercode']");
-  list.forEach(function(e, idx) {
+  var inject = function(e, idx) {
     var figure = e.parentNode;
     var code = e.textContent.substring(1).split("\n");
     e.parentNode.removeChild(e);
@@ -54,6 +54,9 @@ function loadAll() {
     var ns = document.createElement("script");
     ns.textContent = content;
     document.querySelector("head").appendChild(ns);
+  }
+  list.forEach(function(e,idx) {
+    setTimeout(function() { inject(e,idx); }, 0);
   });
 }
 

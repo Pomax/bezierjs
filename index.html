@@ -141,7 +141,10 @@
         </figures>
 
         <p>Calculates the length of this Bezier curve. Length is calculated using numerical approximation,
-          specifically the Legendre-Gauss quadrature algorithm.</p>
+          specifically the Legendre-Gauss quadrature algorithm, which solves the issue of trying to evaluate
+          <!-- B(x) = \int_0^t \sqrt{ \left ( \frac{dx}{dt} \right )^2 + \left ( \frac{dy}{dt} \right )^2 } -->
+          the definite integral over interval [0,t] for sqrt((dx/dt)²+(dx/.dt)²) by treating it as a moderately
+          large sum of easily evaluated small numbers instead.</p>
       </section>
 
 
@@ -606,7 +609,6 @@
           it to a cubic curve and then running through the offsetting algorithm. While the code
           does this automatically, be aware that quadratic curves come with limitations on their
           expressiveness.</p>
-
       </section>
 
       <section scale="outlineshapes">
@@ -766,7 +768,77 @@
         close approximation of the <code>t</code> values involved. Thankfully, repeating the process a low number
         of steps is generally good enough to get reliable values (typically 10 steps yields more than acceptable
         precision).</p>
+      </section>
 
+      <section>
+        <h1>PolyBezier</h1>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(46, 141, 80, 74, 103, 62 );
+            var draw = function() {
+              var lcurve = new Bezier(100,0,100,100,100,200);
+              var outline = curve.outline(25);
+              drawSkeleton(curve);
+              setFill("transparent");
+              drawPolyCurve(outline);
+              var pairs = outline.intersects(lcurve);
+              var tvals = pairs.map(function(p) { return p[1].t; });
+              tvals = [0].concat(tvals).concat([1]).sort();
+              for(var i=0; i<tvals.length-1; i++) {
+                var segment = lcurve.split(tvals[i], tvals[i+1]);
+                setColor("green");
+                if(outline.contains(segment)) {
+                  setColor("red");
+                  drawPoint(segment.get(0));
+                  drawPoint(segment.get(1));
+                }
+                drawCurve(segment);
+              }
+            }
+          </script></figure>
+          <figure class="cubic"><script type="text/beziercode">
+            new Bezier(26, 67, 61, 85, 127, 133, 151, 164);
+            var draw = function() {
+              var lcurve = new Bezier(100,0,100,100,100,200);
+              var outline = curve.outline(25);
+              drawSkeleton(curve);
+              setFill("transparent");
+              drawPolyCurve(outline);
+              var pairs = outline.intersects(lcurve);
+              var tvals = pairs.map(function(p) { return p[1].t; });
+              tvals = [0].concat(tvals).concat([1]).sort();
+              for(var i=0; i<tvals.length-1; i++) {
+                var segment = lcurve.split(tvals[i], tvals[i+1]);
+                setColor("green");
+                if(outline.contains(segment)) {
+                  setColor("red");
+                  drawPoint(segment.get(0));
+                  drawPoint(segment.get(1));
+                }
+                drawCurve(segment);
+              }
+            }
+          </script></figure>
+        </figures>
+
+        <h2>interesections</h2>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(30, 32, 114, 169, 148, 114);
+            var draw = function() {
+              setFill("transparent");
+              drawSkeleton(curve);
+              var outline1 = curve.outline(25);
+              drawPolyCurve(outline1);
+              var outline2 = (new Bezier(86, 141, 80, 74, 123, 62)).outline(25);
+              drawPolyCurve(outline2);
+              var shaper = new Bezier.Boolean(outline1, outline2);
+              var union = shaper.union();
+            }
+          </script></figure>
+        </figures>
       </section>
 
     </main>
@@ -776,7 +848,7 @@
       Still to do: intersection resolution for outlines with overlapping extrusions.</p>
     </footer>
 
-    <script src="lib/bezier.js"></script>
+    <script src="bezier.js"></script>
     <script src="js/draw.js"></script>
     <script src="js/interaction.js"></script>
     <script src="js/loader.js"></script>
