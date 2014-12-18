@@ -142,6 +142,9 @@ module.exports = (function() {
     length: function() {
       return utils.length(this.points, this.derivative.bind(this));
     },
+    area: function() {
+      return utils.area(this.points);
+    },
     getLUT: function(steps) {
       steps = steps || 100;
       var points = [];
@@ -905,6 +908,18 @@ module.exports = (function() {
         sum += this.Cvalues[i] * this.arcfn(p,t,derivativeFn);
       }
       return z * sum;
+    },
+    area: function(p) {
+      if (p.length != 4) return 0;
+      var x0 = p[0].x, y0 = p[0].y,
+        x1 = p[1].x - x0, y1 = p[1].y - y0,
+        x2 = p[2].x - x0, y2 = p[2].y - y0,
+        x3 = p[3].x - x0, y3 = p[3].y - y0;
+      return (
+          x1 * (   -   y2 -   y3)
+        + x2 * (y1        - 2*y3)
+        + x3 * (y1 + 2*y2       )
+      ) * 3 / 20;
     },
     map: function(v, ds,de, ts,te) {
       var d1 = de-ds, d2 = te-ts, v2 =  v-ds, r = v2/d1;

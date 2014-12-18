@@ -48,7 +48,7 @@ function bindDrawFunctions(idx) {
       this.drawPoints(pts, offset);
     },
 
-    drawCurve: function(curve, offset) {
+    drawCurve: function(curve, offset, fill) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
@@ -68,7 +68,11 @@ function bindDrawFunctions(idx) {
           p[3].x + ox, p[3].y + oy
         );
       }
-      ctx.stroke();
+      if (fill) {
+        ctx.fill();
+      } else {
+        ctx.stroke();
+      }
       ctx.closePath();
     },
 
