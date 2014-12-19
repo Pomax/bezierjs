@@ -300,12 +300,14 @@ module.exports = (function() {
       var subsplit = result.right.split(t2);
       return subsplit.left;
     },
-    splitOnInflection: function() {
-      // doesn't actually split on all inflections, just the one lying on the
-      // curve between p1 and p4 (if it exists).
+    splitOnLineIntersection: function() {
+      // splits cubic curves on the line from p1 to p4 (if it intersects with
+      // the curve). returns resulting segments as a list.
+      var p = this.points;
+      if (this.order !== 3) return [this];
       var lineInter = this.intersects({
-        p1: this.points[0],
-        p2: this.points[3]
+        p1: p[0],
+        p2: p[3]
       }).filter(function(t) {
         return t > 1e-9 && 1 - t > 1e-9;
       });
@@ -317,7 +319,7 @@ module.exports = (function() {
       }
     },
     getLoop: function() {
-      // get the subsection of this curve that forms a loop, if it exists.
+      // get the subsection of this curve that forms a loop, if it exists
       var selfInter = this.intersects()[0];
       if (selfInter) {
         var splits = selfInter.split("/");

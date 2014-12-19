@@ -848,7 +848,7 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100, 25, 10, 90, 110, 100, 132, 192 );
             var draw = function() {
-              var segments = curve.splitOnInflection();
+              var segments = curve.splitOnPathIntersection();
               segments.forEach(function(segment) {
                 var loop = segment.getLoop();
                 loopArea = loop ? loop.area() : 0;
