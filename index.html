@@ -854,16 +854,10 @@
               var lineInter = curve.intersects({
                 p1: {x: p1.x, y: p1.y},
                 p2: {x: p4.x, y: p4.y}
+              }).filter(function(t) {
+                return t > 1e-9 && 1 - t > 1e-9;
               });
-              var i = 0;
-              while (i < lineInter.length) {
-                if (lineInter[i] < 1e-9 || 1 - lineInter[i] < 1e-9) {
-                  lineInter.splice(i, 1);
-                } else {
-                  i++;
-                }
-              }
-              if (lineInter) {
+              if (lineInter.length) {
                 var splits = curve.split(lineInter);
                 return [splits.left, splits.right];
               } else {
