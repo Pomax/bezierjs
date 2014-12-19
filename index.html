@@ -847,39 +847,12 @@
         <figures>
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100, 25, 10, 90, 110, 100, 132, 192 );
-            var p1 = curve.points[0],
-              p4 = curve.points[3];
-
-            var splitOnInflection = function(curve) {
-              var lineInter = curve.intersects({
-                p1: {x: p1.x, y: p1.y},
-                p2: {x: p4.x, y: p4.y}
-              }).filter(function(t) {
-                return t > 1e-9 && 1 - t > 1e-9;
-              });
-              if (lineInter.length) {
-                var splits = curve.split(lineInter);
-                return [splits.left, splits.right];
-              } else {
-                return [curve];
-              }
-            };
-
-            var splitOnLoop = function(curve) {
-              var selfInter = curve.intersects()[0];
-              if (selfInter) {
-                var splits = selfInter.split("/");
-                selfInter = curve.split(splits[0], splits[1]);
-              }
-              return selfInter;
-            };
-
             var draw = function() {
-              var segments = splitOnInflection(curve);
+              var segments = curve.splitOnInflection();
               segments.forEach(function(segment) {
-                var loop = splitOnLoop(segment);
+                var loop = segment.getLoop();
                 loopArea = loop ? loop.area() : 0;
-                if (Math.abs(loopArea) > 1) {
+                if (abs(loopArea) > 1) {
                   setFill(loopArea < 0 ? "#7fff7f" : "#ff7f7f");
                   drawCurve(segment, {x: 0, y: 0}, true);
                   setFill(loopArea < 0 ? "#ff7f7f" : "#7fff7f");
@@ -893,10 +866,13 @@
 
               drawSkeleton(curve);
               drawCurve(curve);
+
+              var p1 = curve.points[0],
+                p4 = curve.points[3];
               setFill("black");
-              drawText("Area: " + curve.area(), {x: 5, y: 15});
               drawText("p1", {x:p1.x+7,y:p1.y-3});
               drawText("p4", {x:p4.x+7,y:p4.y-3});
+              drawText("Area: " + curve.area(), {x: 5, y: 15});
             }
           </script></figure>
         </figures>

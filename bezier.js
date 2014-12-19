@@ -300,6 +300,31 @@ module.exports = (function() {
       var subsplit = result.right.split(t2);
       return subsplit.left;
     },
+    splitOnInflection: function() {
+      // doesn't actually split on all inflections, just the one lying on the
+      // curve between p1 and p4 (if it exists).
+      var lineInter = this.intersects({
+        p1: this.points[0],
+        p2: this.points[3]
+      }).filter(function(t) {
+        return t > 1e-9 && 1 - t > 1e-9;
+      });
+      if (lineInter.length) {
+        var splits = this.split(lineInter);
+        return [splits.left, splits.right];
+      } else {
+        return [this];
+      }
+    },
+    getLoop: function() {
+      // get the subsection of this curve that forms a loop, if it exists.
+      var selfInter = this.intersects()[0];
+      if (selfInter) {
+        var splits = selfInter.split("/");
+        selfInter = this.split(splits[0], splits[1]);
+      }
+      return selfInter;
+    },
     inflections: function() {
       var dims = this.dims,
           len = this.dimlen,
