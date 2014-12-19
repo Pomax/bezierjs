@@ -848,7 +848,7 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100, 25, 10, 90, 110, 100, 132, 192 );
             var draw = function() {
-              var segments = curve.splitOnPathIntersection();
+              var segments = curve.splitOnLineIntersection();
               segments.forEach(function(segment) {
                 var loop = segment.getLoop();
                 loopArea = loop ? loop.area() : 0;
@@ -858,8 +858,7 @@
                   setFill(loopArea < 0 ? "#ff7f7f" : "#7fff7f");
                   drawCurve(loop, {x: 0, y: 0}, true);
                 } else {
-                  var segmentArea = segment.area();
-                  setFill(segmentArea < 0 ? "#ff7f7f" : "#7fff7f");
+                  setFill(segment.area() < 0 ? "#ff7f7f" : "#7fff7f");
                   drawCurve(segment, {x: 0, y: 0}, true);
                 }
               });

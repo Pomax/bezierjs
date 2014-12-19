@@ -312,8 +312,8 @@ module.exports = (function() {
         return t > 1e-9 && 1 - t > 1e-9;
       });
       if (lineInter.length) {
-        var splits = this.split(lineInter);
-        return [splits.left, splits.right];
+        var segments = this.split(lineInter);
+        return [segments.left, segments.right];
       } else {
         return [this];
       }
@@ -321,11 +321,9 @@ module.exports = (function() {
     getLoop: function() {
       // get the subsection of this curve that forms a loop, if it exists
       var selfInter = this.intersects()[0];
-      if (selfInter) {
-        var splits = selfInter.split("/");
-        selfInter = this.split(splits[0], splits[1]);
-      }
-      return selfInter;
+      if (!selfInter) return null;
+      selfInter = selfInter.split("/");
+      return this.split(selfInter[0], selfInter[1]);
     },
     inflections: function() {
       var dims = this.dims,
