@@ -1,0 +1,29 @@
+{
+  "name": "bezierjs",
+  "version": "1.0.0",
+  "description": "A javascript library for working with Bezier curves",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "npm run build && node test",
+    "build": "browserify ./lib/index.js --standalone Bezier -o bezier.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pomax/bezierjs"
+  },
+  "keywords": [
+    "bezier",
+    "curves"
+  ],
+  "author": "Pomax",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Pomax/bezierjs/issues"
+  },
+  "homepage": "https://github.com/Pomax/bezierjs",
+  "devDependencies": {
+    "browserify": "^9.0.3",
+    "uglify": "^0.1.1",
+    "uglify-js": "^2.4.17"
+  }
+}
