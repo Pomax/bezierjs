@@ -3,10 +3,11 @@ Bezier.js
 
 A node.js and client-side library for (cubic) Bezier curve work.
 
-For a Demo and the API, hit up either http://pomax.github.io/bezierjs or read the souce (./lib for the library code, start at `index.js`, or beziertest.js for how to use the library).
+For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs)
+or read the souce (`./lib` for the library code, start at `index.js`).
 
-Build with `npm test`, which runs both the build and test. For the
+To rebuild, simply use `npm test`, which runs both the build and tests (which aren't very
+test-like atm, they just allow you to valid two curves. More to come). For comments and
+questions, [tweet at me](https://twitter.com/TheRealPomax) or file an issue.
 
-For comments and questions, [tweet at me](https://twitter.com/TheRealPomax) or just file an issue.
-
-The code in this repo is MIT licensed.
+This code is MIT licensed.
