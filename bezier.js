@@ -83,7 +83,7 @@
       0.0123412297999871995468056670700372915759,
       0.0123412297999871995468056670700372915759
     ],
-    arcfn: function(p, t, derivativeFn) {
+    arcfn: function(t, derivativeFn) {
       var d = derivativeFn(t);
       d = d.x*d.x + d.y*d.y;
       if(typeof d.z !== "undefined") {
@@ -91,11 +91,11 @@
       }
       return sqrt(d);
     },
-    length: function(p, derivativeFn) {
+    length: function(derivativeFn) {
       var z=0.5,sum=0,len=this.Tvalues.length,i,t;
       for(i=0; i<len; i++) {
         t = z * this.Tvalues[i] + z;
-        sum += this.Cvalues[i] * this.arcfn(p,t,derivativeFn);
+        sum += this.Cvalues[i] * this.arcfn(t,derivativeFn);
       }
       return z * sum;
     },
@@ -550,7 +550,7 @@
       this.clockwise = angle > 0;
     },
     length: function() {
-      return utils.length(this.points, this.derivative.bind(this));
+      return utils.length(this.derivative.bind(this));
     },
     getLUT: function(steps) {
       steps = steps || 100;
