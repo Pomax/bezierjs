@@ -1,5 +1,5 @@
 {
-  "name": "bezierjs",
+  "name": "bezier-js",
   "version": "1.0.1",
   "description": "A javascript library for working with Bezier curves",
   "main": "./lib/index.js",
