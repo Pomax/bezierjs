@@ -11,25 +11,44 @@ function bindDrawFunctions(idx) {
 
   return {
     getCanvas: function() { return cvs; },
+
     reset: function() {
       cvs.width = cvs.width;
       ctx.strokeStyle = "black";
       ctx.fillStyle = "none";
     },
-    setColor: function(c) { ctx.strokeStyle = c; },
+
+    setColor: function(c) {
+      ctx.strokeStyle = c;
+    },
+
+    noColor: function(c) {
+      ctx.strokeStyle = "transparent";
+    },
+
     setRandomColor: function() {
       var r = ((255*Math.random())|0),
           g = ((255*Math.random())|0),
           b = ((255*Math.random())|0);
       ctx.strokeStyle = "rgb("+r+","+g+","+b+")";
     },
+
     setRandomFill: function(a) {
+      a = (typeof a === "undefined") ? 1 : a;
       var r = ((255*Math.random())|0),
           g = ((255*Math.random())|0),
           b = ((255*Math.random())|0);
       ctx.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
     },
-    setFill: function(c) { ctx.fillStyle = c; },
+
+    setFill: function(c) {
+      ctx.fillStyle = c;
+    },
+
+    noFill: function() {
+      ctx.fillStyle = "transparent";
+    },
+
     drawSkeleton: function(curve, offset) {
       offset = offset || { x:0, y:0 };
       var pts = curve.points;
@@ -40,6 +59,7 @@ function bindDrawFunctions(idx) {
       ctx.strokeStyle = "black";
       this.drawPoints(pts, offset);
     },
+
     drawCurve: function(curve, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
@@ -88,6 +108,18 @@ function bindDrawFunctions(idx) {
       points.forEach(function(p) {
         this.drawCircle(p, 3, offset);
       }.bind(this));
+    },
+
+    drawArc: function(p, offset) {
+      offset = offset || { x:0, y:0 };
+      var ox = offset.x;
+      var oy = offset.y;
+      ctx.beginPath();
+      ctx.moveTo(p.x + ox, p.y + oy);
+      ctx.arc(p.x + ox, p.y + oy, p.r, p.s, p.e);
+      ctx.lineTo(p.x + ox, p.y + oy);
+      ctx.fill();
+      ctx.stroke();
     },
 
     drawCircle: function(p, r, offset) {

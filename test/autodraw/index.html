@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Auto-tracing test</title>
+  <link rel="stylesheet" href="stylesheet.css">
+  <style>
+    body { margin:0; padding:0; }
+    canvas { position:relative; display: block; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Auto-tracing test</h1>
+
+  <canvas height="600"></canvas>
+
+  <p>Draw on the canvas with the mouse. When you let go, the code
+    kicks in and reduces the number of coordinates you drew, then
+    tries to connect them in a "sensible" way, which right now is
+    not actually that sensible, just Catmull-Rom spline, with cuts
+    where the angle between three points is acute.</p>
+
+  <script src="http://pomax.github.io/pocketknife/pocketknife.js"></script>
+  <script src="../../lib/bezier.js"></script>
+
+  <script src="common.js"></script>
+  <script src="RDP.js"></script>
+  <script src="Abstractor.js"></script>
+  <script src="Handler.js"></script>
+
+  <script>schedule(function() {
+    var cvs = find("canvas");
+    cvs.width = cvs.getBoundingClientRect().width;
+    var ctx = cvs.getContext("2d");
+    var handler = new Handler(cvs);
+    ctx.strokeStyle = "black";
+    cvs.listen("mousedown", handler.md.bind(handler));
+    cvs.listen("mousemove", handler.mm.bind(handler));
+    cvs.listen("mouseup", handler.me.bind(handler));
+  });</script>
+</body>
+</html>

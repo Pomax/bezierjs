@@ -50,7 +50,7 @@ function handleInteraction(cvs, curve) {
 
   cvs.addEventListener("mouseup", function(evt) {
     if(!moving) return;
-    console.log(curve.points.map(function(p) { return p.x+", "+p.y; }).join(", "));
+    // console.log(curve.points.map(function(p) { return p.x+", "+p.y; }).join(", "));
     moving = false;
     mp = false;
   });

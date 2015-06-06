@@ -460,8 +460,47 @@
           function. The array of simple curves that this function yields can safely be scaled.</p>
       </section>
 
+      <section>
+        <h1>.arcs() and .arcs(threshold)</h1>
 
-      <section scale="scale">
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(150,40 , 80,30 , 105,150);
+            var draw = function() {
+              drawSkeleton(curve);
+              var arcs = curve.arcs();
+              setColor("black");
+              arcs.forEach(function(arc) {
+                setRandomFill(0.1);
+                drawArc(arc);
+              });
+            }
+          </script></figure>
+          <figure class="cubic"><script type="text/beziercode">
+            new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+            var draw = function() {
+              drawSkeleton(curve);
+              var arcs = curve.arcs();
+              setColor("black");
+              arcs.forEach(function(arc) {
+                setRandomFill(0.1);
+                drawArc(arc);
+              });
+            }
+          </script></figure>
+        </figures>
+
+        <p>Approximates a Bezier curve as a sequence of circular arcs. An optional threashold
+          argument controls how well an arc needs to fit to still be considered a reasonable
+          approximation. The higher the <code>threshold</code>, the less accurate an arc fit is allowed.
+          If no explicit threshold is set, a value of <code>0.5</code> is used.</p>
+
+        <p>This operation is only supported in 2d (for now).</p>
+
+      </section>
+
+
+      <section>
         <h1>.scale()</h1>
 
         <figures>
@@ -488,7 +527,6 @@
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
               drawSkeleton(curve);
-              drawSkeleton(curve);
               setColor("black");
               var reduced = curve.reduce(),
                   len = reduced.length;
@@ -509,7 +547,7 @@
           work if that point exists, which is only guaranteed for simple segments.</p>
       </section>
 
-      <section scale="outline">
+      <section>
         <h1>.outline(d), .outline(d1,d2), and .outline(d1,d2,d3,d4)</h1>
 
         <figures>
@@ -609,7 +647,7 @@
 
       </section>
 
-      <section scale="outlineshapes">
+      <section>
         <h1>.outlineshapes(d)</h1>
 
         <figures>
@@ -648,7 +686,7 @@
           between shapes rather than between individual curves.</p>
       </section>
 
-      <section scale="intersect">
+      <section>
         <h1>.intersects() and .intersects(line) and .intersects(curve)</h1>
 
         <h2>.intersects()</h2>
@@ -768,7 +806,6 @@
         precision).</p>
 
       </section>
-
     </main>
 
     <footer>
