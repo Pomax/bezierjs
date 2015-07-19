@@ -26,4 +26,4 @@ check(Bezier.fromSVG("M 0 0 Q 0.5 1 1 0"));
 
 // plain and SVG cubic check
 check(new Bezier(0,0 , 0,1   , 1,1 , 1,0));
-check(Bezier.fromSVG("m 0 0 C 0 1 1 0 0 -1"));
+check(Bezier.fromSVG("m 0 0 c 0 1 1 1 1 0"));
