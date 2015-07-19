@@ -1,29 +1,72 @@
+var assert = require("assert");
 var Bezier = require("./lib");
 
-function check(b) {
-  console.log("---");
-  console.log(b.toString());
-  console.log(b.length());
-  console.log(b.dpoints);
-  console.log(b.derivative(0), b.derivative(0.5), b.derivative(1));
-  console.log(b.normal(0), b.normal(0.5), b.normal(1));
-
-  var res = b.split(0.321);
-  var points = res.span;
-//  console.log(utils.pointsToString(points));
-  var p321 = b.get(0.321);
-//  console.log("check on final point: should be ", utils.pointToString(p321));
-
-  var roots = b.inflections();
-  console.log(roots);
-
-  console.log(b.bbox());
-}
-
 // plain and SVG quadratic check
-check(new Bezier(0,0 , 0.5,1 , 1,0));
-check(Bezier.fromSVG("M 0 0 Q 0.5 1 1 0"));
+[
+  new Bezier(0,0, .5,1, 1,0),
+  Bezier.fromSVG("M 0 0 Q 0.5 1 1 0")
+]
+  .forEach(function(b) {
+    assert.equal(b.toString(), "[0/0, 0.5/1, 1/0]");
+    assert.equal(b.length(), 1.4789428575453212);
+    assert.deepEqual(b.dpoints, [
+      [{x:1, y:2}, {x:1, y:-2}],
+      [{x:0, y:-4}]
+    ]);
+
+    assert.deepEqual(b.derivative(0), {x:1, y:2});
+    assert.deepEqual(b.derivative(0.5), {x:1, y:0});
+    assert.deepEqual(b.derivative(1), {x:1, y:-2});
+
+    assert.deepEqual(b.normal(0), {x:-0.8944271909999159, y:0.4472135954999579});
+    assert.deepEqual(b.normal(0.5), {x:-0, y:1});
+    assert.deepEqual(b.normal(1), {x:0.8944271909999159, y:0.4472135954999579});
+
+    assert.deepEqual(b.inflections(), {x:[], y:[0.5], values:[0.5]});
+    assert.deepEqual(b.bbox(), {
+      x:{min:0, mid:0.5, max:1, size:1},
+      y:{min:0, mid:0.25, max:0.5, size:0.5}
+    });
+  });
+
+// SVG relative quadratic check
+assert.equal(
+  Bezier.fromSVG("5 5c.5 1 1 0").toString(),
+  "[5/5, 5.5/6, 6/5]"
+);
 
 // plain and SVG cubic check
-check(new Bezier(0,0 , 0,1   , 1,1 , 1,0));
-check(Bezier.fromSVG("m 0 0 c 0 1 1 1 1 0"));
+[
+  new Bezier(0,0, 0,1, 1,1, 1,0),
+  Bezier.fromSVG("m 0 0 C 0 1 1 1 1 0")
+]
+  .forEach(function(b) {
+    assert.equal(b.toString(), "[0/0, 0/1, 1/1, 1/0]");
+    assert.equal(b.length(), 2.0000000000000004);
+    assert.deepEqual(b.dpoints, [
+      [{x:0, y:3}, {x:3, y:0}, {x:0, y:-3}],
+      [{x:6, y:-6}, {x:-6, y:-6}],
+      [{x:-12, y:0}]
+    ]);
+
+    assert.deepEqual(b.derivative(0), {x:0, y:3});
+    assert.deepEqual(b.derivative(0.5), {x:1.5, y:0});
+    assert.deepEqual(b.derivative(1), {x:0, y:-3});
+
+    assert.deepEqual(b.normal(0), {x:-1, y:0});
+    assert.deepEqual(b.normal(0.5), {x:-0, y:1});
+    assert.deepEqual(b.normal(1), {x:1, y:0});
+
+    assert.deepEqual(b.inflections(), {x:[0, 0.5, 1], y:[0.5], values:[0, 0.5, 0.5, 1]});
+    assert.deepEqual(b.bbox(), {
+      x:{min:0, mid:0.5, max:1, size:1},
+      y:{min:0, mid:0.375, max:0.75, size:0.75}
+    });
+
+  });
+
+// SVG relative cubic check
+assert.equal(
+  Bezier.fromSVG("m1-1c0,1 1,1 1,0").toString(),
+  "[1/-1, 1/0, 2/0, 2/-1]"
+);
