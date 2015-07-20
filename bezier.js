@@ -545,7 +545,7 @@
   };
 
   Bezier.fromSVG = function(svgString) {
-    var list = svgString.match(/[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/g).map(parseFloat);
+    var list = svgString.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/g).map(parseFloat);
     var relative = /[cq]/.test(svgString);
     if(!relative) return new Bezier(list);
     list = list.map(function(v,i) {
