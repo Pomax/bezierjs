@@ -8,7 +8,7 @@ var assert = require("chai").use(require("chai-stats")).assert;
 ]
   .forEach(function(b) {
     assert.equal(b.toString(), "[0/0, 0.5/1, 1/0]");
-    assert.almostEqual(b.length(), 1.47894285);
+    assert.almostEqual(b.length(), 1.4789428575453212);
     assert.deepAlmostEqual(b.dpoints, [
       [{x:1, y:2}, {x:1, y:-2}],
       [{x:0, y:-4}]
@@ -18,9 +18,9 @@ var assert = require("chai").use(require("chai-stats")).assert;
     assert.deepAlmostEqual(b.derivative(0.5), {x:1, y:0});
     assert.deepAlmostEqual(b.derivative(1), {x:1, y:-2});
 
-    assert.deepAlmostEqual(b.normal(0), {x:-0.89442719, y:0.44721359});
+    assert.deepAlmostEqual(b.normal(0), {x:-0.8944271909999159, y:0.4472135954999579});
     assert.deepAlmostEqual(b.normal(0.5), {x:-0, y:1});
-    assert.deepAlmostEqual(b.normal(1), {x:0.89442719, y:0.44721359});
+    assert.deepAlmostEqual(b.normal(1), {x:0.8944271909999159, y:0.4472135954999579});
 
     assert.deepAlmostEqual(b.inflections(), {x:[], y:[0.5], values:[0.5]});
     assert.deepAlmostEqual(b.bbox(), {
@@ -42,7 +42,7 @@ assert.equal(
 ]
   .forEach(function(b) {
     assert.equal(b.toString(), "[0/0, 0/1, 1/1, 1/0]");
-    assert.almostEqual(b.length(), 2);
+    assert.almostEqual(b.length(), 2.0000000000000004);
     assert.deepAlmostEqual(b.dpoints, [
       [{x:0, y:3}, {x:3, y:0}, {x:0, y:-3}],
       [{x:6, y:-6}, {x:-6, y:-6}],
