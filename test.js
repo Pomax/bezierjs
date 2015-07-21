@@ -42,7 +42,7 @@ assert.equal(
 ]
   .forEach(function(b) {
     assert.equal(b.toString(), "[0/0, 0/1, 1/1, 1/0]");
-    assert.almostEqual(b.length(), 2.0000000000000004);
+    assert.almostEqual(b.length(), 2);
     assert.deepAlmostEqual(b.dpoints, [
       [{x:0, y:3}, {x:3, y:0}, {x:0, y:-3}],
       [{x:6, y:-6}, {x:-6, y:-6}],
