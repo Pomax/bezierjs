@@ -483,7 +483,7 @@
         offset = offset.concat(v.offset(d));
       });
       return new PolyBezier(offset);
-    },
+    }
   };
 
 
