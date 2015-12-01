@@ -498,14 +498,15 @@
   var Bezier = function(coords) {
     var args = (coords && coords.forEach ? coords : arguments);
     if(typeof args[0] === "object") {
-      args = [];
-      for(var i=0; i<coords.length; i++) {
+      var newargs = [];
+      for(var i=0; i<args.length; i++) {
         ['x','y','z'].forEach(function(d) {
-          if(typeof coords[i][d] !== "undefined") {
-            args.push(coords[i][d]);
+          if(typeof args[i][d] !== "undefined") {
+            newargs.push(args[i][d]);
           }
         });
       }
+      args = newargs;
     }
     var len = args.length;
     if(len!==6 && len!==8 && len!==9 && len!==12) {
