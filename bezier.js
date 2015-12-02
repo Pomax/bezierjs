@@ -496,16 +496,16 @@
    *
    */
   var Bezier = function(coords) {
-    var args = (coords && coords.forEach ? coords : arguments);
+    var args = (coords && coords.forEach) ? coords : [].slice.call(arguments);
     if(typeof args[0] === "object") {
       var newargs = [];
-      for(var i=0; i<args.length; i++) {
+      args.forEach(function(point) {
         ['x','y','z'].forEach(function(d) {
-          if(typeof args[i][d] !== "undefined") {
-            newargs.push(args[i][d]);
+          if(typeof point[d] !== "undefined") {
+            newargs.push(point[d]);
           }
         });
-      }
+      });
       args = newargs;
     }
     var len = args.length;
