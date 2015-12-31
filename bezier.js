@@ -713,7 +713,7 @@
       };
       return n;
     },
-    hull: function() {
+    hull: function(t) {
       var p = this.points,
           _p = [],
           pt,
@@ -729,7 +729,7 @@
       while(p.length>1) {
         _p = [];
         for(i=0, l=p.length-1; i<l; i++) {
-          pt = utils.lerp(t1,p[i],p[i+1]);
+          pt = utils.lerp(t,p[i],p[i+1]);
           q[idx++] = pt;
           _p.push(pt);
         }
@@ -743,7 +743,7 @@
       if(t2===1) { return this.split(t1).right; }
 
       // no shortcut: use "de Casteljau" iteration.
-      var q = this.hull();
+      var q = this.hull(t1);
       var result = {
         left: this.order === 2 ? new Bezier([q[0],q[3],q[5]]) : new Bezier([q[0],q[4],q[7],q[9]]),
         right: this.order === 2 ? new Bezier([q[5],q[4],q[2]]) : new Bezier([q[9],q[8],q[6],q[3]]),
