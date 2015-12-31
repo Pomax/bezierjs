@@ -144,6 +144,28 @@ function bindDrawFunctions(idx) {
       ctx.stroke();
     },
 
+    drawHull: function(hull, offset) {
+      ctx.beginPath();
+      if(hull.length === 6) {
+        ctx.moveTo(hull[0].x, hull[0].y);
+        ctx.lineTo(hull[1].x, hull[1].y);
+        ctx.lineTo(hull[2].x, hull[2].y);
+        ctx.moveTo(hull[3].x, hull[3].y);
+        ctx.lineTo(hull[4].x, hull[4].y);
+      } else {
+        ctx.moveTo(hull[0].x, hull[0].y);
+        ctx.lineTo(hull[1].x, hull[1].y);
+        ctx.lineTo(hull[2].x, hull[2].y);
+        ctx.lineTo(hull[3].x, hull[3].y);
+        ctx.moveTo(hull[4].x, hull[4].y);
+        ctx.lineTo(hull[5].x, hull[5].y);
+        ctx.lineTo(hull[6].x, hull[6].y);
+        ctx.moveTo(hull[7].x, hull[7].y);
+        ctx.lineTo(hull[8].x, hull[8].y);
+      }
+      ctx.stroke();
+    },
+
     drawShape: function(shape, offset) {
       offset = offset || { x:0, y:0 };
       var order = shape.forward.points.length - 1;

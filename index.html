@@ -370,6 +370,36 @@
           inflection points.</p>
       </section>
 
+      <section id="hull">
+        <h1>.hull(t)</h1>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(150,40 , 80,30 , 105,150);
+            var draw = function() {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("rgb(255,100,100)");
+              drawHull(curve.hull());
+            }
+          </script></figure>
+
+          <figure class="cubic"><script type="text/beziercode">
+            new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+            var draw = function() {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("rgb(255,100,100)");
+              drawHull(curve.hull());
+            }
+          </script></figure>
+        </figures>
+
+        <p>Calculates (if not cached) the bounding box for this curve, based on its hull coordinates and its
+          inflection points.</p>
+      </section>
+
+
 
       <section id="offset">
         <h1>.offset(d) and .offset(t, d)</h1>
