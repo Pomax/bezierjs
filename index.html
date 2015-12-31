@@ -380,23 +380,30 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("rgb(255,100,100)");
-              drawHull(curve.hull(0.4));
+              var hull = curve.hull(0.5)
+              drawHull(hull);
+              drawCircle(hull.slice(-1)[0], 5);
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
-            new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+            new Bezier(100,25 , 10,90 , 50,185 , 170,175);
             var draw = function() {
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("rgb(255,100,100)");
-              drawHull(curve.hull(0.7));
+              var hull = curve.hull(0.5)
+              drawHull(hull);
+              drawCircle(hull.slice(-1)[0], 5);
             }
           </script></figure>
         </figures>
 
-        <p>Calculates (if not cached) the bounding box for this curve, based on its hull coordinates and its
-          inflection points.</p>
+        <p>Generates all hull points, at all iterations, for an on-curve point at the specified t-value.
+        For quadratic curves, this generates a point[6], and for cubic curves, this generates a point[10],
+        where the first iteration is [0,1,2] and [0,1,2,3] respectively, the second iteration is [3,4]
+        and [4,5,6] respectively, the third iteration is [5] (the on-curve point for quadratic curves) and
+        [7,8] respectively, and the fourth iteration (for cubic curves only) is [9].</p>
       </section>
 
 
