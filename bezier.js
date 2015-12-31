@@ -713,11 +713,7 @@
       };
       return n;
     },
-    split: function(t1, t2) {
-      // shortcuts
-      if(t1===0 && !!t2) { return this.split(t2).left; }
-      if(t2===1) { return this.split(t1).right; }
-      // no shortcut: use "de Casteljau" iteration.
+    hull: function() {
       var p = this.points,
           _p = [],
           pt,
@@ -739,6 +735,15 @@
         }
         p = _p;
       }
+      return q;
+    },
+    split: function(t1, t2) {
+      // shortcuts
+      if(t1===0 && !!t2) { return this.split(t2).left; }
+      if(t2===1) { return this.split(t1).right; }
+
+      // no shortcut: use "de Casteljau" iteration.
+      var q = this.hull();
       var result = {
         left: this.order === 2 ? new Bezier([q[0],q[3],q[5]]) : new Bezier([q[0],q[4],q[7],q[9]]),
         right: this.order === 2 ? new Bezier([q[5],q[4],q[2]]) : new Bezier([q[9],q[8],q[6],q[3]]),
