@@ -526,7 +526,7 @@
         }
       }
     }
-    var _3d = (!higher && (len === 9 || len === 12)) || (coords && typeof coords[0].z !== "undefined");
+    var _3d = (!higher && (len === 9 || len === 12)) || (coords && coords[0] && typeof coords[0].z !== "undefined");
     this._3d = _3d;
     var points = [];
     for(var idx=0, step=(_3d ? 3 : 2); idx<len; idx+=step) {
