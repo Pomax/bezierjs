@@ -617,13 +617,15 @@
     length: function() {
       return utils.length(this.derivative.bind(this));
     },
+    _lut: [],
     getLUT: function(steps) {
       steps = steps || 100;
-      var points = [];
+      if (this.lut.length === steps) { return this._lut; }
+      this._lut = [];
       for(var t=0; t<=steps; t++) {
-        points.push(this.compute(t/steps));
+        this._lut.push(this.compute(t/steps));
       }
-      return points;
+      return this._lut;
     },
     get: function(t) {
       return this.compute(t);
@@ -635,32 +637,62 @@
       // shortcuts
       if(t===0) { return this.points[0]; }
       if(t===1) { return this.points[this.order]; }
-      // plain computation
-      var mt = 1-t,
-          mt2 = mt*mt,
-          t2 = t*t,
-          a,b,c,d = 0,
-          p = this.points;
-      if(this.order===2) {
-        p = [p[0], p[1], p[2], ZERO];
-        a = mt2;
-        b = mt*t*2;
-        c = t2;
+
+      var p = this.points;
+      var mt = 1-t;
+
+      // linear?
+      if(this.order===1) {
+        ret = {
+          x: mt*p[0].x + t*p[1].x,
+          y: mt*p[0].y + t*p[1].y
+        };
+        if (this._3d) { ret.z = mt*p[0].z + t*p[1].z; }
+        return ret;
       }
-      if(this.order===3) {
-        a = mt2*mt;
-        b = mt2*t*3;
-        c = mt*t2*3;
-        d = t*t2;
+
+      // quadratic/cubic curve?
+      if(this.order<4) {
+        var mt2 = mt*mt,
+            t2 = t*t,
+            a,b,c,d = 0;
+        if(this.order===2) {
+          p = [p[0], p[1], p[2], ZERO];
+          a = mt2;
+          b = mt*t*2;
+          c = t2;
+        }
+        else if(this.order===3) {
+          a = mt2*mt;
+          b = mt2*t*3;
+          c = mt*t2*3;
+          d = t*t2;
+        }
+        var ret = {
+          x: a*p[0].x + b*p[1].x + c*p[2].x + d*p[3].x,
+          y: a*p[0].y + b*p[1].y + c*p[2].y + d*p[3].y
+        };
+        if(this._3d) {
+          ret.z = a*p[0].z + b*p[1].z + c*p[2].z + d*p[3].z;
+        }
+        return ret;
       }
-      var ret = {
-        x: a*p[0].x + b*p[1].x + c*p[2].x + d*p[3].x,
-        y: a*p[0].y + b*p[1].y + c*p[2].y + d*p[3].y
-      };
-      if(this._3d) {
-        ret.z = a*p[0].z + b*p[1].z + c*p[2].z + d*p[3].z;
+
+      // higher order curves: use de Casteljau's computation
+      var dCpts = JSON.parse(JSON.stringify(this.points));
+      while(dCpts.length > 1) {
+        for (var i=0; i<dCpts.length-1; i++) {
+          dCpts[i] = {
+            x: dCpts[i].x + (dCpts[i+1].x - dCpts[i].x) * t,
+            y: dCpts[i].y + (dCpts[i+1].y - dCpts[i].y) * t
+          };
+          if (typeof dCpts[i].z !== "undefined") {
+            dCpts[i] = dCpts[i].z + (dCpts[i+1].z - dCpts[i].z) * t
+          }
+        }
+        dCpts.splice(dCpts.length-1, 1);
       }
-      return ret;
+      return dCpts[0];
     },
     raise: function() {
       var p = this.points, np = [p[0]], i, k=p.length, pi, pim;

@@ -69,21 +69,34 @@ assert.equal(
 );
 
 
+// "line" curves
+[
+  new Bezier([0, 0, 100, 100])
+].forEach(function(b) {
+  assert.equal(b.toString(), "[0/0, 100/100]");
+  var t5 = b.compute(0.5);
+  assert.equal(t5.x, 50);
+  assert.equal(t5.y, 50);
+});
+
 // high order curves
 [
-  new Bezier([{x:0,y:0}, {x:0,y:1}, {x:1,y:1}, {x:1,y:2}, {x:2,y:2}]),
+  new Bezier([{x:0,y:0}, {x:0,y:1}, {x:1,y:1}, {x:1,y:2}, {x:2,y:2}])
 ].forEach(function(b) {
   assert.equal(b.toString(), "[0/0, 0/1, 1/1, 1/2, 2/2]");
 });
 
 [
-  new Bezier([{x:0,y:0}, {x:0,y:1}, {x:1,y:1}, {x:1,y:2}, {x:2,y:2}, {x:2,y:3}]),
+  new Bezier([{x:0,y:0}, {x:0,y:1}, {x:1,y:1}, {x:1,y:2}, {x:2,y:2}, {x:2,y:3}])
 ].forEach(function(b) {
   assert.equal(b.toString(), "[0/0, 0/1, 1/1, 1/2, 2/2, 2/3]");
 });
 
 [
-  new Bezier([{x:0,y:0,z:10}, {x:0,y:1,z:11}, {x:1,y:1,z:12}, {x:1,y:2,z:13}, {x:2,y:2,z:14}, {x:2,y:3,z:15}]),
+  new Bezier([{x:0,y:0,z:10}, {x:0,y:1,z:11}, {x:1,y:1,z:12}, {x:1,y:2,z:13}, {x:2,y:2,z:14}, {x:2,y:3,z:15}])
 ].forEach(function(b) {
   assert.equal(b.toString(), "[0/0/10, 0/1/11, 1/1/12, 1/2/13, 2/2/14, 2/3/15]");
+  var t5 = b.compute(0.5);
+  assert.equal(t5.x, 1);
+  assert.equal(t5.y, 1.5);
 });
