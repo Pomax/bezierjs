@@ -145,7 +145,7 @@
     round: function(v, d) {
       var s = '' + v;
       var pos = s.indexOf(".");
-      return parseFloat(s.substring(0,pos+d));
+      return parseFloat(s.substring(0,pos+1+d));
     },
     dist: function(p1, p2) {
       var dx = p1.x - p2.x,
