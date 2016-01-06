@@ -100,3 +100,14 @@ assert.equal(
   assert.equal(t5.x, 1);
   assert.equal(t5.y, 1.5);
 });
+
+// Utils hookup?
+assert.isArray(Bezier.getUtils().Tvalues);
+assert.isFunction(Bezier.getUtils().map);
+
+[
+  new Bezier([{x:0,y:0,z:10}, {x:0,y:1,z:11}, {x:1,y:1,z:12}])
+].forEach(function(b) {
+assert.isArray(b.getUtils().Tvalues);
+assert.isFunction(b.getUtils().map);
+});

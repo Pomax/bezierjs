@@ -568,9 +568,14 @@
     return new Bezier(list);
   };
 
-  Bezier.utils = utils;
+  var getUtils = function() {
+    return utils;
+  };
+
+  Bezier.getUtils = getUtils;
 
   Bezier.prototype = {
+    getUtils: getUtils,
     valueOf: function() {
       return this.toString();
     },
