@@ -141,6 +141,12 @@
       dot = dx1*dx2 + dy1*dy2;
       return atan2(cross, dot);
     },
+    // round as string, to avoid rounding errors
+    round: function(v, d) {
+      var s = '' + v;
+      var pos = s.indexOf(".");
+      return parseFloat(s.substring(0,pos+d));
+    },
     dist: function(p1, p2) {
       var dx = p1.x - p2.x,
           dy = p1.y - p2.y;
