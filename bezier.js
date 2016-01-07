@@ -638,6 +638,19 @@
       }
       return this._lut;
     },
+    on: function(point, error) {
+      error = error || 5;
+      var lut = this.getLUT(), hits = [], c, t=0;
+      for(i=0; i<lut.length; i++) {
+        c = lut[i];
+        if (utils.dist(c,p) < error) {
+          hits.push(c)
+          t += i / lut.length;
+        }
+      }
+      if(!hits.length) return false;
+      return t /= hits.length;
+    },
     get: function(t) {
       return this.compute(t);
     },
