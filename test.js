@@ -116,3 +116,6 @@ var test_bezier = [0, 1.74, .21, 1.67, .28, 1.32, .28, .86];
 var test_line = { p1: { x: -.56, y: .95}, p2: { x: .57, y: .95 } };
 assert(new Bezier(test_bezier).intersects(test_line).length !== 0);
 
+
+
+
