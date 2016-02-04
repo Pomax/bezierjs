@@ -2,10 +2,10 @@
   "name": "bezier-js",
   "version": "1.4.1",
   "description": "A javascript library for working with Bezier curves",
-  "main": "./lib/index.js",
+  "main": "./index.js",
   "scripts": {
-    "test": "rimraf bezier.js && webpack && node test",
-    "build": "browserify ./lib/index.js --standalone Bezier -o bezier.js"
+    "test": "npm run build && node test",
+    "build": "rimraf bezier.js && webpack"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,5 @@
 function handleInteraction(cvs, curve) {
+  curve.mouse = false;
 
   var fix = function(e) {
     e = e || window.event;
@@ -29,6 +30,7 @@ function handleInteraction(cvs, curve) {
 
   cvs.addEventListener("mousemove", function(evt) {
     fix(evt);
+
     var found = false;
     lpts.forEach(function(p) {
       var mx = evt.offsetX;
@@ -39,7 +41,10 @@ function handleInteraction(cvs, curve) {
     });
     cvs.style.cursor = found ? "pointer" : "default";
 
-    if(!moving) return;
+    if(!moving) {
+      return handler.onupdate(evt);
+    }
+
     ox = evt.offsetX - mx;
     oy = evt.offsetY - my;
     mp.x = cx + ox;

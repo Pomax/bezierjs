@@ -1,1 +1,1 @@
-module.exports = require('./lib/base');
+module.exports = require('./lib/bezier');

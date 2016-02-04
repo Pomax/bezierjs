@@ -407,6 +407,45 @@
       </section>
 
 
+      <section id="project">
+        <h1>.project(point)</h1>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(150,40 , 80,30 , 105,150);
+            var draw = function(evt) {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("rgb(255,100,100)");
+              if (evt) {
+                var mouse = {x: evt.offsetX, y: evt.offsetY};
+                var p = curve.project(mouse);
+                drawLine(p,mouse);
+              }
+            }
+          </script></figure>
+
+          <figure class="cubic"><script type="text/beziercode">
+            new Bezier(100,25 , 10,90 , 50,185 , 170,175);
+            var draw = function(evt) {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("rgb(255,100,100)");
+              if (evt) {
+                var mouse = {x: evt.offsetX, y: evt.offsetY};
+                var p = curve.project(mouse);
+                drawLine(p,mouse);
+              }
+            }
+          </script></figure>
+        </figures>
+
+        <p>Finds the on-curve point closest to the specific off-curve point, using a two-pass projection test
+        based on the curve's LUT. A distance comparison finds the closest match, after which a fine interval
+        around that match is checked to see if a better projection can be found.</p>
+      </section>
+
+
 
       <section id="offset">
         <h1>.offset(d) and .offset(t, d)</h1>

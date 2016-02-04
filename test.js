@@ -1,4 +1,4 @@
-var Bezier = require("./lib/base");
+var Bezier = require("./lib/bezier");
 var utils = Bezier.getUtils();
 var assert = require("chai").use(require("chai-stats")).assert;
 
@@ -148,3 +148,9 @@ assert(new Bezier(test_bezier).intersects(test_line).length !== 0);
 
   assert(utils.between(np.y,my,MY) === true, "y inside range, despite IEEE rounding");
 }());
+
+
+
+var b = new Bezier([0,0, 20,100, 60,30, 75,15, 100,100]);
+var projection = b.project({x: 15, y: 27});
+console.log(projection);

@@ -12,10 +12,13 @@ function bindDrawFunctions(idx) {
   return {
     getCanvas: function() { return cvs; },
 
-    reset: function() {
+    reset: function(curve, evt) {
       cvs.width = cvs.width;
       ctx.strokeStyle = "black";
       ctx.fillStyle = "none";
+      if (evt && curve) {
+        curve.mouse = {x: evt.offsetX, y: evt.offsetY};
+      }
     },
 
     setColor: function(c) {
