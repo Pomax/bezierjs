@@ -4,7 +4,7 @@
   "description": "A javascript library for working with Bezier curves",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "npm run build && node test",
+    "test": "rimraf bezier.js && webpack && node test",
     "build": "browserify ./lib/index.js --standalone Bezier -o bezier.js"
   },
   "repository": {
@@ -22,10 +22,16 @@
   },
   "homepage": "https://github.com/Pomax/bezierjs",
   "devDependencies": {
+    "babel-core": "^6.4.5",
+    "babel-loader": "^6.2.2",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
     "browserify": "^9.0.3",
+    "chai": "^3.2.0",
+    "chai-stats": "^0.3.0",
+    "mkdirp": "^0.5.1",
     "uglify": "^0.1.1",
     "uglify-js": "^2.4.17",
-    "chai": "^3.2.0",
-    "chai-stats": "^0.3.0"
+    "webpack": "^1.12.13"
   }
 }
