@@ -59,6 +59,74 @@
       </section>
 
 
+      <section id="constructor">
+        <h1>Bezier.quadraticFromPoints(p1,p2,p3,t) / Bezier.cubicFromPoints(p1,p2,p3,t,d1)</h1>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            false;
+            var B = {x: 100, y: 50};
+            var tvalues = [0.2, 0.3, 0.4, 0.5];
+            var curves = tvalues.map(function(t) {
+              return Bezier.quadraticFromPoints({x:150, y: 40}, B, {x:35, y:160}, t);
+            });
+            var draw = function() {
+              var offset = {x:45,y:30};
+              curves.forEach(function(b,i) {
+                drawSkeleton(b, offset, true);
+                setColor("rgba(0,0,0,0.2)");
+                drawCircle(b.points[1], 3, offset);
+                drawText("t="+tvalues[i], {
+                  x: b.points[1].x + offset.x - 15,
+                  y: b.points[1].y + offset.y - 10,
+                });
+                setRandomColor();
+                drawCurve(b, offset);
+              });
+              setColor("black");
+              drawCircle(curves[0].points[0], 3, offset);
+              drawCircle(curves[0].points[2], 3, offset);
+              drawCircle(B, 3, offset);
+            }
+          </script></figure>
+
+          <figure class="cubic"><script type="text/beziercode">
+            false;
+            var p1 = {x:110, y: 50},
+                B  = {x: 50, y: 80},
+                p3 = {x:135, y: 100};
+            var tvalues = [0.2, 0.3, 0.4, 0.5];
+            var curves = tvalues.map(function(t) {
+              return Bezier.cubicFromPoints(p1, B, p3, t);
+            });
+            var draw = function() {
+              var offset = {x:0,y:0};
+              curves.forEach(function(b,i) {
+                setRandomColor();
+                drawCurve(b, offset);
+              });
+              setColor("black");
+              drawCircle(curves[0].points[0], 3, offset);
+              drawCircle(curves[0].points[3], 3, offset);
+              drawCircle(B, 3, offset);
+            }
+          </script></figure>
+        </figures>
+
+        <p>Create a curve through three points.</p>
+
+        <p>The points p1 through p3 are required, all additional arguments are optional. In both cases <code>t</code> defaults
+        to <code>0.5</code> when omitted.</p>
+
+        <p>The cubic value <code>d1</code> indicates the strut length for building a cubic curve, with the full strut being
+        length <code>d1 * (1-t)/t</code>. If omitted, a length based on <code>B--C</code> is used.</p>
+
+        <p>The illustrations show both quadratic and cubic curves going through three fixed points, but with different
+        <code>t</code> values specified (0.2, 0.3, 0.4, and 0.5). For the cubic example, <code>d1</code> has not between
+        explicitly specified. (no skeleton is shown for the cubic curves, as the additional lines crowd the illustration
+        too much).</p>
+      </section>
+
       <section id="getLUT">
         <h1>.getLUT(steps)</h1>
 

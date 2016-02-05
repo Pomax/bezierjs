@@ -32,6 +32,8 @@ function handleInteraction(cvs, curve) {
     fix(evt);
 
     var found = false;
+
+    if(!lpts) return;
     lpts.forEach(function(p) {
       var mx = evt.offsetX;
       var my = evt.offsetY;

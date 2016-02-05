@@ -9,6 +9,14 @@ function bindDrawFunctions(idx) {
   var button = figure.querySelector("button");
   if(button) { figure.appendChild(button); }
 
+  var randomColors = [];
+  for(var i=0,j; i<360; i++) {
+    j = (i*47)%360;
+    randomColors.push("hsl("+j+",50%,50%)");
+  }
+  var randomIndex = 0;
+
+
   return {
     getCanvas: function() { return cvs; },
 
@@ -19,6 +27,7 @@ function bindDrawFunctions(idx) {
       if (evt && curve) {
         curve.mouse = {x: evt.offsetX, y: evt.offsetY};
       }
+      randomIndex = 0;
     },
 
     setColor: function(c) {
@@ -30,18 +39,17 @@ function bindDrawFunctions(idx) {
     },
 
     setRandomColor: function() {
-      var r = ((255*Math.random())|0),
-          g = ((255*Math.random())|0),
-          b = ((255*Math.random())|0);
-      ctx.strokeStyle = "rgb("+r+","+g+","+b+")";
+      randomIndex = (randomIndex+1) % randomColors.length;
+      var c = randomColors[randomIndex];
+      ctx.strokeStyle = c;
     },
 
     setRandomFill: function(a) {
+      randomIndex = (randomIndex+1) % randomColors.length;
       a = (typeof a === "undefined") ? 1 : a;
-      var r = ((255*Math.random())|0),
-          g = ((255*Math.random())|0),
-          b = ((255*Math.random())|0);
-      ctx.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
+      var c = randomColors[randomIndex];
+      c = c.replace('hsl(','hsla(').replace(')',','+a+')');
+      ctx.fillStyle = c;
     },
 
     setFill: function(c) {
@@ -52,7 +60,7 @@ function bindDrawFunctions(idx) {
       ctx.fillStyle = "transparent";
     },
 
-    drawSkeleton: function(curve, offset) {
+    drawSkeleton: function(curve, offset, nocoords) {
       offset = offset || { x:0, y:0 };
       var pts = curve.points;
       ctx.strokeStyle = "lightgrey";
@@ -60,7 +68,7 @@ function bindDrawFunctions(idx) {
       if(pts.length === 3) { this.drawLine(pts[1], pts[2], offset); }
       else {this.drawLine(pts[2], pts[3], offset); }
       ctx.strokeStyle = "black";
-      this.drawPoints(pts, offset);
+      if(!nocoords) this.drawPoints(pts, offset);
     },
 
     drawCurve: function(curve, offset) {
