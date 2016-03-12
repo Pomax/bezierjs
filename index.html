@@ -367,8 +367,8 @@
       </section>
 
 
-      <section id="inflection">
-        <h1>.inflections()</h1>
+      <section id="extrema">
+        <h1>.extremas()</h1>
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
@@ -377,7 +377,7 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              curve.inflections().values.forEach(function(t) {
+              curve.extrema().values.forEach(function(t) {
                 drawCircle(curve.get(t),3);
               });
             }
@@ -389,19 +389,19 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              curve.inflections().values.forEach(function(t) {
+              curve.extrema().values.forEach(function(t) {
                 drawCircle(curve.get(t),3);
               });
             }
           </script></figure>
         </figures>
 
-        <p>Calculates all the inflection points on a curve. Inflections are calculated for each dimension,
+        <p>Calculates all the extrema on a curve. Extrema are calculated for each dimension,
           rather than for the full curve, so that the result is not the number of convex/concave transitions,
           but the number of those transitions for each separate dimension.</p>
 
         <p>This function yields an object <code>{x: [num, num, ...], y: [...], z: [...], values: [...]}</code>
-          where each dimension lists the array of <code>t</code> values at which an inflection occurs,
+          where each dimension lists the array of <code>t</code> values at which an extremum occurs,
           <code>z</code> exists only if the curve was a 3d curve, and the <code>values</code> property is the
           aggregate of the <code>t</code> values across all dimensions.</p>
 
@@ -434,8 +434,7 @@
           </script></figure>
         </figures>
 
-        <p>Calculates (if not cached) the bounding box for this curve, based on its hull coordinates and its
-          inflection points.</p>
+        <p>Calculates (if not cached) the bounding box for this curve, based on its hull coordinates and its extrema.</p>
       </section>
 
       <section id="hull">
