@@ -2,6 +2,7 @@ var Bezier = require("./lib/bezier");
 var utils = Bezier.getUtils();
 var assert = require("chai").use(require("chai-stats")).assert;
 
+
 // plain and SVG quadratic check
 (function testQuadratic() {
   [
@@ -202,4 +203,9 @@ var assert = require("chai").use(require("chai-stats")).assert;
   Bp = b.get(t);
   assert(utils.approximately(B.x, Bp.x), "cubic B and computed B have same x coordinate with t="+t);
   assert(utils.approximately(B.y, Bp.y), "cubic B and computed B have same y coordinate with t="+t);
+}());
+
+(function testOffset() {
+  var B = new Bezier(330,592, 330,557, 315,522, 315,485);
+  B.offset(20);
 }());
