@@ -791,7 +791,7 @@
       </section>
 
       <section>
-        <h1>.outlineshapes(d)</h1>
+        <h1>.outlineshapes(d), .outlineshapes(d1, d2), and .outlineshapes(d1, d2, curveIntersectionThreshold)</h1>
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
@@ -824,9 +824,16 @@
         <p>This generates a curve's outline as a series of shapes, rather than as a path sequence. Each shape is
           an object <code>{startcap: (bezier), forward: (bezier), endcap: (bezier), back: (bezier)}</code>.
           Additionally, each cap has a <code>.virtual</code> attribute to indicate whether it a true cap for
-          the original curve's outline, or an intermediary cap somewhere inside the collection of outline shapes.
-          Finally, shapes have an <code>.intersects(othershape)</code> function for finding intersections
-          between shapes rather than between individual curves.</p>
+          the original curve's outline, or an intermediary cap somewhere inside the collection of outline shapes.</p>
+
+        <p>When only one distance value is given, the shape's curve's outlines are generated at distance <code>d</code> on both
+          the normal and anti-normal. If two distance values are given, the shape's curve's outlines are generated at distance
+          <code>d1</code> on along the normal, and <code>d2</code> along the anti-normal.</p>
+
+        <p>Finally, shapes have an <code>.intersections(othershape)</code> function for finding intersections
+          between shapes rather than between individual curves. If <code>curveIntersectionThreshold</code> is provided, it
+          will be used for precision of <a href="#curvetocurveintersection">curve to curve intersections</a>.</p>
+
       </section>
 
       <section>
@@ -900,8 +907,10 @@
           not standard Cardano's algorithm for solving the cubic root function.</p>
       </section>
 
+      <a name="curvetocurveintersection"></a>
+      
       <section>
-        <h2>.intersects(curve)</h2>
+        <h2>.intersects(curve) and .intersects(curve, curveIntersectionThreshold)</h2>
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
@@ -946,7 +955,8 @@
         "homes in" on the actual intersections, such that with infinite divisions, we can get an arbitrarily
         close approximation of the <code>t</code> values involved. Thankfully, repeating the process a low number
         of steps is generally good enough to get reliable values (typically 10 steps yields more than acceptable
-        precision).</p>
+        precision). When <code>curveIntersectionThreshold</code> is provided, this will be used for bounding box 
+        comparisons in x and y dimensions so that precision can be specified, otherwise a default value of .5 will be used.</p>
 
       </section>
     </main>
