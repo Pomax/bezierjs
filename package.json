@@ -5,6 +5,7 @@
   "main": "./index.js",
   "scripts": {
     "test": "npm run build && node test",
+    "test:manual": "http-server test/manual",
     "build": "rimraf bezier.js && webpack"
   },
   "repository": {
