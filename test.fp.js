@@ -251,3 +251,21 @@ var deepFreeze = require('deep-freeze');
   assert.deepEqual(cubSplit1.span, bCubSplit1.span);
   assert.deepEqual(cubSplit2, bCubSplit2.points);
 }());
+
+(function testExtrema() {
+  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+
+  deepFreeze(cub);
+
+  assert.deepEqual(BezierFP.extrema(cub), bCub.extrema());
+}());
+
+(function testBbox() {
+  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+
+  deepFreeze(cub);
+
+  assert.deepEqual(BezierFP.bbox(cub), bCub.bbox());
+}());
