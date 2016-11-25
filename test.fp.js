@@ -107,7 +107,7 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(quad);
 
   bQuad.computedirection();
-  assert.equal(bQuad.clockwise, BezierFP.isClockwise(quad));
+  assert.equal(BezierFP.isClockwise(quad), bQuad.clockwise);
 }());
 
 (function testDerivative() {
@@ -119,8 +119,8 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(quad);
   deepFreeze(cub);
 
-  assert.deepEqual(bQuad.derivative(0.5), BezierFP.derivative(quad, 0.5));
-  assert.deepEqual(bCub.derivative(0.5), BezierFP.derivative(cub, 0.5));
+  assert.deepEqual(BezierFP.derivative(quad, 0.5), bQuad.derivative(0.5));
+  assert.deepEqual(BezierFP.derivative(cub, 0.5), bCub.derivative(0.5));
 }());
 
 (function testLength() {
@@ -129,7 +129,7 @@ var deepFreeze = require('deep-freeze');
 
   deepFreeze(cub);
 
-  assert.equal(bCub.length(), BezierFP.length(cub));
+  assert.equal(BezierFP.length(cub), bCub.length());
 }());
 
 (function testCompute() {
@@ -141,8 +141,8 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(quad);
   deepFreeze(cub);
 
-  assert.deepEqual(bQuad.compute(0.3), BezierFP.compute(quad, 0.3));
-  assert.deepEqual(bCub.compute(0.3), BezierFP.compute(cub, 0.3));
+  assert.deepEqual(BezierFP.compute(quad, 0.3), bQuad.compute(0.3));
+  assert.deepEqual(BezierFP.compute(cub, 0.3), bCub.compute(0.3));
 }());
 
 (function testLUT() {
@@ -151,7 +151,7 @@ var deepFreeze = require('deep-freeze');
 
   deepFreeze(cub);
 
-  assert.deepEqual(bCub.getLUT(), BezierFP.LUT(cub));
+  assert.deepEqual(BezierFP.LUT(cub), bCub.getLUT());
 }());
 
 (function testCrosses() {
@@ -164,8 +164,8 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(pointOn);
   deepFreeze(pointOut);
 
-  assert.equal(bCub.on(pointOn), BezierFP.crosses(cub, pointOn));
-  assert.equal(bCub.on(pointOut), BezierFP.crosses(cub, pointOut));
+  assert.equal(BezierFP.crosses(cub, pointOn), bCub.on(pointOn));
+  assert.equal(BezierFP.crosses(cub, pointOut), bCub.on(pointOut));
 }());
 
 (function testProject() {
@@ -176,7 +176,7 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(cub);
   deepFreeze(point);
 
-  assert.deepEqual(bCub.project(point), BezierFP.project(cub, point));
+  assert.deepEqual(BezierFP.project(cub, point), bCub.project(point));
 }());
 
 (function testRaise() {
@@ -185,7 +185,7 @@ var deepFreeze = require('deep-freeze');
 
   deepFreeze(quad);
 
-  assert.deepEqual(bQuad.raise().points, BezierFP.raise(quad));
+  assert.deepEqual(BezierFP.raise(quad), bQuad.raise().points);
 }());
 
 (function testInflections() {
@@ -197,8 +197,8 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(quad);
   deepFreeze(cub);
 
-  assert.deepEqual(bQuad.inflections(), BezierFP.inflections(quad));
-  assert.deepEqual(bCub.inflections(), BezierFP.inflections(cub));
+  assert.deepEqual(BezierFP.inflections(quad), bQuad.inflections());
+  assert.deepEqual(BezierFP.inflections(cub), bCub.inflections());
 }());
 
 (function testNormal() {
@@ -207,7 +207,7 @@ var deepFreeze = require('deep-freeze');
 
   deepFreeze(cub);
 
-  assert.deepEqual(bCub.normal(0.5), BezierFP.normal(cub, 0.5));
+  assert.deepEqual(BezierFP.normal(cub, 0.5), bCub.normal(0.5));
 
   // TODO: test 3d
 }());
@@ -218,9 +218,36 @@ var deepFreeze = require('deep-freeze');
 
   deepFreeze(cub);
 
-  assert.deepEqual(bCub.hull(0.5), BezierFP.hull(cub, 0.5));
+  assert.deepEqual(BezierFP.hull(cub, 0.5), bCub.hull(0.5));
 }());
 
 (function testSplit() {
+  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
 
+  deepFreeze(cub);
+
+  bCubSplit1 = bCub.split(0.5);
+  cubSplit1 = BezierFP.split(cub, 0.5);
+  bCubSplit2 = bCub.split(0.2, 0.7);
+  cubSplit2 = BezierFP.split(cub, 0.2, 0.7);
+
+  assert.equal(cubSplit1.left[0]._t1, bCubSplit1.left._t1);
+  assert.equal(cubSplit1.left[0]._t2, bCubSplit1.left._t2);
+  assert.equal(cubSplit1.right[0]._t1, bCubSplit1.right._t1);
+  assert.equal(cubSplit1.right[0]._t2, bCubSplit1.right._t2);
+  assert.equal(cubSplit2[0]._t1, bCubSplit2._t1);
+  assert.equal(cubSplit2[0]._t2, bCubSplit2._t2);
+
+  delete cubSplit1.left[0]._t1;
+  delete cubSplit1.left[0]._t2;
+  delete cubSplit1.right[0]._t1;
+  delete cubSplit1.right[0]._t2;
+  delete cubSplit2[0]._t1;
+  delete cubSplit2[0]._t2;
+
+  assert.deepEqual(cubSplit1.left, bCubSplit1.left.points);
+  assert.deepEqual(cubSplit1.right, bCubSplit1.right.points);
+  assert.deepEqual(cubSplit1.span, bCubSplit1.span);
+  assert.deepEqual(cubSplit2, bCubSplit2.points);
 }());
