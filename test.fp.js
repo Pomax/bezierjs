@@ -5,6 +5,10 @@ var utilsFP = BezierFP.getUtils();
 var assert = require("chai").use(require("chai-stats")).assert;
 var deepFreeze = require('deep-freeze');
 
+/*
+ * ## Test bezier.fp.js
+ */
+
 (function testOrder() {
   var quad = [{x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}];
   var cub = [{x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
@@ -268,4 +272,18 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(cub);
 
   assert.deepEqual(BezierFP.bbox(cub), bCub.bbox());
+}());
+
+/*
+ * ## Test utils.fp.js
+ */
+
+(function testMakeline() {
+  var p1 = {x: 20, y: 20};
+  var p2 = {x: 40, y: 40};
+
+  deepFreeze(p1);
+  deepFreeze(p2);
+
+  assert.deepEqual(utilsFP.makeline(p1, p2), utils.makeline(p1, p2).points);
 }());
