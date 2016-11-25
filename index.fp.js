@@ -1,3 +1,4 @@
+require('./lib/assign-polyfill');
 // Solve cross-dependencies between bezier.js and utils.js
 var _utils   = {};
 var _bezier  = {};

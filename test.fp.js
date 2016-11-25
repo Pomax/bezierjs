@@ -78,15 +78,19 @@ var deepFreeze = require('deep-freeze');
   assert.equal(BezierFP.toSVG(cub), 'M 0 0 C 1 1 2 2 3 3');
 }());
 
-(function testInvert() {
+(function testReverse() {
   var quad = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}];
   var cub = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
 
   deepFreeze(quad);
   deepFreeze(cub);
 
-  assert.deepEqual(BezierFP.invert(quad), [{x: 2, y: 2, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 0, y: 0}]);
-  assert.deepEqual(BezierFP.invert(cub), [{x: 3, y: 3, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}]);
+  assert.deepEqual(BezierFP.reverse(quad), [{x: 2, y: 2, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 0, y: 0}]);
+  assert.deepEqual(BezierFP.reverse(cub), [{x: 3, y: 3, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}]);
+}());
+
+(function testIsLinear() {
+  // TODO
 }());
 
 /*
@@ -273,6 +277,33 @@ var deepFreeze = require('deep-freeze');
 
   assert.deepEqual(BezierFP.bbox(cub), bCub.bbox());
 }());
+
+(function testOutlineshapes() {
+  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+
+  deepFreeze(cub);
+
+  var bCubOutlines = bCub.outlineshapes();
+  var cubOutlines = BezierFP.outlineshapes(cub);
+
+  assert.equal(cubOutlines.length, bCubOutlines.length);
+
+  bCubOutlines.forEach(function(shape, shapeId) {
+    Object.keys(shape).forEach(function(key) {
+      var bCurve = shape[key];
+      var curve = cubOutlines[shapeId];
+
+      assert.equal(curve[0].virtual, bCurve.virtual);
+
+      delete curve[0].virtual;
+
+      assert.deepEqual(curve, bCurve.points);
+    });
+  });
+}());
+
+
 
 /*
  * ## Test utils.fp.js
