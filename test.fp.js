@@ -282,6 +282,33 @@ var deepFreeze = require('deep-freeze');
   assert.deepEqual(BezierFP.bbox(cub), bCub.bbox());
 }());
 
+(function testOutline() {
+  var bCub = new Bezier(150,40 , 80,30 , 105,150);
+  var cub = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
+
+  deepFreeze(cub);
+
+  var bCubOutlines = bCub.outline(25);
+  var cubOutlines = BezierFP.outline(cub, 25);
+
+  assert.equal(cubOutlines.length, bCubOutlines.curves.length);
+
+  cubOutlines.forEach(function(curve, i) {
+    var bCurve = bCubOutlines.curves[i];
+
+    assert.equal(curve[0].virtual, bCurve.virtual);
+    // TODO: t1 / t2 asserts
+
+    curve.forEach(function(point, j) {
+      delete point._t1;
+      delete point._t2;
+      delete point.virtual;
+    });
+
+    assert.deepEqual(curve, bCurve.points);
+  });
+}());
+
 (function testOutlineshapes() {
   var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
   var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
@@ -291,19 +318,26 @@ var deepFreeze = require('deep-freeze');
   var bCubOutlines = bCub.outlineshapes(25, 15);
   var cubOutlines = BezierFP.outlineshapes(cub, 25, 15);
 
-  assert.equal(cubOutlines.length, bCubOutlines.curves.length);
+  assert.equal(cubOutlines.length, bCubOutlines.length);
 
   bCubOutlines.forEach(function(shape, shapeId) {
-    Object.keys(shape).forEach(function(key) {
+    ['startcap', 'forward', 'back', 'endcap'].forEach(function(key) {
       var bCurve = shape[key];
-      var curve = cubOutlines[shapeId];
+      var curve = cubOutlines[shapeId][key];
 
       assert.equal(curve[0].virtual, bCurve.virtual);
+      // TODO: t1 / t2 asserts
 
-      delete curve[0].virtual;
+      curve.forEach(function(point, j) {
+        delete point._t1;
+        delete point._t2;
+        delete point.virtual;
+      });
 
       assert.deepEqual(curve, bCurve.points);
     });
+
+    assert.deepEqual(shape.bbox, cubOutlines[shapeId].bbox);
   });
 }());
 
@@ -321,4 +355,89 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(p2);
 
   assert.deepEqual(utilsFP.makeline(p1, p2), utils.makeline(p1, p2).points);
+}());
+
+(function testFindbbox(){
+  // WIP
+}());
+
+(function testShapeintersections() {
+  var s1Obj = utils.makeshape(
+    new Bezier(0,0 , 50,25 , 0,50),
+    new Bezier(1,1 , 51,26 , 1,51)
+  );
+  var s2Obj = utils.makeshape(
+    new Bezier(50,0 , 0,25 , 50,0),
+    new Bezier(51,1 , 1,26 , 51,1)
+  );
+
+  var s1 = utilsFP.makeshape(
+    [{x: 0, y: 0}, {x: 50, y: 25}, {x: 0, y: 50}],
+    [{x: 1, y: 1}, {x: 51, y: 26}, {x: 1, y: 51}]
+  );
+  var s2 = utilsFP.makeshape(
+    [{x: 50, y: 0}, {x: 0, y: 25}, {x: 50, y: 0}],
+    [{x: 51, y: 1}, {x: 1, y: 26}, {x: 51, y: 1}]
+  );
+
+  deepFreeze(s1);
+  deepFreeze(s2);
+
+  assert.deepEqual(
+    utilsFP.shapeintersections(s1, s1.bbox, s2, s2.bbox),
+    utils.shapeintersections(s1Obj, s1Obj.bbox, s2Obj, s2Obj.bbox)
+  );
+}());
+
+(function testMakeshape() {
+  var forwardObj = new Bezier(0,0 , 50,25 , 0,50);
+  var backObj = new Bezier(1,1 , 51,26 , 1,51);
+
+  var forward = [{x: 0, y: 0}, {x: 50, y: 25}, {x: 0, y: 50}];
+  var back = [{x: 1, y: 1}, {x: 51, y: 26}, {x: 1, y: 51}];
+
+  deepFreeze(forward);
+  deepFreeze(back);
+
+  var shape = utilsFP.makeshape(forward, back);
+  var shapeObj = utils.makeshape(forwardObj, backObj)
+
+  assert.deepEqual(shape.back, shapeObj.back.points);
+  assert.deepEqual(shape.bbox, shapeObj.bbox);
+  assert.deepEqual(shape.endcap, shapeObj.endcap.points);
+  assert.deepEqual(shape.forward, shapeObj.forward.points);
+  assert.deepEqual(shape.startcap, shapeObj.startcap.points);
+}());
+
+(function testGetminmax() {
+  var curve = new Bezier(0,0 , 10,10 , 20,30);
+
+  var points = [{x: 0, y: 0}, {x: 10, y: 10}, {x: 20, y: 30}];
+  var d = 'x';
+  var list = [0];
+
+  deepFreeze(points);
+  deepFreeze(d);
+  deepFreeze(list);
+
+  assert.deepEqual(
+    utilsFP.getminmax(points, d, list),
+    utils.getminmax(curve, d, Array.from(list))
+  );
+}());
+
+(function testPairiteration() {
+  var c1 = new Bezier(0,0 , 10,10 , 20,30);
+  var c2 = new Bezier(20,20 , 0,0 , 12,42);
+
+  var p1 = [{x: 0, y: 0}, {x: 10, y: 10}, {x: 20, y: 30}];
+  var p2 = [{x: 20, y: 20}, {x: 0, y: 0}, {x: 12, y: 42}];
+
+  deepFreeze(p1);
+  deepFreeze(p2);
+
+  assert.deepEqual(
+    utilsFP.pairiteration(p1, p2),
+    utils.pairiteration(c1, c2)
+  );
 }());
