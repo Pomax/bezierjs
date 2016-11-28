@@ -90,7 +90,11 @@ var deepFreeze = require('deep-freeze');
 }());
 
 (function testIsLinear() {
-  // TODO
+  // TODO test
+}());
+
+(function testIsSimple() {
+  // TODO test
 }());
 
 /*
@@ -284,10 +288,10 @@ var deepFreeze = require('deep-freeze');
 
   deepFreeze(cub);
 
-  var bCubOutlines = bCub.outlineshapes();
-  var cubOutlines = BezierFP.outlineshapes(cub);
+  var bCubOutlines = bCub.outlineshapes(25, 15);
+  var cubOutlines = BezierFP.outlineshapes(cub, 25, 15);
 
-  assert.equal(cubOutlines.length, bCubOutlines.length);
+  assert.equal(cubOutlines.length, bCubOutlines.curves.length);
 
   bCubOutlines.forEach(function(shape, shapeId) {
     Object.keys(shape).forEach(function(key) {

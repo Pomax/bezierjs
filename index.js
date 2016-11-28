@@ -6,4 +6,6 @@ var utils    = require('./lib/utils.js')(Bezier);
 
 Object.assign(_utils, utils);
 
+// TODO: make PolyBezier public somehow
+
 module.exports = Bezier;
