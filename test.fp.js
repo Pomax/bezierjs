@@ -358,7 +358,19 @@ var deepFreeze = require('deep-freeze');
 }());
 
 (function testFindbbox(){
-  // WIP
+  var sectionsObj = [
+    new Bezier(0,0 , 50,25 , 0,50),
+    new Bezier(1,1 , 51,26 , 1,51),
+  ];
+  
+  var sections = [
+    [{x: 0, y: 0}, {x: 50, y: 25}, {x: 0, y: 50}],
+    [{x: 1, y: 1}, {x: 51, y: 26}, {x: 1, y: 51}],
+  ];
+  
+  deepFreeze(sections);
+  
+  assert.deepEqual(utilsFP.findbbox(sections), utils.findbbox(sectionsObj));
 }());
 
 (function testShapeintersections() {
