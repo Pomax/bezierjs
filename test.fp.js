@@ -7,6 +7,9 @@ var deepFreeze = require('deep-freeze');
 
 /*
  * ## Test bezier.fp.js
+ * Most of the units only test two things:
+ * - That results of BezierFP are consistent with results from Bezier.
+ * - That methods of BezierFP never mutate parameters.
  */
 
 (function testOrder() {
@@ -78,31 +81,6 @@ var deepFreeze = require('deep-freeze');
   assert.equal(BezierFP.toSVG(cub), 'M 0 0 C 1 1 2 2 3 3');
 }());
 
-(function testReverse() {
-  var quad = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}];
-  var cub = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
-
-  deepFreeze(quad);
-  deepFreeze(cub);
-
-  assert.deepEqual(BezierFP.reverse(quad), [{x: 2, y: 2, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 0, y: 0}]);
-  assert.deepEqual(BezierFP.reverse(cub), [{x: 3, y: 3, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}]);
-}());
-
-(function testIsLinear() {
-  // TODO test
-}());
-
-(function testIsSimple() {
-  // TODO test
-}());
-
-/*
- * The following tests only verify two things:
- * - That results of BezierFP are consistent with results from Bezier.
- * - That methods of BezierFP never mutate parameters.
- */
-
 (function testDerivativePoints() {
   var bQuad = new Bezier(150,40 , 80,30 , 105,150);
   var quad = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
@@ -122,17 +100,23 @@ var deepFreeze = require('deep-freeze');
   assert.equal(BezierFP.isClockwise(quad), bQuad.clockwise);
 }());
 
-(function testDerivative() {
-  var bQuad = new Bezier(150,40 , 80,30 , 105,150);
-  var quad = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
-  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
-  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+(function testIsLinear() {
+  var cub = [{x: 0, y: 0}, {x: 25, y: 26}, {x: 74, y: 75}, { x: 100, y: 100}];
+
+  deepFreeze(cub);
+
+  assert.equal(BezierFP.isLinear(cub));
+}());
+
+(function testReverse() {
+  var quad = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}];
+  var cub = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
 
   deepFreeze(quad);
   deepFreeze(cub);
 
-  assert.deepEqual(BezierFP.derivative(quad, 0.5), bQuad.derivative(0.5));
-  assert.deepEqual(BezierFP.derivative(cub, 0.5), bCub.derivative(0.5));
+  assert.deepEqual(BezierFP.reverse(quad), [{x: 2, y: 2, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 0, y: 0}]);
+  assert.deepEqual(BezierFP.reverse(cub), [{x: 3, y: 3, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}]);
 }());
 
 (function testLength() {
@@ -142,19 +126,6 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(cub);
 
   assert.equal(BezierFP.length(cub), bCub.length());
-}());
-
-(function testCompute() {
-  var bQuad = new Bezier(150,40 , 80,30 , 105,150);
-  var quad = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
-  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
-  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
-
-  deepFreeze(quad);
-  deepFreeze(cub);
-
-  assert.deepEqual(BezierFP.compute(quad, 0.3), bQuad.compute(0.3));
-  assert.deepEqual(BezierFP.compute(cub, 0.3), bCub.compute(0.3));
 }());
 
 (function testLUT() {
@@ -191,6 +162,19 @@ var deepFreeze = require('deep-freeze');
   assert.deepEqual(BezierFP.project(cub, point), bCub.project(point));
 }());
 
+(function testCompute() {
+  var bQuad = new Bezier(150,40 , 80,30 , 105,150);
+  var quad = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
+  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+
+  deepFreeze(quad);
+  deepFreeze(cub);
+
+  assert.deepEqual(BezierFP.compute(quad, 0.3), bQuad.compute(0.3));
+  assert.deepEqual(BezierFP.compute(cub, 0.3), bCub.compute(0.3));
+}());
+
 (function testRaise() {
   var bQuad = new Bezier(150,40 , 80,30 , 105,150);
   var quad = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
@@ -198,6 +182,19 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(quad);
 
   assert.deepEqual(BezierFP.raise(quad), bQuad.raise().points);
+}());
+
+(function testDerivative() {
+  var bQuad = new Bezier(150,40 , 80,30 , 105,150);
+  var quad = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
+  var bCub = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+  var cub = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+
+  deepFreeze(quad);
+  deepFreeze(cub);
+
+  assert.deepEqual(BezierFP.derivative(quad, 0.5), bQuad.derivative(0.5));
+  assert.deepEqual(BezierFP.derivative(cub, 0.5), bCub.derivative(0.5));
 }());
 
 (function testInflections() {
@@ -282,6 +279,26 @@ var deepFreeze = require('deep-freeze');
   assert.deepEqual(BezierFP.bbox(cub), bCub.bbox());
 }());
 
+(function testOverlaps() {
+
+}());
+
+(function testOffset() {
+
+}());
+
+(function testIsSimple() {
+// TODO test
+}());
+
+(function testReduce() {
+
+}());
+
+(function testScale() {
+
+}());
+
 (function testOutline() {
   var bCub = new Bezier(150,40 , 80,30 , 105,150);
   var cub = [{x: 150, y: 40}, {x: 80, y: 30}, {x: 105, y: 150}];
@@ -341,7 +358,25 @@ var deepFreeze = require('deep-freeze');
   });
 }());
 
+(function testIntersects() {
 
+}());
+
+(function testLineIntersects() {
+
+}());
+
+(function testSelfIntersects() {
+
+}());
+
+(function testCurveIntersects() {
+
+}());
+
+(function testArcs() {
+
+}());
 
 /*
  * ## Test utils.fp.js
@@ -434,7 +469,7 @@ var deepFreeze = require('deep-freeze');
 
   assert.deepEqual(
     utilsFP.getminmax(points, d, list),
-    utils.getminmax(curve, d, Array.from(list))
+    utils.getminmax(curve, d, list.concat())
   );
 }());
 
