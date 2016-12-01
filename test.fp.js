@@ -70,6 +70,15 @@ var deepFreeze = require('deep-freeze');
   assert.deepEqual(BezierFP.dimlen(quad3dBis), 3);
 }());
 
+(function testIsLinear() {
+  var cub = [{x: 0, y: 0}, {x: 25, y: 25.1}, {x: 75.1, y: 75}, { x: 100, y: 100}];
+
+  deepFreeze(cub);
+
+  assert.equal(BezierFP.isLinear(cub), false);
+  assert.equal(BezierFP.isLinear(cub, 0.1), true);
+}());
+
 (function testToSVG() {
   var quad = [{x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}];
   var cub = [{x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
@@ -98,25 +107,6 @@ var deepFreeze = require('deep-freeze');
 
   bQuad.computedirection();
   assert.equal(BezierFP.isClockwise(quad), bQuad.clockwise);
-}());
-
-(function testIsLinear() {
-  var cub = [{x: 0, y: 0}, {x: 25, y: 26}, {x: 74, y: 75}, { x: 100, y: 100}];
-
-  deepFreeze(cub);
-
-  assert.equal(BezierFP.isLinear(cub));
-}());
-
-(function testReverse() {
-  var quad = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}];
-  var cub = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
-
-  deepFreeze(quad);
-  deepFreeze(cub);
-
-  assert.deepEqual(BezierFP.reverse(quad), [{x: 2, y: 2, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 0, y: 0}]);
-  assert.deepEqual(BezierFP.reverse(cub), [{x: 3, y: 3, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}]);
 }());
 
 (function testLength() {
@@ -378,6 +368,17 @@ var deepFreeze = require('deep-freeze');
 
 }());
 
+(function testReverse() {
+  var quad = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}];
+  var cub = [{x: 0, y: 0, _t1: 0.2, _t2: 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}];
+
+  deepFreeze(quad);
+  deepFreeze(cub);
+
+  assert.deepEqual(BezierFP.reverse(quad), [{x: 2, y: 2, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 1, y: 1}, {x: 0, y: 0}]);
+  assert.deepEqual(BezierFP.reverse(cub), [{x: 3, y: 3, _t2: 1 - 0.2, _t1: 1 - 0.7, extra: 'info'}, {x: 2, y: 2}, {x: 1, y: 1}, {x: 0, y: 0}]);
+}());
+
 /*
  * ## Test utils.fp.js
  */
@@ -397,14 +398,14 @@ var deepFreeze = require('deep-freeze');
     new Bezier(0,0 , 50,25 , 0,50),
     new Bezier(1,1 , 51,26 , 1,51),
   ];
-  
+
   var sections = [
     [{x: 0, y: 0}, {x: 50, y: 25}, {x: 0, y: 50}],
     [{x: 1, y: 1}, {x: 51, y: 26}, {x: 1, y: 51}],
   ];
-  
+
   deepFreeze(sections);
-  
+
   assert.deepEqual(utilsFP.findbbox(sections), utils.findbbox(sectionsObj));
 }());
 
