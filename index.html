@@ -795,7 +795,7 @@
       </section>
 
       <section>
-        <h1>.outlineshapes(d), .outlineshapes(d1, d2), and .outlineshapes(d1, d2, curveIntersectionThreshold)</h1>
+        <h1>.outlineShapes(d), .outlineShapes(d1, d2), and .outlineShapes(d1, d2, curveIntersectionThreshold)</h1>
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
@@ -804,7 +804,7 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              curve.outlineshapes(25).forEach(function(s) {
+              curve.outlineShapes(25).forEach(function(s) {
                 setRandomFill(0.2);
                 drawShape(s);
               });
@@ -817,7 +817,7 @@
               drawSkeleton(curve);
               drawCurve(curve);
               setColor("red");
-              curve.outlineshapes(25).forEach(function(s) {
+              curve.outlineShapes(25).forEach(function(s) {
                 setRandomFill(0.2);
                 drawShape(s);
               });
@@ -912,7 +912,7 @@
       </section>
 
       <a name="curvetocurveintersection"></a>
-      
+
       <section>
         <h2>.intersects(curve) and .intersects(curve, curveIntersectionThreshold)</h2>
 
@@ -959,7 +959,7 @@
         "homes in" on the actual intersections, such that with infinite divisions, we can get an arbitrarily
         close approximation of the <code>t</code> values involved. Thankfully, repeating the process a low number
         of steps is generally good enough to get reliable values (typically 10 steps yields more than acceptable
-        precision). When <code>curveIntersectionThreshold</code> is provided, this will be used for bounding box 
+        precision). When <code>curveIntersectionThreshold</code> is provided, this will be used for bounding box
         comparisons in x and y dimensions so that precision can be specified, otherwise a default value of .5 will be used.</p>
 
       </section>
