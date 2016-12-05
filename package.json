@@ -4,10 +4,13 @@
   "description": "A javascript library for working with Bezier curves",
   "main": "./index.js",
   "scripts": {
-    "test": "npm run build && npm run test:oo && npm run test:fp",
+    "test": "npm run build && npm run test:all",
     "test:oo": "node test/test.js",
     "test:fp": "node test/test.fp.js",
-    "build": "rimraf bezier.js && webpack"
+    "test:all": "npm run test:oo && npm run test:fp",
+    "build:oo": "rimraf bezier.js && webpack index.js",
+    "build:fp": "rimraf fp/bezier.js && webpack fp/index.js --config fp/webpack.config.js",
+    "build": "npm run build:oo && npm run build:fp",
   },
   "repository": {
     "type": "git",

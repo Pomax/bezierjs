@@ -1,6 +1,6 @@
 var Bezier = require('./index.js');
 var utils = Bezier.getUtils();
-var BezierFP = require('./index.fp.js');
+var BezierFP = require('./fp/index.js');
 var utilsFP = BezierFP.getUtils();
 var assert = require("chai").use(require("chai-stats")).assert;
 var deepFreeze = require('deep-freeze');
@@ -64,10 +64,10 @@ var deepFreeze = require('deep-freeze');
   deepFreeze(quad3d);
   deepFreeze(quad3dBis);
 
-  assert.deepEqual(BezierFP.dimlen(quad2d), 2);
-  assert.deepEqual(BezierFP.dimlen(quad2dBis), 2);
-  assert.deepEqual(BezierFP.dimlen(quad3d), 3);
-  assert.deepEqual(BezierFP.dimlen(quad3dBis), 3);
+  assert.deepEqual(BezierFP.dimLen(quad2d), 2);
+  assert.deepEqual(BezierFP.dimLen(quad2dBis), 2);
+  assert.deepEqual(BezierFP.dimLen(quad3d), 3);
+  assert.deepEqual(BezierFP.dimLen(quad3dBis), 3);
 }());
 
 (function testIsLinear() {
@@ -270,6 +270,8 @@ var deepFreeze = require('deep-freeze');
 }());
 
 (function testOverlaps() {
+  var cub1 = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
+  var cub2 = [{x: 100, y: 25}, {x: 10, y: 90}, {x: 110, y: 100}, { x: 150, y: 195}];
 
 }());
 
