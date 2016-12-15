@@ -10,7 +10,7 @@
     "test:all": "npm run test:oo && npm run test:fp",
     "build:oo": "rimraf bezier.js && webpack index.js",
     "build:fp": "rimraf fp/bezier.js && webpack fp/index.js --config fp/webpack.config.js",
-    "build": "npm run build:oo && npm run build:fp",
+    "build": "npm run build:oo && npm run build:fp"
   },
   "repository": {
     "type": "git",

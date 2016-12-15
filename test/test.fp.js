@@ -1,9 +1,10 @@
-var Bezier = require('./index.js');
-var utils = Bezier.getUtils();
-var BezierFP = require('./fp/index.js');
-var utilsFP = BezierFP.getUtils();
 var assert = require("chai").use(require("chai-stats")).assert;
 var deepFreeze = require('deep-freeze');
+
+var Bezier = require('../index.js');
+var utils = Bezier.getUtils();
+var BezierFP = require('../fp/index.js');
+var utilsFP = BezierFP.getUtils();
 
 /*
  * ## Test bezier.fp.js
