@@ -1,4 +1,4 @@
-var Bezier = require("./lib/bezier");
+var Bezier = require("../lib/bezier");
 var utils = Bezier.getUtils();
 var assert = require("chai").use(require("chai-stats")).assert;
 
