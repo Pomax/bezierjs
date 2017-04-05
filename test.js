@@ -213,3 +213,10 @@ var assert = require("chai").use(require("chai-stats")).assert;
   assert(e[1] === 0.5, "Extrema test curve value 2 is one half");
   assert(e[2] === 1, "Extrema test curve value 3 is one");
 }());
+
+(function testArcEndvalue() {
+  var B = new Bezier([25.308000000000003,10.260000000000001,25.848000000000002,10.728000000000001,25.848000000000002,11.304000000000002]);
+  var arcs = B.arcs(0.0012143080752705958)
+  var arc = arcs[1];
+  assert(arc.interval.end === 1, "final arc interval is capped at t=1.0");
+}());
