@@ -5,7 +5,7 @@
     <title>PWM calculator</title>
     <link rel="stylesheet" href="style.css">
   </head>
-  <body>
+  <body onload="document.getElementById('points').value=updateFrameCount(document.getElementById('points').value)">
     <header>
       <h1>PWM Lookup Table Generator</h1>
     </header>
@@ -27,7 +27,7 @@
           </figure>
         </td>
         <td>
-          <p>number of points/frames</p><input type=number value=100 oninput="this.value=updateFrameCount(this.value)" onload="this.value=updateFrameCount(this.value)">
+          <p>number of points/frames</p><input id=points type=number value=100 oninput="this.value=updateFrameCount(this.value)">
           <button onClick=getValues(document.getElementById("output"))>Get Values</button>
         </td>
       </tr>
