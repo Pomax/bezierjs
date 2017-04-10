@@ -5,7 +5,7 @@
     <title>PWM calculator</title>
     <link rel="stylesheet" href="style.css">
   </head>
-  <body onload="document.getElementById('points').value=updateFrameCount(document.getElementById('points').value)">
+  <body>
     <header>
       <h1>PWM Lookup Table Generator</h1>
     </header>
@@ -13,22 +13,38 @@
       <tr>
         <td>
           <figure><script type="text/beziercode">
-            new Bezier(0,200 , 120,150 , 200,15 , 300,0);
-            
+            new Bezier(0,document.body.clientHeight/2 ,5,10, 20,20 , document.body.clientWidth/2,0);
             var draw = function() {
-              setCurve(curve, getCanvas())
-              getCanvas().width=300
-              getCanvas().height=200
               drawSkeleton(curve);
               drawCurve(curve);
               getValues(document.getElementById("output"))
+
             }
+            setCurve(curve, getCanvas())
+            window_resize()
           </script>
           </figure>
         </td>
         <td>
-          <p>number of points/frames</p><input id=points type=number value=100 oninput="this.value=updateFrameCount(this.value)">
-          <button onClick=getValues(document.getElementById("output"))>Get Values</button>
+        <table>
+          <tr>
+            <td>
+              <text>Number of Values</text>
+              </td>
+              <td>
+                <input id=points type=number value=100 oninput="this.value=updateFrameCount(this.value)">
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <text>Animation Time</text>
+              </td>
+                <td>
+                  <input id=time type=number value=1.2 oninput="this.value=updateFrameCount(this.value)"><text>s</text>
+                </td>
+              </tr>
+            </table>
+          <div class=container style="background-color: #ff0000; height:50px; width:50px;"></div>
         </td>
       </tr>
     </table>  

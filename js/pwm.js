@@ -7,6 +7,42 @@ var bits = 8
 function setCurve(c, cvs){
 	curve=c;
 	canvas=cvs
+	canvas.ondblclick = canvas_double_click;
+	// canvas.addEventListener('resize', canvas_resize)
+	// canvas.onresize = canvas_resize;
+	window.addEventListener('resize', window_resize)
+	document.addEventListener('load', window_resize)
+	console.log('set curve')
+}
+
+function window_resize(arg){
+	var new_width = window.innerWidth/2;
+	var new_height = window.innerHeight*0.7;
+	//compute a scale factor for the existing points
+	var scale = [new_width/canvas.width, new_height/canvas.height];
+	for(p of curve.points){
+		p.x *= scale[0];
+		p.y *= scale[1];
+
+		//range check new values.
+		//todo check if they are equal to a boundary before scaling, and set to new boundary
+		if(p.x>new_width)
+			p.x = new_width
+		else if(p.x<0)
+			p.x=0
+		if(p.y>new_height)
+			p.y=new_height;
+		else if (p.y<0)
+			p.y=0
+	}
+	canvas.width=new_width;
+	canvas.height=new_height;
+	canvas.dispatchEvent(new Event('mousemove'));
+}
+
+function canvas_double_click(arg)
+{
+
 }
 
 function _power_to_intensity(num, max)
