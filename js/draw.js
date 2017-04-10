@@ -6,8 +6,8 @@ function bindDrawFunctions(idx) {
   cvs.height = 200;
   var ctx = cvs.getContext("2d");
   figure.appendChild(cvs);
-  var button = figure.querySelector("button");
-  if(button) { figure.appendChild(button); }
+  // var button = figure.querySelector("button");
+  // if(button) { figure.appendChild(button); }
 
   var randomColors = [];
   for(var i=0,j; i<360; i++) {
