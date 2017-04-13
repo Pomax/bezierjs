@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <title>PWM calculator</title>
     <link rel="stylesheet" href="style.css">
+    <script src="js/draw.js"></script>
+    <script src="js/interaction.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="./js/pwm.js"></script>
+    <script src="./js/linegroup.js"></script>
+    <script src="./bezier.js"></script>
   </head>
   <body>
     <header>
@@ -12,16 +18,9 @@
     <table>
       <tr>
         <td>
-          <figure><script type="text/beziercode">
-            new Bezier(0,document.body.clientHeight/2 ,5,10, 20,20 , document.body.clientWidth/2,0);
-            var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              getValues(document.getElementById("output"))
-
-            }
-            setCurve(curve, getCanvas())
-            window_resize()
+          <canvas id=cvs width=500 height=500 bgcolor="black"></canvas>
+          <figure><script>
+            var lg = new LineGroup(curve, document.getElementById('cvs'));
           </script>
           </figure>
         </td>
@@ -49,10 +48,5 @@
       </tr>
     </table>  
     <font face=monospace size=2><p id="output">nothing</p></font>
-    <script src="./js/pwm.js"></script>
-    <script src="./bezier.js"></script>
-    <script src="js/draw.js"></script>
-    <script src="js/interaction.js"></script>
-    <script src="js/loader.js"></script>
   </body>
 </html>
