@@ -1,22 +1,12 @@
-function bindDrawFunctions(cvs) {
+class Draw {
 
-  this.ctx = cvs.getContext("2d");
-  // var button = figure.querySelector("button");
-  // if(button) { figure.appendChild(button); }
-
-  var randomColors = [];
-  for(var i=0,j; i<360; i++) {
-    j = (i*47)%360;
-    randomColors.push("hsl("+j+",50%,50%)");
+  constructor(canvas){
+    this.ctx = cvs.getContext("2d");  
   }
-  var randomIndex = 0;
 
+  getCanvas() { return cvs; }
 
-  return {
-    getCanvas: function() { return cvs; },
-    test: function() {console.log('asdf')},
-
-    reset: function(curve, evt) {
+  reset(curve, evt) {
       cvs.width = cvs.width;
       this.ctx.strokeStyle = "black";
       this.ctx.fillStyle = "none";
@@ -24,39 +14,39 @@ function bindDrawFunctions(cvs) {
         curve.mouse = {x: evt.offsetX, y: evt.offsetY};
       }
       randomIndex = 0;
-    },
+    }
 
-    setColor: function(c) {
+  setColor(c) {
       this.ctx.strokeStyle = c;
-    },
+    }
 
-    noColor: function(c) {
+  noColor(c) {
       this.ctx.strokeStyle = "transparent";
-    },
+    }
 
-    setRandomColor: function() {
+  setRandomColor() {
       randomIndex = (randomIndex+1) % randomColors.length;
       var c = randomColors[randomIndex];
       this.ctx.strokeStyle = c;
-    },
+    }
 
-    setRandomFill: function(a) {
+  setRandomFill(a) {
       randomIndex = (randomIndex+1) % randomColors.length;
       a = (typeof a === "undefined") ? 1 : a;
       var c = randomColors[randomIndex];
       c = c.replace('hsl(','hsla(').replace(')',','+a+')');
       this.ctx.fillStyle = c;
-    },
+    }
 
-    setFill: function(c) {
+  setFill(c) {
       this.ctx.fillStyle = c;
-    },
+    }
 
-    noFill: function() {
+  noFill() {
       this.ctx.fillStyle = "transparent";
-    },
+    }
 
-    drawSkeleton: function(curve, offset, nocoords) {
+  drawSkeleton(curve, offset, nocoords) {
       offset = offset || { x:0, y:0 };
       var pts = curve.points;
       this.ctx.strokeStyle = "lightgrey";
@@ -65,9 +55,9 @@ function bindDrawFunctions(cvs) {
       else {this.drawLine(pts[2], pts[3], offset); }
       this.ctx.strokeStyle = "black";
       if(!nocoords) this.drawPoints(pts, offset);
-    },
+    }
 
-    drawCurve: function(curve, offset) {
+  drawCurve(curve, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
@@ -89,9 +79,9 @@ function bindDrawFunctions(cvs) {
       }
       this.ctx.stroke();
       this.ctx.closePath();
-    },
+    }
 
-    drawLine: function(p1, p2, offset) {
+  drawLine(p1, p2, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
@@ -99,25 +89,25 @@ function bindDrawFunctions(cvs) {
       this.ctx.moveTo(p1.x + ox,p1.y + oy);
       this.ctx.lineTo(p2.x + ox,p2.y + oy);
       this.ctx.stroke();
-    },
+    }
 
-    drawPoint: function(p, offset) {
+  drawPoint(p, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
       this.ctx.beginPath();
       this.ctx.arc(p.x + ox, p.y + oy, 5, 0, 2*Math.PI);
       this.ctx.stroke();
-    },
+    }
 
-    drawPoints: function(points, offset) {
+  drawPoints(points, offset) {
       offset = offset || { x:0, y:0 };
-      points.forEach(function(p) {
-        this.drawCircle(p, 3, offset);
-      }.bind(this));
-    },
+      for(var p of points){
+          this.drawCircle(p, 3, offset);
+      }
+    }
 
-    drawArc: function(p, offset) {
+  drawArc(p, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
@@ -127,18 +117,18 @@ function bindDrawFunctions(cvs) {
       this.ctx.lineTo(p.x + ox, p.y + oy);
       this.ctx.fill();
       this.ctx.stroke();
-    },
+    }
 
-    drawCircle: function(p, r, offset) {
+  drawCircle(p, r, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
       this.ctx.beginPath();
       this.ctx.arc(p.x + ox, p.y + oy, r, 0, 2*Math.PI);
       this.ctx.stroke();
-    },
+    }
 
-    drawbbox: function(bbox, offset) {
+  drawbbox(bbox, offset) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
@@ -149,9 +139,9 @@ function bindDrawFunctions(cvs) {
       this.ctx.lineTo(bbox.x.max + ox, bbox.y.min + oy);
       this.ctx.closePath();
       this.ctx.stroke();
-    },
+    }
 
-    drawHull: function(hull, offset) {
+  drawHull(hull, offset) {
       this.ctx.beginPath();
       if(hull.length === 6) {
         this.ctx.moveTo(hull[0].x, hull[0].y);
@@ -171,9 +161,9 @@ function bindDrawFunctions(cvs) {
         this.ctx.lineTo(hull[8].x, hull[8].y);
       }
       this.ctx.stroke();
-    },
+    }
 
-    drawShape: function(shape, offset) {
+  drawShape(shape, offset) {
       offset = offset || { x:0, y:0 };
       var order = shape.forward.points.length - 1;
       this.ctx.beginPath();
@@ -207,11 +197,10 @@ function bindDrawFunctions(cvs) {
       this.ctx.closePath();
       this.ctx.fill();
       this.ctx.stroke();
-    },
+    }
 
-    drawText: function(text, offset) {
+  drawText(text, offset) {
       offset = offset || { x:0, y:0 };
       this.ctx.fillText(text, offset.x, offset.y);
     }
-  };
 }

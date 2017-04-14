@@ -20,7 +20,15 @@
         <td>
           <canvas id=cvs width=500 height=500 bgcolor="black"></canvas>
           <figure><script>
-            var lg = new LineGroup(curve, document.getElementById('cvs'));
+            document.body.onload = function(){
+              console.log(document.getElementById('cvs'))
+              var draw = new Draw(document.getElementById('cvs'))
+              var c = new Bezier(0,0, 100,100, 200,100, 300,300)
+              console.log(c.points[0])
+              var lg = new LineGroup(c);
+              draw.drawSkeleton(c)
+              draw.drawCurve(c)
+            }
           </script>
           </figure>
         </td>

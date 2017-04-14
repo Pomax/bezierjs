@@ -70,3 +70,10 @@ function handleInteraction(cvs, curve) {
 
   return handler;
 }
+
+function bindInteraction(canvas, linegroup){
+  canvas.onmousemove = function(event){
+    console.log('move event: ', event)
+
+  }
+}
