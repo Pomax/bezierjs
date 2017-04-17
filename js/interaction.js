@@ -1,5 +1,5 @@
-function handleInteraction(cvs, curve) {
-  curve.mouse = false;
+function handleInteraction(cvs, lg) {
+  // curve.mouse = false;
 
   var fix = function(e) {
     e = e || window.event;
@@ -9,7 +9,6 @@ function handleInteraction(cvs, curve) {
     e.offsetY = e.clientY - rect.top;
   };
 
-  var lpts = curve.points;
   var moving = false, mx = my = ox = oy = 0, cx, cy, mp = false;
 
   var handler = { onupdate: function() {} };
@@ -18,14 +17,16 @@ function handleInteraction(cvs, curve) {
     fix(evt);
     mx = evt.offsetX;
     my = evt.offsetY;
-    lpts.forEach(function(p) {
-      if(Math.abs(mx-p.x)<10 && Math.abs(my-p.y)<10) {
-        moving = true;
-        mp = p;
-        cx = p.x;
-        cy = p.y;
+    for(l of lg.curves){
+      for(var p of l.points){
+        if(Math.abs(mx-p.x)<10 && Math.abs(my-p.y)<10) {
+          moving = true;
+          mp = p;
+          cx = p.x;
+          cy = p.y;
+        }
       }
-    });
+    }
   });
 
   cvs.addEventListener("mousemove", function(evt) {
@@ -33,26 +34,28 @@ function handleInteraction(cvs, curve) {
 
     var found = false;
 
-    if(!lpts) return;
-    lpts.forEach(function(p) {
-      var mx = evt.offsetX;
-      var my = evt.offsetY;
-      if(Math.abs(mx-p.x)<10 && Math.abs(my-p.y)<10) {
-        found = found || true;
-      }
-    });
-    cvs.style.cursor = found ? "pointer" : "default";
+    for(c of lg.curves){
+      if(!c.points) return;
+        c.points.forEach(function(p) {
+          var mx = evt.offsetX;
+          var my = evt.offsetY;
+          if(Math.abs(mx-p.x)<10 && Math.abs(my-p.y)<10) {
+            found = found || true;
+          }
 
-    if(!moving) {
-      return handler.onupdate(evt);
-    }
+          if(!moving) {
+            return handler.onupdate(evt);
+          }
 
-    ox = evt.offsetX - mx;
-    oy = evt.offsetY - my;
-    mp.x = cx + ox;
-    mp.y = cy + oy;
-    curve.update();
-    handler.onupdate();
+          ox = evt.offsetX - mx;
+          oy = evt.offsetY - my;
+          mp.x = cx + ox;
+          mp.y = cy + oy;
+          c.update();
+          handler.onupdate();
+        });
+        cvs.style.cursor = found ? "pointer" : "default";
+    };
   });
 
   cvs.addEventListener("mouseup", function(evt) {

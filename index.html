@@ -20,14 +20,18 @@
         <td>
           <canvas id=cvs width=500 height=500 bgcolor="black"></canvas>
           <figure><script>
+            var c, lg, draw
             document.body.onload = function(){
-              console.log(document.getElementById('cvs'))
-              var draw = new Draw(document.getElementById('cvs'))
-              var c = new Bezier(0,0, 100,100, 200,100, 300,300)
-              console.log(c.points[0])
-              var lg = new LineGroup(c);
-              draw.drawSkeleton(c)
-              draw.drawCurve(c)
+              c = new Bezier(0,0, 100,100, 200,100, 300,300)
+              lg = new LineGroup(c);
+              draw = new Draw(document.getElementById('cvs'))
+              draw.drawSkeleton(lg)
+              draw.drawCurve(lg)
+              handleInteraction(document.getElementById('cvs'), lg)
+            }
+            document.getElementById('cvs').onmousemove = function(){
+              draw.drawSkeleton(lg)
+              draw.drawCurve(lg)
             }
           </script>
           </figure>

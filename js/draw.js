@@ -1,7 +1,16 @@
 class Draw {
 
-  constructor(canvas){
+  constructor(cvs){
+    console.log(cvs)
+    this.canvas = cvs
     this.ctx = cvs.getContext("2d");  
+  }
+
+  draw(lg){
+    for(c of lg){
+      drawSkeleton(c)
+      drawCurve(c)
+    }
   }
 
   getCanvas() { return cvs; }
@@ -24,20 +33,6 @@ class Draw {
       this.ctx.strokeStyle = "transparent";
     }
 
-  setRandomColor() {
-      randomIndex = (randomIndex+1) % randomColors.length;
-      var c = randomColors[randomIndex];
-      this.ctx.strokeStyle = c;
-    }
-
-  setRandomFill(a) {
-      randomIndex = (randomIndex+1) % randomColors.length;
-      a = (typeof a === "undefined") ? 1 : a;
-      var c = randomColors[randomIndex];
-      c = c.replace('hsl(','hsla(').replace(')',','+a+')');
-      this.ctx.fillStyle = c;
-    }
-
   setFill(c) {
       this.ctx.fillStyle = c;
     }
@@ -46,18 +41,21 @@ class Draw {
       this.ctx.fillStyle = "transparent";
     }
 
-  drawSkeleton(curve, offset, nocoords) {
-      offset = offset || { x:0, y:0 };
-      var pts = curve.points;
-      this.ctx.strokeStyle = "lightgrey";
-      this.drawLine(pts[0], pts[1], offset);
-      if(pts.length === 3) { this.drawLine(pts[1], pts[2], offset); }
-      else {this.drawLine(pts[2], pts[3], offset); }
-      this.ctx.strokeStyle = "black";
-      if(!nocoords) this.drawPoints(pts, offset);
+  drawSkeleton(lg, offset, nocoords) {
+      for(curve of lg.curves){
+        offset = offset || { x:0, y:0 };
+        var pts = curve.points;
+        this.ctx.strokeStyle = "lightgrey";
+        this.drawLine(pts[0], pts[1], offset);
+        if(pts.length === 3) { this.drawLine(pts[1], pts[2], offset); }
+        else {this.drawLine(pts[2], pts[3], offset); }
+        this.ctx.strokeStyle = "black";
+        if(!nocoords) this.drawPoints(pts, offset);
+      }
     }
 
-  drawCurve(curve, offset) {
+  drawCurve(lg, offset) {
+    for(curve of lg.curves) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;
@@ -79,6 +77,7 @@ class Draw {
       }
       this.ctx.stroke();
       this.ctx.closePath();
+      }
     }
 
   drawLine(p1, p2, offset) {
@@ -92,6 +91,7 @@ class Draw {
     }
 
   drawPoint(p, offset) {
+      console.log((new Error()).stack)
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;

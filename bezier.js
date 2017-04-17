@@ -6,7 +6,8 @@ var Bezier = function(t) {
     }
     var r = {};
     return n.m = t, n.c = r, n.p = "", n(0)
-}([function(t, n, r) {
+}
+([function(t, n, r) {
     "use strict";
     t.exports = r(1)
 }, function(t, n, r) {
