@@ -1,19 +1,19 @@
 class Draw {
 
-  constructor(cvs){
+  constructor(cvs, lg){
     console.log(cvs)
     this.canvas = cvs
     this.ctx = cvs.getContext("2d");  
-  }
-
-  draw(lg){
-    for(c of lg){
-      drawSkeleton(c)
-      drawCurve(c)
-    }
+    this.utility = Bezier.getUtils();
   }
 
   getCanvas() { return cvs; }
+
+
+  draw(lg){
+    this.drawSkeleton(lg);
+    this.drawCurve(lg);
+  }
 
   reset(curve, evt) {
       cvs.width = cvs.width;

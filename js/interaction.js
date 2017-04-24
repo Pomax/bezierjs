@@ -1,4 +1,4 @@
-function handleInteraction(cvs, lg) {
+function handleInteraction(cvs, draw) {
   // curve.mouse = false;
 
   var fix = function(e) {
@@ -51,11 +51,11 @@ function handleInteraction(cvs, lg) {
           oy = evt.offsetY - my;
           mp.x = cx + ox;
           mp.y = cy + oy;
-          c.update();
           handler.onupdate();
         });
         cvs.style.cursor = found ? "pointer" : "default";
     };
+    draw.draw(lg)
   });
 
   cvs.addEventListener("mouseup", function(evt) {

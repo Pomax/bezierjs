@@ -27,12 +27,12 @@
               draw = new Draw(document.getElementById('cvs'))
               draw.drawSkeleton(lg)
               draw.drawCurve(lg)
-              handleInteraction(document.getElementById('cvs'), lg)
+              handleInteraction(document.getElementById('cvs'), draw)
             }
-            document.getElementById('cvs').onmousemove = function(){
-              draw.drawSkeleton(lg)
-              draw.drawCurve(lg)
-            }
+            // document.getElementById('cvs').onmousemove = function(){
+            //   draw.drawSkeleton(lg)
+            //   draw.drawCurve(lg)
+            // }
           </script>
           </figure>
         </td>
