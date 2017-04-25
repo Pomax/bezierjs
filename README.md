@@ -1,18 +1,7 @@
-# Bezier.js
+# PWM Lookup Table Generator
 
-A node.js and client-side library for (quadratic and cubic) Bezier curve work.
+Based on bezier.js to make a tool that can let Industrial designers effectively and efficiently convey to Electrical Engineers and Firmware Engineers what kind of LED lighting profiles they want.
 
-For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs)
-or read the souce (`./lib` for the library code, start at `index.js`).
+This tool is totally a work in progress, and is probably not ready for you to use, yet.
 
-## Installation
-
-`npm install bezier-js`
-
-## Working on the code
-
-To rebuild, simply use `npm test`, which runs both the build and tests (which aren't very
-test-like atm, they just allow you to valid two curves. More to come). For comments and
-questions, [tweet at me](https://twitter.com/TheRealPomax) or file an issue.
-
-This code is MIT licensed.
+A live demo of the current state of code is available here: [https://internetofawesome.github.io/ledstudio/](https://internetofawesome.github.io/bezierjs/)
