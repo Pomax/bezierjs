@@ -11,6 +11,8 @@ class Draw {
 
 
   draw(lg){
+    this.ctx.clearRect(0, 0, cvs.width, cvs.height);
+    this.setFill('white');
     this.drawSkeleton(lg);
     this.drawCurve(lg);
   }
