@@ -1,19 +1,19 @@
-var curve;
 var canvas;
 var frameCount;
 var lines = [];
 var bits = 8
+var lut=[]
 
-function setCurve(c, cvs){
-	curve=c;
-	canvas=cvs
-	canvas.ondblclick = canvas_double_click;
-	// canvas.addEventListener('resize', canvas_resize)
-	// canvas.onresize = canvas_resize;
-	window.addEventListener('resize', window_resize)
-	document.addEventListener('load', window_resize)
-	console.log('set curve')
-}
+// function setCurve(c, cvs){
+// 	curve=c;
+// 	canvas=cvs
+// 	canvas.ondblclick = canvas_double_click;
+// 	// canvas.addEventListener('resize', canvas_resize)
+// 	// canvas.onresize = canvas_resize;
+// 	window.addEventListener('resize', window_resize)
+// 	document.addEventListener('load', window_resize)
+// 	console.log('set curve')
+// }
 
 function window_resize(arg){
 	var new_width = window.innerWidth/2;
@@ -53,29 +53,53 @@ function _power_to_intensity(num, max)
   return result;
 }
 
-function intensity_to_power(num, bits) {
-  var max_val = Math.pow(2, bits);
-  return Math.round(Math.exp( Math.log(max_val)*num)-1)
+function updateLUT(lg){
+	var resinput = document.getElementById('pwmres');
+	var timeinput = document.getElementById('time');
+	var pointsinput = document.getElementById('points');
+	var points = pointsinput.value;
+	var time = timeinput.value;
+	var res = resinput.value;
+	var max_val = Math.pow(2,res);
+
+	var min=lg.curves[0].points[0].x
+	var lastcurve = lg.curves[lg.curves.length-1];
+	var max=lastcurve.points[lastcurve.points.length - 1].x
+	var step = (max-min)/(points-1)
+	var i=min
+	var lutPoints=[];
+	var tlut=[]
+
+
+	for(var c of lg.curves){
+	  //increment i with step until we are at the end of this curve
+	  var maxx = c.points[c.points.length-1].x
+	  for(i;i<maxx; i+=step){
+	    
+	    var tp = c.intersects({p1:{x:i, y:0}, p2:{x:i, y:9999999}})
+	    //get the y value and normalize it by canvas height
+	    var h = (cvs.height-c.get(tp).y)/cvs.height;
+
+	    tlut.push(h);
+
+	    //convert desired intensity to PWM duty cycle
+	    h = intensity_to_power(h, max_val);
+	    h = Math.round(h);
+
+	    lutPoints.push(h)
+	    var color = _power_to_intensity(h,max_val)*255
+	    color = "#" + (color<<16 | color<<8 | color).toString(16)
+	    tlut.push(color);
+	  }
+	}
+	document.getElementById('output').innerHTML = lutPoints;
+	lut=tlut;
 }
 
-function updateFrameCount(f){
-	if(f>1000){
-		console.log("too many points");
-		return 1000
-	}
-	frameCount = f;
-	lines = [];
-	width=canvas.width;
-	height=canvas.height;
-	step=canvas.width/(frameCount-1);
-	var i=frameCount
-	var x_i;
-	for(var i=0; i<frameCount; i++){
-		x_i = i*step;
-		var l = {p1:{x:x_i,y:0}, p2:{x:x_i, y:height}}
-		lines.push(l);
-	}
-	return f;
+// convert desired intensity to PWM duty cycle, accounting for non-linearity
+// of the eye
+function intensity_to_power(num, max_val) {
+  return Math.round(Math.exp( Math.log(max_val)*num)-1)
 }
 
 function pwm_draw(){
@@ -88,4 +112,14 @@ function getValues(output){
 		arr.push(intensity_to_power((canvas.height-c.y)/canvas.height, bits))
 	}
 	output.innerHTML = arr.join(", ");
+}
+
+function simStep(i){
+	var time = document.getElementById('time').value;
+	var steps = document.getElementById('points').value;
+	if(i>=lut.length)
+		i=0;
+	sim = document.getElementById('sim');
+	sim.style.backgroundColor = lut[i]
+	setTimeout(function(){simStep(i+1)}, time/steps*1000);
 }

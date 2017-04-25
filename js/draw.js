@@ -44,7 +44,7 @@ class Draw {
     }
 
   drawSkeleton(lg, offset, nocoords) {
-      for(curve of lg.curves){
+      for(var curve of lg.curves){
         offset = offset || { x:0, y:0 };
         var pts = curve.points;
         this.ctx.strokeStyle = "lightgrey";
@@ -57,7 +57,7 @@ class Draw {
     }
 
   drawCurve(lg, offset) {
-    for(curve of lg.curves) {
+    for(var curve of lg.curves) {
       offset = offset || { x:0, y:0 };
       var ox = offset.x;
       var oy = offset.y;

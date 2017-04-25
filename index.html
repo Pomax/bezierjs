@@ -18,7 +18,7 @@
     <table>
       <tr>
         <td>
-          <canvas id=cvs width=500 height=500 bgcolor="black"></canvas>
+          <canvas id=cvs width=500 height=500 bgcolor="black" style="border: 1px solid black"></canvas>
           <figure><script>
             var c, lg, draw
             document.body.onload = function(){
@@ -28,11 +28,8 @@
               draw.drawSkeleton(lg)
               draw.drawCurve(lg)
               handleInteraction(document.getElementById('cvs'), draw)
+              simStep(0)
             }
-            // document.getElementById('cvs').onmousemove = function(){
-            //   draw.drawSkeleton(lg)
-            //   draw.drawCurve(lg)
-            // }
           </script>
           </figure>
         </td>
@@ -43,7 +40,7 @@
               <text>Number of Values</text>
               </td>
               <td>
-                <input id=points type=number value=100 oninput="this.value=updateFrameCount(this.value)">
+                <input id=points type=number value=32>
               </td>
             </tr>
             <tr>
@@ -51,14 +48,21 @@
                 <text>Animation Time</text>
               </td>
                 <td>
-                  <input id=time type=number value=1.2 oninput="this.value=updateFrameCount(this.value)"><text>s</text>
+                  <input id=time type=number value=1.2><text>s</text>
                 </td>
               </tr>
+              <tr>
+                <td>
+                  <text>PWM Resolution</text>
+              </td>
+              <td>
+                <input id="pwmres" value="8"><text>bits</text>
+              </td>
             </table>
-          <div class=container style="background-color: #ff0000; height:50px; width:50px;"></div>
+          <div class=container id="sim" style="background-color: #ff0000; height:50px; width:50px;"></div>
         </td>
       </tr>
     </table>  
-    <font face=monospace size=2><p id="output">nothing</p></font>
+    <font face=monospace size=2><p style="word-wrap: break-word; width: 100%" id="output">nothing</p></font>
   </body>
 </html>

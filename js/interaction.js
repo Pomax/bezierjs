@@ -1,11 +1,27 @@
-function updateLUT(lg, points){
-    for(var i=0; i<points; i++){
-
-    }
-  }
-
 function handleInteraction(cvs, draw) {
-  // curve.mouse = false;
+  var resinput = document.getElementById('pwmres');
+  var timeinput = document.getElementById('time');
+  var pointsinput = document.getElementById('points');
+  var points = pointsinput.value;
+  var time = timeinput.value;
+  var res = resinput.value;
+
+  lg.curves[0].update()
+  updateLUT(lg)
+
+  pointsinput.addEventListener('input', function(evt){
+    points = pointsinput.value;
+    updateLUT(lg)
+  })
+
+  timeinput.addEventListener('input', function(evt){
+    time = timeinput.value;
+  })
+
+  resinput.addEventListener('input', function(evt){
+    res = resinput.value
+    updateLUT(lg)
+  })
 
   var fix = function(e) {
     // e = e || window.event;
@@ -69,6 +85,8 @@ function handleInteraction(cvs, draw) {
     var found = false;
     var lx = evt.offsetX;
     var ly = evt.offsetY;
+
+    updateLUT(lg)
 
     if(!moving){
       for(c of lg.curves){
