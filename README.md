@@ -9,6 +9,10 @@ or read the souce (`./lib` for the library code, start at `index.js`).
 
 `npm install bezier-js`
 
+## CDN usage
+
+`<script src="https://cdn.jsdelivr.net/npm/bezier-js@2/lib/bezier.js"></script>`
+
 ## Working on the code
 
 To rebuild, simply use `npm test`, which runs both the build and tests (which aren't very
