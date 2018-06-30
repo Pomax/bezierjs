@@ -7,7 +7,7 @@ var assert = require("chai").use(require("chai-stats")).assert;
 (function testQuadratic() {
   [
     new Bezier(0,0, .5,1, 1,0),
-    Bezier.fromSVG("M 0 0 Q 0.5 1 1 0")
+    Bezier.SVGtoBeziers("M 0 0 Q 0.5 1 1 0").curve(0)
   ].forEach(function(b) {
     assert.equal(b.toString(), "[0/0, 0.5/1, 1/0]");
     assert.almostEqual(b.length(), 1.4789428575453212);
@@ -33,7 +33,7 @@ var assert = require("chai").use(require("chai-stats")).assert;
 
   // SVG relative quadratic check
   assert.equal(
-    Bezier.fromSVG("5 5c.5 1 1 0").toString(),
+    Bezier.SVGtoBeziers("m5 5q.5 1 1 0").curve(0).toString(),
     "[5/5, 5.5/6, 6/5]"
   );
 }());
@@ -42,7 +42,7 @@ var assert = require("chai").use(require("chai-stats")).assert;
 (function testCubic() {
   [
     new Bezier(0,0, 0,1, 1,1, 1,0),
-    Bezier.fromSVG("m 0 0 C 0 1 1 1 1 0")
+    Bezier.SVGtoBeziers("m 0 0 C 0 1 1 1 1 0").curve(0)
   ].forEach(function(b) {
     assert.equal(b.toString(), "[0/0, 0/1, 1/1, 1/0]");
     assert.almostEqual(b.length(), 2);
@@ -69,7 +69,7 @@ var assert = require("chai").use(require("chai-stats")).assert;
 
   // SVG relative cubic check
   assert.equal(
-    Bezier.fromSVG("m1-1c0,1 1,1 1,0").toString(),
+    Bezier.SVGtoBeziers("m1-1c0,1 1,1 1,0").curve(0).toString(),
     "[1/-1, 1/0, 2/0, 2/-1]"
   );
 }());
@@ -219,4 +219,14 @@ var assert = require("chai").use(require("chai-stats")).assert;
   var arcs = B.arcs(0.0012143080752705958)
   var arc = arcs[1];
   assert(arc.interval.end === 1, "final arc interval is capped at t=1.0");
+}());
+
+(function testSVG() {
+  var circle="M138.406787,51.9034859 C138.406787,51.9034859 74.8695308,-25.4868408 21.9358155,9.81888414 C-30.9978998,45.1246091 32.5393566,122.514936 32.5393566,122.514936";
+  var circleSegments = Bezier.SVGtoBeziers(circle);
+  assert(circleSegments.curves.length === 2, "two sections to the circle");
+
+  var path="M133.38,286.76 C59.7162601,286.76 0,227.04374 0,153.38 C0,79.7162601 59.7162601,20 133.38,20 C207.04374,20 266.76,79.7162601 266.76,153.38 C266.76,227.04374 207.04374,286.76 133.38,286.76 Z";
+  var pathSegments = Bezier.SVGtoBeziers(path);
+  assert(pathSegments.curves.length === 4, "four sections to the path");
 }());
