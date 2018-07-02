@@ -33,5 +33,8 @@
     "uglify": "^0.1.1",
     "uglify-js": "^2.4.17",
     "webpack": "^1.12.13"
+  },
+  "dependencies": {
+    "live-server": "^1.2.0"
   }
 }
