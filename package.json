@@ -29,13 +29,11 @@
     "browserify": "^9.0.3",
     "chai": "^3.2.0",
     "chai-stats": "^0.3.0",
+    "live-server": "^1.2.0",    
     "mkdirp": "^0.5.1",
     "rimraf": "2.6.2",
     "uglify": "^0.1.1",
     "uglify-js": "^2.4.17",
     "webpack": "^1.12.13"
-  },
-  "dependencies": {
-    "live-server": "^1.2.0"
   }
 }
