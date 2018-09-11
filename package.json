@@ -1,6 +1,6 @@
 {
   "name": "bezier-js",
-  "version": "2.2.14",
+  "version": "2.2.15",
   "description": "A javascript library for working with Bezier curves",
   "main": "./index.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "browserify": "^9.0.3",
     "chai": "^3.2.0",
     "chai-stats": "^0.3.0",
-    "live-server": "^1.2.0",    
+    "live-server": "^1.2.0",
     "mkdirp": "^0.5.1",
     "rimraf": "2.6.2",
     "uglify": "^0.1.1",
