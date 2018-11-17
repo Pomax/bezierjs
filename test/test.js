@@ -230,3 +230,11 @@ var assert = require("chai").use(require("chai-stats")).assert;
   var pathSegments = Bezier.SVGtoBeziers(path);
   assert(pathSegments.curves.length === 4, "four sections to the path");
 }());
+
+(function testIntersection() {
+  var b = new Bezier(76,250, 77,150, 220,50);
+  var l = {p1: { x:13, y:140 }, p2: { x:213, y:140 }};
+  var i = b.intersects(l);
+  assert(i.length === 1, "curve intersects horizontal");
+  assert(i[0] === 0.55, "curve intersects horizontal");
+}());
