@@ -1,6 +1,6 @@
 {
   "name": "bezier-js",
-  "version": "2.2.17",
+  "version": "2.2.18",
   "description": "A javascript library for working with Bezier curves",
   "main": "./index.js",
   "scripts": {
