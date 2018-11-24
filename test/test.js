@@ -238,3 +238,12 @@ var assert = require("chai").use(require("chai-stats")).assert;
   assert(i.length === 1, "curve intersects horizontal");
   assert(i[0] === 0.55, "curve intersects horizontal");
 }());
+
+(function testCurvature() {
+  var b = new Bezier(60,190, 5,5, 110,250, 175,15);
+
+  for(var t=0; t<=1; t+=0.01) {
+    let r = b.curvature(t);
+    // mostly this just needs to run. Not be "correct" for now.
+  }
+}());

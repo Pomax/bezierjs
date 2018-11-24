@@ -408,6 +408,100 @@
         <p>These points can be used to determine the reach of a curve.</p>
       </section>
 
+      <section id="inflections">
+        <h1>.inflections()</h1>
+
+        <figures>
+          <figure class="quadratic"><script type="text/beziercode">
+            new Bezier(150,40 , 80,30 , 105,150);
+            var draw = function() {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("red");
+              curve.inflections().forEach(function(t) {
+                drawCircle(curve.get(t),3);
+              });
+            }
+          </script></figure>
+
+          <figure class="cubic"><script type="text/beziercode">
+            new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+            var draw = function() {
+              drawSkeleton(curve);
+              drawCurve(curve);
+              setColor("red");
+              curve.inflections().forEach(function(t) {
+                drawCircle(curve.get(t),3);
+              });
+            }
+          </script></figure>
+        </figures>
+
+        <p>Calculates all the inflection points on on a curve. That is, all points where the curvature
+          of the curve changes sign.</p>
+
+        <p>This function yields an array of <code>t</code> values at which inflections occur.</p>
+
+        <p>Note that quadratic curves by definition cannot have inflections.</p>
+      </section>
+
+      <section id="curvature">
+          <h1>.curvature(t)</h1>
+
+          <figures>
+            <figure class="quadratic"><script type="text/beziercode">
+              new Bezier(150,40 , 80,30 , 105,150);
+              var draw = function() {
+                drawSkeleton(curve);
+                drawCurve(curve);
+                for(var s=0; s<256; s+=2) {
+                  setColor("rgba(255,127,"+s+",0.6)");
+                  let t = s/255;
+                  let p = curve.get(t);
+                  let n = curve.normal(t);
+                  let kr = curve.curvature(t);
+                  drawLine(p, {
+                    x: p.x + n.x * kr.k,
+                    y: p.y + n.y * kr.k
+                  });
+                }
+              }
+            </script></figure>
+
+            <figure class="cubic"><script type="text/beziercode">
+              new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+              var draw = function() {
+                drawSkeleton(curve);
+                drawCurve(curve);
+                for(var s=0; s<256; s+=2) {
+                  setColor("rgba(255,127,"+s+",0.6)");
+                  let t = s/255;
+                  let p = curve.get(t);
+                  let n = curve.normal(t);
+                  let kr = curve.curvature(t);
+                  drawLine(p, {
+                    x: p.x + n.x * kr.k,
+                    y: p.y + n.y * kr.k
+                  });
+                }
+              }
+            </script></figure>
+          </figures>
+
+          <p>Calculates the curvature of the curve at point <code>t</code>, using the curvature formula:</p>
+
+          <p>
+          <br><pre>         |     x'y" - y'x"    |
+  κ(t) = | ------------------ |
+         |  (x'² + y'²)^(2/3) |</pre><br>
+          </p>
+
+          <p>This function yields an object <code>{ k:number, r:number}</code> in which the value <code>k</code>
+            is the curvature at point <code>t</code> and <code>r</code> is the radius of that curvature, equal to
+            <code>1/k</code>. Note that an infinite curvature, e.g. when <code>k=0</code>, is represented as
+            <code>r=0</code> as well, rather than as some infinity value.
+          </p>
+        </section>
 
       <section id="bbox">
         <h1>.bbox()</h1>
@@ -912,7 +1006,7 @@
       </section>
 
       <a name="curvetocurveintersection"></a>
-      
+
       <section>
         <h2>.intersects(curve) and .intersects(curve, curveIntersectionThreshold)</h2>
 
@@ -959,7 +1053,7 @@
         "homes in" on the actual intersections, such that with infinite divisions, we can get an arbitrarily
         close approximation of the <code>t</code> values involved. Thankfully, repeating the process a low number
         of steps is generally good enough to get reliable values (typically 10 steps yields more than acceptable
-        precision). When <code>curveIntersectionThreshold</code> is provided, this will be used for bounding box 
+        precision). When <code>curveIntersectionThreshold</code> is provided, this will be used for bounding box
         comparisons in x and y dimensions so that precision can be specified, otherwise a default value of .5 will be used.</p>
 
       </section>
