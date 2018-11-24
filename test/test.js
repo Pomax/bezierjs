@@ -246,4 +246,11 @@ var assert = require("chai").use(require("chai-stats")).assert;
     let r = b.curvature(t);
     // mostly this just needs to run. Not be "correct" for now.
   }
+
+  b = new Bezier({x:60,y:190,z:1}, {x:5,y:5,z:2}, {x:110,y:250,z:3});
+
+  for(var t=0; t<=1; t+=0.01) {
+    let r = b.curvature(t);
+    // mostly this just needs to run. Not be "correct" for now.
+  }
 }());
