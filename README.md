@@ -7,7 +7,15 @@ or read the souce (`./lib` for the library code, start at `index.js`).
 
 ## Installation
 
-`npm install bezier-js`
+`npm install bezier-js` will add bezier.js to your dependencies, remember to add `--save` or `--save-dev` if you need that to be persistent of course.
+
+## Use
+
+`var Bezier = require('bezier-js')` and off you go.
+
+## Use in the browser
+
+Load the toplevel `bezier.js` the same way you would any other browser script, using a `<script src="..."></script>` declaration.
 
 ## Working on the code
 
