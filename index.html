@@ -461,8 +461,8 @@
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
                   drawLine(p, {
-                    x: p.x + n.x * kr.k,
-                    y: p.y + n.y * kr.k
+                    x: p.x + n.x * kr.r,
+                    y: p.y + n.y * kr.r
                   });
                 }
               }
@@ -479,9 +479,11 @@
                   let p = curve.get(t);
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
+                  console.log(Math.abs(kr.k))
+                  if (Math.abs(kr.k) <= 0.015) continue;
                   drawLine(p, {
-                    x: p.x + n.x * kr.k,
-                    y: p.y + n.y * kr.k
+                    x: p.x + n.x * kr.r,
+                    y: p.y + n.y * kr.r
                   });
                 }
               }
@@ -493,7 +495,7 @@
           <p>
           <br><pre>         |     x'y" - y'x"    |
   κ(t) = | ------------------ |
-         |  (x'² + y'²)^(2/3) |</pre><br>
+         |  (x'² + y'²)^(3/2) |</pre><br>
           </p>
 
           <p>This function yields an object <code>{ k:number, r:number}</code> in which the value <code>k</code>
