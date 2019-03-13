@@ -461,8 +461,9 @@
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
                   drawLine(p, {
-                    x: p.x + n.x * kr.r,
-                    y: p.y + n.y * kr.r
+                    // n.x * kr.k is almost less than 1
+                    x: p.x + n.x * kr.k * 10000,
+                    y: p.y + n.y * kr.k * 10000,
                   });
                 }
               }
@@ -479,11 +480,9 @@
                   let p = curve.get(t);
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
-                  console.log(Math.abs(kr.k))
-                  if (Math.abs(kr.k) <= 0.015) continue;
                   drawLine(p, {
-                    x: p.x + n.x * kr.r,
-                    y: p.y + n.y * kr.r
+                    x: p.x + n.x * kr.k * 10000,
+                    y: p.y + n.y * kr.k * 10000,
                   });
                 }
               }
