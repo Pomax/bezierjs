@@ -461,7 +461,6 @@
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
                   drawLine(p, {
-                    // n.x * kr.k is almost less than 1
                     x: p.x + n.x * kr.k * 10000,
                     y: p.y + n.y * kr.k * 10000,
                   });
