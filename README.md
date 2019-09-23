@@ -19,8 +19,14 @@ Load the toplevel `bezier.js` the same way you would any other browser script, u
 
 ## Working on the code
 
-To rebuild, simply use `npm test`, which runs both the build and tests (which aren't very
-test-like atm, they just allow you to valid two curves. More to come). For comments and
-questions, [tweet at me](https://twitter.com/TheRealPomax) or file an issue.
+To test new code, use `npm test`.
+
+To build the library, use `npm run build`.
+
+## License
 
 This code is MIT licensed.
+
+## Engagement
+
+For comments and questions, [tweet at me](https://twitter.com/TheRealPomax) or file an issue.
