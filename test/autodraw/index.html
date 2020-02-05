@@ -20,23 +20,11 @@
     not actually that sensible, just Catmull-Rom spline, with cuts
     where the angle between three points is acute.</p>
 
-  <script src="http://pomax.github.io/pocketknife/pocketknife.js"></script>
-  <script src="../../lib/bezier.js"></script>
-
-  <script src="common.js"></script>
-  <script src="RDP.js"></script>
-  <script src="Abstractor.js"></script>
-  <script src="Handler.js"></script>
-
-  <script>schedule(function() {
-    var cvs = find("canvas");
-    cvs.width = cvs.getBoundingClientRect().width;
-    var ctx = cvs.getContext("2d");
-    var handler = new Handler(cvs);
-    ctx.strokeStyle = "black";
-    cvs.listen("mousedown", handler.md.bind(handler));
-    cvs.listen("mousemove", handler.mm.bind(handler));
-    cvs.listen("mouseup", handler.me.bind(handler));
-  });</script>
+  <script src="../../bezier.js" async defer></script>
+  <script src="common.js" async defer></script>
+  <script src="RDP.js" async defer></script>
+  <script src="Abstractor.js" async defer></script>
+  <script src="Handler.js" async defer></script>
+  <script src="index.js"  async defer></script>
 </body>
 </html>
