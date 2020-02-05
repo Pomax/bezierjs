@@ -32,6 +32,28 @@ class Handler {
     this.recording = false;
     this.cvs.width = this.cvs.width;
     var ctx = this.ctx;
+    var rdpcoords = rdp.runRDP(this.coords);
+
+    // CR curve fitting: note that we'll
+    // miss the first and last segment due to CR conversion...
+    ctx.strokeStyle="rgba(0,200,0,0.5)";
+    let c1 = rdpcoords[0], c2 = rdpcoords[1], c3 = rdpcoords[2], c4 = rdpcoords[3], p2, p3, p4;
+    ctx.moveTo(c2.x, c2.y);
+    for(let p=4, e=rdpcoords.length; p<=e; p++) {
+      p2 = { x: c2.x + (c3.x - c1.x) / 6, y: c2.y + (c3.y - c1.y) / 6 };
+      p3 = { x: c3.x - (c4.x - c2.x) / 6, y: c3.y - (c4.y - c2.y) / 6 };
+      p4 = c3;
+
+      ctx.bezierCurveTo(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
+      ctx.stroke();
+
+      c1 = c2;
+      c2 = c3;
+      c3 = c4;
+      c4 = rdpcoords[p];
+    }
+
+    // TODO: Redo this curve after aesthetic cleanup?
 
     // original points
     ctx.strokeStyle="rgba(100,100,200,0.6)";
@@ -43,32 +65,10 @@ class Handler {
 
     // reduced points
     ctx.strokeStyle="red";
-    rdp.runRDP(this.coords).forEach(p => {
+    rdpcoords.forEach(p => {
       ctx.beginPath();
       ctx.arc(p.x,p.y,1,0,tau);
       ctx.stroke();
     });
-
-    // CR curve fitting: note that we'll
-    // miss the first and last segment due to CR conversion...
-    ctx.strokeStyle="rgba(0,200,0,0.5)";
-    let p1, p2, p3, p4;
-    let c1 = this.coords[0], c2 = this.coords[1], c3 = this.coords[2], c4 = this.coords[3];
-    ctx.moveTo(c1.x, c1.y);
-    for(let p=4, e=this.coords.length-1; p<e; p++) {
-      c1 = c2; c2 = c3; c3 = c4; c4 = this.coords[p];
-
-      p1 = c2;
-      p2 = { x: c2.x + (c3.x - c1.x) / 6, y: c2.y + (c3.y - c1.y) / 6 };
-      p3 = { x: c3.x - (c4.x - c2.x) / 6, y: c3.y - (c4.y - c2.y) / 6 };
-      p4 = c3;
-
-      ctx.bezierCurveTo(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
-      ctx.stroke();
-    }
-
-    // Redo this curve after aesthetic cleanup?
-
-    // TODO: code goes here
   }
 }
