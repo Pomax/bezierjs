@@ -1,5 +1,9 @@
 var tau = Math.PI*2;
 
+function abs(x) {
+  return Math.abs(x);
+}
+
 function sqr(x) {
   return x * x;
 }
@@ -49,3 +53,41 @@ function lli(p1, p2, p3, p4) {
   if(d==0) { return false; }
   return { x: nx/d, y: ny/d, z: 0 };
 };
+
+
+// angle between p1-p2 and p2-p3
+function getAngle(p1,p2,p3) {
+  var atan2 = Math.atan2,
+      v1 = { x: p1.x - p2.x, y: p1.y - p2.y },
+      v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
+  return atan2(v2.y, v2.x) - atan2(v1.y, v1.x);
+}
+
+/*
+
+function dot2(a,b) {
+  return a.x*b.x + a.y*b.y;
+}
+
+
+// angle between p1-p2 and p2-p3
+function angle2(p1,p2,p3) {
+  let sqrt = Math.sqrt, acos = Math.acos;
+  let a = {
+    x: p1.x - p2.x,
+    y: p1.y - p2.y
+  };
+  let b = {
+    x: p3.x - p2.x,
+    y: p3.y - p2.y
+  };
+  let d = dot2(a,b);
+  let ma = sqrt(a.x*a.x + a.y*a.y);
+  let mb = sqrt(b.x*b.x + b.y*b.y);
+  let m = ma * mb;
+  let phi= acos(d/m);
+  //logNow(p1,p2,p3, a,b, d,m,phi);
+  return phi;
+}
+
+*/

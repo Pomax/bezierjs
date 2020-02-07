@@ -1,8 +1,16 @@
 // Bezier abstraction based on RDP reduced coordinates
-var Abstractor = function() {};
-Abstractor.prototype = {
+class Abstractor {
+  constructor(coords) {
+    this.coords = coords;
+  }
+
+  abstract() {
+    var list = abstractor.split(coords);
+    return list.map(list => this.convert(list));
+  }
+
   // create a virtual start and end point for CR-splining
-  prep: function(c,m,p5,p6,dx,dy) {
+  prep(c,m,p5,p6,dx,dy) {
     m = c.length - 1;
     dx = c[1].x-c[0].x;
     dy = c[1].y-c[0].y;
@@ -11,10 +19,10 @@ Abstractor.prototype = {
     dy = c[m].y-c[m-1].y;
     p6 = { x: c[m].x + dx, y: c[m].y + dy };
     return [p5].concat(c).concat([p6]);
-  },
+  }
 
   // form bezier segments using catmull-rom-to-bezier conversion
-  convert: function(c,p1,p2,p3,p4,dx,dy,cx1,cy1,cx2,cy2,p5,ci) {
+  convert(c,p1,p2,p3,p4,dx,dy,cx1,cy1,cx2,cy2,p5,ci) {
     var l = c.length, i, curves=[], f=1;
     c = this.prep(c);
     for(i=1; i<l; i++) {
@@ -32,26 +40,18 @@ Abstractor.prototype = {
       curves.push(p5);
     }
     return curves;
-  },
-
-  // angle between p1-p2 and p2-p3
-  getAngle: function(p1,p2,p3) {
-    var atan2 = Math.atan2,
-        v1 = { x: p2.x - p1.x, y: p2.y - p1.y },
-        v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
-    return atan2(v2.y, v2.x) - atan2(v1.y, v1.x);
-  },
+  }
 
   // positive or negative winding triangle?
-  getTriangleWinding: function(p1,p2,p3) {
+  getTriangleWinding(p1,p2,p3) {
     if(p2 && p3) {
       p1 = this.getAngle(p1,p2,p3);
     }
     return p1 > 0 ? 1 : -1;
-  },
+  }
 
   // split the list of coordinates when we see a kink or discontinuity
-  split: function(c) {
+  split(c) {
     var threshold = Math.PI/3;
     var list = [], i, s, p0, p1, p2, p3, a, b, t = Math.PI/2;
     for(s=0,i=0; i<c.length-2; i++) {
@@ -71,18 +71,3 @@ Abstractor.prototype = {
     return list;
   }
 };
-
-var abstractor = new Abstractor();
-
-function abstract(coords) {
-  var curves = [];
-  var list = abstractor.split(coords);
-  return list.map(function(list) {
-    return abstractor.convert(list);
-  });
-};
-
-
-if(typeof module !== "undefined") {
-  module.exports = abstract;
-}

@@ -5,13 +5,28 @@ class RDP {
   }
 
   runRDP(coords) {
+    this.markAngles(coords);
     coords = coords.slice();
     if(coords.length===2) {
       coords[0].keep = true;
       coords[1].keep = true;
       return coords;
     }
-    return this.reducePoints(coords);
+    return this.reducePoints(coords)
+  }
+
+  markAngles(coords) {
+    let a = coords[0],
+        b = coords[1],
+        c = coords[2],
+        angle;
+    for(let i=3, e=coords.length-1; i<e; i++) {
+      angle = abs(getAngle(a,b,c));
+      if (angle < 1.8) b.oblique = true;
+      a = b;
+      b = c;
+      c = coords[i];
+    }
   }
 
   reducePoints(coords) {
@@ -22,7 +37,6 @@ class RDP {
         w = coords[e],
         md = 0,
         mdi = 0,
-        t = this.threshold,
         p,i,d;
 
     for(i=s+1; i<e-1; i++) {
@@ -32,7 +46,7 @@ class RDP {
     }
 
     // if a transition is detected, process each set separately
-    if(md > t) {
+    if(md > this.threshold) {
       this.runRDP(coords.slice(s,mdi+1))
       this.runRDP(coords.slice(mdi));
     } else {
@@ -41,12 +55,12 @@ class RDP {
     }
 
     // filter out all unmarked coordinates
-    return coords.filter(function(c) { return c.keep; });
+    coords = coords.filter(function(c) { return c.keep; });
+
+    // ... do more...?
+
+    return coords;
   }
 }
 
 var rdp = new RDP();
-
-if(typeof module !== "undefined") {
-  module.exports = rdp;
-}
