@@ -5,14 +5,31 @@ class RDP {
   }
 
   runRDP(coords) {
-    this.markAngles(coords);
     coords = coords.slice();
+    this.markAngles(coords);
     if(coords.length===2) {
       coords[0].keep = true;
       coords[1].keep = true;
       return coords;
     }
-    return this.reducePoints(coords)
+    coords = this.reducePoints(coords)
+    // this.mergeClosePoints(coords);
+    this.markAngles(coords);
+    return coords;
+  }
+
+  mergeClosePoints(coords) {
+    for(let i=0; i<coords.length-2; i++) {
+      let c = coords[i];
+      let n = coords[i+1];
+      if (c.acute) continue;
+      if (n.acute) continue;
+      if (dist(c,n) < 10) {
+        c.x = (c.x + n.x) / 2;
+        c.y = (c.y + n.y) / 2;
+        coords.splice(i+1, 1);
+      }
+    }
   }
 
   markAngles(coords) {
@@ -22,7 +39,12 @@ class RDP {
         angle;
     for(let i=3, e=coords.length-1; i<e; i++) {
       angle = abs(getAngle(a,b,c));
-      if (angle < 1.8) b.oblique = true;
+      if (angle < 1.8) {
+        // TODO: this also depends on the fidelity of the curve. The closer
+        //       points are, the more neighbours play a role in determining
+        //       whether this is true acuteness or not.
+        b.acute = true;
+      }
       a = b;
       b = c;
       c = coords[i];
@@ -56,8 +78,6 @@ class RDP {
 
     // filter out all unmarked coordinates
     coords = coords.filter(function(c) { return c.keep; });
-
-    // ... do more...?
 
     return coords;
   }
