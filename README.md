@@ -11,11 +11,11 @@ or read the souce (`./lib` for the library code, start at `index.js`).
 
 ## Use
 
-`var Bezier = require('bezier-js')` and off you go.
+`const { Bezier } = require('bezier-js')` and off you go.
 
 ## Use in the browser
 
-Load the toplevel `bezier.js` the same way you would any other browser script, using a `<script src="..."></script>` declaration.
+Load `dist/bezier.js` the same way you would any other browser script, using a `<script src="..."></script>` declaration.
 
 ## Working on the code
 

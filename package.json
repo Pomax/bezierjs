@@ -2,10 +2,11 @@
   "name": "bezier-js",
   "version": "2.6.1",
   "description": "A javascript library for working with Bezier curves",
-  "main": "./index.js",
+  "main": "./lib/bezier.js",
+  "module": "./lib/bezier.es.js",
   "scripts": {
     "test": "node test/test.js",
-    "build": "rimraf bezier.js && webpack"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -22,18 +23,29 @@
   },
   "homepage": "https://github.com/Pomax/bezierjs",
   "devDependencies": {
-    "babel-core": "^6.4.5",
-    "babel-loader": "^6.2.2",
-    "babel-preset-es2015": "^6.3.13",
-    "babel-preset-react": "^6.3.13",
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-transform-arrow-functions": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "@rollup/plugin-babel": "^5.1.0",
+    "@rollup/plugin-node-resolve": "^8.4.0",
+    "babel-eslint": "^10.1.0",
     "browserify": "^9.0.3",
     "chai": "^3.2.0",
     "chai-stats": "^0.3.0",
+    "eslint": "^7.6.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "live-server": "^1.2.0",
     "mkdirp": "^0.5.1",
     "rimraf": "2.6.2",
-    "uglify": "^0.1.1",
-    "uglify-js": "^2.4.17",
-    "webpack": "^1.12.13"
+    "rollup": "^2.23.0",
+    "rollup-plugin-sourcemaps": "^0.6.2",
+    "rollup-plugin-terser": "^6.1.0"
   }
 }
