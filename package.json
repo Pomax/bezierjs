@@ -5,11 +5,11 @@
   "main": "./index.js",
   "type": "module",
   "scripts": {
-    "lint:lib": "prettier ./lib/*.js --write",
-    "lint:test": "prettier old-tests.js --write",
-    "old-tests": "node old-tests.js",
-    "test": "npm run start",
-    "start": "run-s lint:* old-tests"
+    "lint:lib": "prettier ./lib/**/*.js --write",
+    "lint:test": "prettier ./test/**/*.js --write",
+    "mocha": "mocha test/**/*.js",
+    "test": "npm start",
+    "start": "run-s lint:* mocha"
   },
   "repository": {
     "type": "git",
@@ -26,8 +26,7 @@
   },
   "homepage": "https://github.com/Pomax/bezierjs",
   "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-stats": "^0.3.0",
+    "mocha": "^8.1.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5"
   }
