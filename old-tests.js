@@ -1,6 +1,9 @@
-var Bezier = require("./lib/bezier");
-var utils = Bezier.getUtils();
-var assert = require("chai").use(require("chai-stats")).assert;
+import { Bezier } from "./lib/bezier.js";
+import chai from "chai";
+import chaiStats from "chai-stats";
+
+const utils = Bezier.getUtils();
+const assert = chai.use(chaiStats).assert;
 
 // plain and SVG quadratic check
 (function testQuadratic() {
@@ -331,3 +334,5 @@ var assert = require("chai").use(require("chai-stats")).assert;
     // mostly this just needs to run. Not be "correct" for now.
   }
 })();
+
+console.log("All tests pass.");
