@@ -7,8 +7,9 @@
   "scripts": {
     "lint:lib": "prettier ./lib/*.js --write",
     "lint:test": "prettier old-tests.js --write",
-    "test": "node old-tests.js",
-    "start": "run-s lint:* test"
+    "old-tests": "node old-tests.js",
+    "test": "npm run start",
+    "start": "run-s lint:* old-tests"
   },
   "repository": {
     "type": "git",
