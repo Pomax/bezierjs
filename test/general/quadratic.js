@@ -1,4 +1,6 @@
 import { Bezier } from "../../lib/bezier.js";
+const utils = Bezier.getUtils();
+
 import chai from "chai";
 import chaiStats from "chai-stats";
 const assert = chai.use(chaiStats).assert;
@@ -62,5 +64,26 @@ describe(`Quadratic bezier`, () => {
   describe(`from SVG builder`, () => {
     const b = Bezier.SVGtoBeziers("M 0 0 Q 0.5 1 1 0").curve(0);
     run(b);
+  });
+
+  describe(`from point set`, () => {
+    const M = { x: 75, y: 25 };
+    const pts = [{ x: 0, y: 0 }, M, { x: 100, y: 100 }];
+
+    it(`has the correct midpoint using default t value`, () => {
+      const b = Bezier.quadraticFromPoints(pts[0], pts[1], pts[2]);
+      const midpoint = b.get(0.5);
+
+      assert.isTrue(utils.approximately(M.x, midpoint.x));
+      assert.isTrue(utils.approximately(M.y, midpoint.y));
+    });
+
+    it(`has the correct t=0.25 point using t=0.25 as reference`, () => {
+      const t = 0.25;
+      const b = Bezier.quadraticFromPoints(pts[0], pts[1], pts[2], t);
+      const quarterpoint = b.get(t);
+      assert.isTrue(utils.approximately(M.x, quarterpoint.x));
+      assert.isTrue(utils.approximately(M.y, quarterpoint.y));
+    });
   });
 });
