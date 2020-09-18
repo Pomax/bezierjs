@@ -1,0 +1,13 @@
+.github
+
+# Ignore documentation
+index.html
+js
+style.css
+
+# Ignore tests
+test
+test.js
+
+# Ignore build tools
+webpack.config.js
