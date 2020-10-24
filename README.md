@@ -13,7 +13,7 @@ or read the souce (`./lib` for the library code, start at `bezier.js`).
 
 ### "Not" installation if you just want a single file
 
-There is an already rolled-up version of `bezier.js` in the `docs` directory. Just use that.
+There is an already rolled-up version of `bezier.js` in the `dist` directory. Just use that.
 
 ## Use
 
