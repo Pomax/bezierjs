@@ -17,26 +17,23 @@ There is an already rolled-up version of `bezier.js` in the `docs` directory. Ju
 
 ## Use
 
-`import { Bezier } from "bezier-js"` and off you go.
+About as simple as it gets:
+
+```
+import { Bezier } from "bezier-js";
+
+const b = new Bezier(...);
+```
 
 ## Use in the browser
 
-Copy the contents of the `lib` directory to wherever you like (`/js`, `/vendor`, etc), or place the rolled-up version of the library there, and then load the library using a script element:
+Copy the contents of the `lib` directory to wherever you like (`/js`, `/vendor`, etc), or place the rolled-up version of the library there, and then load the library as an import to whatever script needs to use the `Bezier` constructor using:
 
 ```
-<!doctype html>
-  <head>
-    ...
-    <script src="/some/location/bezier.js" type="module" async>
-  </head>
-  <body>
-    ...
-  </body>
-</html>
+import { Bezier } from "/js/vendor/bezier-js";
+
+const b = new Bezier(...);
 ```
-
-Note that modules execute as if they had the `defer` attribute, so you don't need to manually specify it.
-
 
 ## Working on the code
 
