@@ -22,7 +22,7 @@
     "rollup": "run-s rollup:docs rollup:dist",
     "rollup:base": "rollup ./lib/bezier.js --format esm --file ",
     "rollup:docs": "npm run rollup:base -- ./docs/js/bezier.js",
-    "rollup:dist": "npm run rollup:base -- ./dist/js/bezier.js",
+    "rollup:dist": "npm run rollup:base -- ./dist/bezier.js",
     "lint:lib": "prettier ./lib/**/*.js --write",
     "lint:test": "prettier ./test/**/*.js --write",
     "mocha": "mocha test/**/*.js",
