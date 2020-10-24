@@ -11,9 +11,9 @@ or read the souce (`./lib` for the library code, start at `bezier.js`).
 
 `npm install bezier-js` will add bezier.js to your dependencies, remember to add `--save` or `--save-dev` if you need that to be persistent of course.
 
-### "Not" installation if you just want a single file
+### Without using a package manager
 
-There is an already rolled-up version of `bezier.js` in the `dist` directory. Just use that.
+There is a rolled-up version of `bezier.js` in the `dist` directory. Just download that.
 
 ## Use
 
