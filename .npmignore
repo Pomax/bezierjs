@@ -2,6 +2,9 @@
 .github
 .gitignore
 
+# ignore original source
+lib
+
 # Ignore documentation
 docs
 

@@ -1,21 +1,15 @@
 {
   "name": "bezier-js",
   "version": "3.0.0",
+  "author": "Pomax",
   "description": "A javascript library for working with Bezier curves",
-  "main": "./lib/bezier.js",
+  "main": "./dist/bezier.js",
   "type": "module",
-  "scripts": {
-    "rollup": "run-s rollup:docs rollup:dist",
-    "rollup:base": "rollup ./lib/bezier.js --format esm --file ",
-    "rollup:docs": "npm run rollup:base -- ./docs/js/bezier.js",
-    "rollup:dist": "npm run rollup:base -- ./dist/js/bezier.js",
-    "lint:lib": "prettier ./lib/**/*.js --write",
-    "lint:test": "prettier ./test/**/*.js --write",
-    "mocha": "mocha test/**/*.js",
-    "test": "npm start",
-    "start": "run-s lint:* mocha",
-    "precommit": "run-s test rollup "
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Pomax/bezierjs/issues"
   },
+  "homepage": "https://github.com/Pomax/bezierjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/Pomax/bezierjs"
@@ -24,12 +18,17 @@
     "bezier",
     "curves"
   ],
-  "author": "Pomax",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Pomax/bezierjs/issues"
+  "scripts": {
+    "rollup": "run-s rollup:docs rollup:dist",
+    "rollup:base": "rollup ./lib/bezier.js --format esm --file ",
+    "rollup:docs": "npm run rollup:base -- ./docs/js/bezier.js",
+    "rollup:dist": "npm run rollup:base -- ./dist/js/bezier.js",
+    "lint:lib": "prettier ./lib/**/*.js --write",
+    "lint:test": "prettier ./test/**/*.js --write",
+    "mocha": "mocha test/**/*.js",
+    "test": "npm start && npm run rollup",
+    "start": "run-s lint:* mocha"
   },
-  "homepage": "https://github.com/Pomax/bezierjs",
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-stats": "^0.3.0",
