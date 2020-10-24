@@ -23,18 +23,20 @@ describe(`Quadratic bezier`, () => {
         ],
         [{ x: 0, y: -4 }],
       ]);
-      assert.deepAlmostEqual(b.derivative(0), { x: 1, y: 2 });
-      assert.deepAlmostEqual(b.derivative(0.5), { x: 1, y: 0 });
-      assert.deepAlmostEqual(b.derivative(1), { x: 1, y: -2 });
+      assert.deepAlmostEqual(b.derivative(0), { t: 0, x: 1, y: 2 });
+      assert.deepAlmostEqual(b.derivative(0.5), { t: 0.5, x: 1, y: 0 });
+      assert.deepAlmostEqual(b.derivative(1), { t: 1, x: 1, y: -2 });
     });
 
     it(`has the expected normals`, () => {
       assert.deepAlmostEqual(b.normal(0), {
+        t: 0,
         x: -0.8944271909999159,
         y: 0.4472135954999579,
       });
-      assert.deepAlmostEqual(b.normal(0.5), { x: -0, y: 1 });
+      assert.deepAlmostEqual(b.normal(0.5), { t: 0.5, x: -0, y: 1 });
       assert.deepAlmostEqual(b.normal(1), {
+        t: 1,
         x: 0.8944271909999159,
         y: 0.4472135954999579,
       });
@@ -73,17 +75,14 @@ describe(`Quadratic bezier`, () => {
     it(`has the correct midpoint using default t value`, () => {
       const b = Bezier.quadraticFromPoints(pts[0], pts[1], pts[2]);
       const midpoint = b.get(0.5);
-
-      assert.isTrue(utils.approximately(M.x, midpoint.x));
-      assert.isTrue(utils.approximately(M.y, midpoint.y));
+      assert.deepAlmostEqual(M, midpoint);
     });
 
     it(`has the correct t=0.25 point using t=0.25 as reference`, () => {
       const t = 0.25;
       const b = Bezier.quadraticFromPoints(pts[0], pts[1], pts[2], t);
       const quarterpoint = b.get(t);
-      assert.isTrue(utils.approximately(M.x, quarterpoint.x));
-      assert.isTrue(utils.approximately(M.y, quarterpoint.y));
+      assert.deepAlmostEqual(M, quarterpoint);
     });
   });
 });

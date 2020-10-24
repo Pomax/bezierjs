@@ -1,0 +1,141 @@
+html, body, header, footer {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+body {
+  font-size: 16px;
+}
+head {
+  display: none;
+}
+header h1 {
+  margin-top: 0;
+}
+section {
+  position: relative;
+}
+figure.quadratic {
+  float: left;
+  display: block;
+  margin-right: 1em;
+}
+figure.cubic {
+  float: right;
+  display: block;
+  margin-left: 1em;
+}
+figure {
+  width: 200px;
+  height: 200px;
+  display: block;
+  margin:0;
+  padding: 0;
+  position: relative;
+  margin-bottom: 50px;
+}
+figure canvas {
+  border: 1px solid black;
+  position: relative;
+  background: white;
+  z-index: 3;
+}
+figure button {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: calc(100% + 2px);
+  margin: 0;
+  padding: 0;
+  color: white;
+  border: 1px solid black;
+
+  background: -moz-linear-gradient(top,  #7c9fff 0%, #5a86ff 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7c9fff), color-stop(100%,#5a86ff)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #7c9fff 0%,#5a86ff 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #7c9fff 0%,#5a86ff 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #7c9fff 0%,#5a86ff 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #7c9fff 0%,#5a86ff 100%); /* W3C */
+}
+figure.quadratic button {
+  left: 0;
+}
+figure.cubic button {
+  right: 0;
+}
+figure.quadratic .textarea {
+  left: calc(100% - 1px);
+}
+figure.cubic .textarea {
+  right: calc(100% - 1px);
+}
+figure .textarea {
+  position: absolute;
+  z-index: 2;
+  background: white;
+  display: block;
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  margin: 0;
+  bottom: -1px;
+  line-height: 16px;
+  background: rgb(220, 225, 237);
+  white-space: pre;
+  font-family: monospace;
+  font-size: 14px;
+  transition: width 0.2s, height 0.2s;
+}
+figure .textarea.showcode {
+  width: 600px;
+  height: 200px;
+  padding: 2px;
+  border: 1px solid black;
+  box-shadow: 0 0 25px 5px rgb(89, 93, 114);
+}
+code {
+  background: #E7EBFD;
+  border: 1px solid blue;
+  border-width: 0 0 1px 0;
+  padding: 0 2px;
+  white-space: nowrap;
+  line-height: 1.25em;
+}
+header, main, section, h1, h2, figures, footer {
+  clear: both;
+}
+main {
+  width: 90%;
+  margin: auto;
+}
+h1, h2 {
+  background: rgb(90, 134, 255);
+  color: white;
+  padding: 4px;
+  font-family: Helvetica;
+}
+h2 {
+  background: white;
+  border: 1px solid rgb(90, 134, 255);
+  border-width: 0 0 1px 0;
+  color: rgb(90, 134, 255);
+}
+section {
+  min-height: calc(300px);
+  margin-bottom: 1em;
+}
+footer {
+  background: rgb(90, 134, 255);
+  color: white;
+  padding: 4px 0px;
+  text-align: center;
+  font-family: Helvetica;
+}
+footer a {
+  color: rgb(0,0,0);
+}
+section ul {
+  margin-left: 200px;
+}
