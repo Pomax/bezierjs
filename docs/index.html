@@ -31,16 +31,16 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
             }
           </script></figure>
         </figures>
@@ -58,7 +58,6 @@
           is 2d or 3d.</p>
       </section>
 
-
       <section id="fromPoints">
         <a href="#fromPoints"><h1>Bezier.quadraticFromPoints(p1,p2,p3,t) / Bezier.cubicFromPoints(p1,p2,p3,t,d1)</h1></a>
 
@@ -67,26 +66,24 @@
             false;
             var B = {x: 100, y: 50};
             var tvalues = [0.2, 0.3, 0.4, 0.5];
-            var curves = tvalues.map(function(t) {
-              return Bezier.quadraticFromPoints({x:150, y: 40}, B, {x:35, y:160}, t);
-            });
+            var curves = tvalues.map(t => Bezier.quadraticFromPoints({x:150, y: 40}, B, {x:35, y:160}, t));
             var draw = function() {
               var offset = {x:45,y:30};
-              curves.forEach(function(b,i) {
-                drawSkeleton(b, offset, true);
-                setColor("rgba(0,0,0,0.2)");
-                drawCircle(b.points[1], 3, offset);
-                drawText("t="+tvalues[i], {
+              curves.forEach((b,i) => {
+                this.drawSkeleton(b, offset, true);
+                this.setColor("rgba(0,0,0,0.2)");
+                this.drawCircle(b.points[1], 3, offset);
+                this.drawText("t=" + tvalues[i], {
                   x: b.points[1].x + offset.x - 15,
                   y: b.points[1].y + offset.y - 10,
                 });
-                setRandomColor();
-                drawCurve(b, offset);
+                this.setRandomColor();
+                this.drawCurve(b, offset);
               });
-              setColor("black");
-              drawCircle(curves[0].points[0], 3, offset);
-              drawCircle(curves[0].points[2], 3, offset);
-              drawCircle(B, 3, offset);
+              this.setColor("black");
+              this.drawCircle(curves[0].points[0], 3, offset);
+              this.drawCircle(curves[0].points[2], 3, offset);
+              this.drawCircle(B, 3, offset);
             }
           </script></figure>
 
@@ -96,19 +93,17 @@
                 B  = {x: 50, y: 80},
                 p3 = {x:135, y: 100};
             var tvalues = [0.2, 0.3, 0.4, 0.5];
-            var curves = tvalues.map(function(t) {
-              return Bezier.cubicFromPoints(p1, B, p3, t);
-            });
+            var curves = tvalues.map(t => Bezier.cubicFromPoints(p1, B, p3, t));
             var draw = function() {
               var offset = {x:0,y:0};
-              curves.forEach(function(b,i) {
-                setRandomColor();
-                drawCurve(b, offset);
+              curves.forEach((b,i) => {
+                this.setRandomColor();
+                this.drawCurve(b, offset);
               });
-              setColor("black");
-              drawCircle(curves[0].points[0], 3, offset);
-              drawCircle(curves[0].points[3], 3, offset);
-              drawCircle(B, 3, offset);
+              this.setColor("black");
+              this.drawCircle(curves[0].points[0], 3, offset);
+              this.drawCircle(curves[0].points[3], 3, offset);
+              this.drawCircle(B, 3, offset);
             }
           </script></figure>
         </figures>
@@ -134,18 +129,18 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
+              this.drawSkeleton(curve);
               var LUT = curve.getLUT(16);
-              LUT.forEach(function(p) { drawCircle(p,2); });
+              LUT.forEach(p => this.drawCircle(p,2));
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
+              this.drawSkeleton(curve);
               var LUT = curve.getLUT(16);
-              LUT.forEach(function(p) { drawCircle(p,2); });
+              LUT.forEach(p => this.drawCircle(p,2));
             }
           </script></figure>
         </figures>
@@ -164,21 +159,21 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               var arclength = curve.length();
               var offset = curve.offset(-10), last=offset.length-1;
-              offset.forEach(function(c,idx) {
-                drawCurve(c);
+              offset.forEach((c,idx) => {
+                this.drawCurve(c);
                 if(idx===last) {
                   var p1 = curve.offset(0.95, -15);
                   var p2 = c.get(1);
                   var p3 = curve.offset(0.95, -5);
-                  drawLine(p1,p2);
-                  drawLine(p2,p3);
+                  this.drawLine(p1,p2);
+                  this.drawLine(p2,p3);
                   var label = ((100*arclength)|0)/100 + "px";
-                  drawText(label, {x:p2.x+7,y:p2.y-3});
+                  this.drawText(label, {x:p2.x+7,y:p2.y-3});
                 }
               });
             }
@@ -187,21 +182,21 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100, 25, 10, 90, 110, 100, 132, 192 );
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               var arclength = curve.length();
               var offset = curve.offset(-10), last=offset.length-1;
-              offset.forEach(function(c,idx) {
-                drawCurve(c);
+              offset.forEach((c,idx) => {
+                this.drawCurve(c);
                 if(idx===last) {
                   var p1 = curve.offset(0.95, -15);
                   var p2 = c.get(1);
                   var p3 = curve.offset(0.95, -5);
-                  drawLine(p1,p2);
-                  drawLine(p2,p3);
+                  this.drawLine(p1,p2);
+                  this.drawLine(p2,p3);
                   var label = ((100*arclength)|0)/100 + "px";
-                  drawText(label, {x:p2.x+7,y:p2.y-3});
+                  this.drawText(label, {x:p2.x+7,y:p2.y-3});
                 }
               });
             }
@@ -212,7 +207,6 @@
           specifically the Legendre-Gauss quadrature algorithm.</p>
       </section>
 
-
       <section id="get">
         <a href="#get"><h1>.get(t) and .compute(t)</h1></a>
 
@@ -220,20 +214,20 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              drawPoint(curve.get(0.5));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              this.drawPoint(curve.get(0.5));
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              drawPoint(curve.get(0.5));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              this.drawPoint(curve.get(0.5));
             }
           </script></figure>
         </figures>
@@ -251,13 +245,13 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               for(var t=0; t<=1; t+=0.1) {
                 var pt = curve.get(t);
                 var dv = curve.derivative(t);
-                drawLine(pt, { x: pt.x + dv.x, y: pt.y + dv.y} );
+                this.drawLine(pt, { x: pt.x + dv.x, y: pt.y + dv.y} );
               }
             }
           </script></figure>
@@ -265,13 +259,13 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               for(var t=0; t<=1; t+=0.1) {
                 var pt = curve.get(t);
                 var dv = curve.derivative(t);
-                drawLine(pt, { x: pt.x + dv.x, y: pt.y + dv.y} );
+                this.drawLine(pt, { x: pt.x + dv.x, y: pt.y + dv.y} );
               }
             }
           </script></figure>
@@ -281,7 +275,6 @@
           a not-normalized vector <code>{x: dx, y: dy}</code>.</p>
       </section>
 
-
       <section id="normal">
         <a href="#normal"><h1>.normal(t)</h1></a>
 
@@ -289,14 +282,14 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               var pt, nv, d=20;
               for(var t=0; t<=1; t+=0.1) {
                 var pt = curve.get(t);
                 var nv = curve.normal(t);
-                drawLine(pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
+                this.drawLine(pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
               }
             }
           </script></figure>
@@ -304,14 +297,14 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               var pt, nv, d=20;
               for(var t=0; t<=1; t+=0.1) {
                 var pt = curve.get(t);
                 var nv = curve.normal(t);
-                drawLine(pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
+                this.drawLine(pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
               }
             }
           </script></figure>
@@ -332,28 +325,28 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              setColor("lightgrey");
-              drawCurve(curve);
+              this.drawSkeleton(curve);
+              this.setColor("lightgrey");
+              this.drawCurve(curve);
               var c = curve.split(0.25, 0.75);
-              setColor("red");
-              drawCurve(c);
-              drawCircle(curve.get(0.25),3);
-              drawCircle(curve.get(0.75),3);
+              this.setColor("red");
+              this.drawCurve(c);
+              this.drawCircle(curve.get(0.25),3);
+              this.drawCircle(curve.get(0.75),3);
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              setColor("lightgrey");
-              drawCurve(curve);
+              this.drawSkeleton(curve);
+              this.setColor("lightgrey");
+              this.drawCurve(curve);
               var c = curve.split(0.25, 0.75);
-              setColor("red");
-              drawCurve(c);
-              drawCircle(curve.get(0.25),3);
-              drawCircle(curve.get(0.75),3);
+              this.setColor("red");
+              this.drawCurve(c);
+              this.drawCircle(curve.get(0.25),3);
+              this.drawCircle(curve.get(0.75),3);
             }
           </script></figure>
         </figures>
@@ -374,24 +367,20 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.extrema().values.forEach(function(t) {
-                drawCircle(curve.get(t),3);
-              });
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.extrema().values.forEach(t => this.drawCircle(curve.get(t),3));
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.extrema().values.forEach(function(t) {
-                drawCircle(curve.get(t),3);
-              });
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.extrema().values.forEach(t => this.drawCircle(curve.get(t),3));
             }
           </script></figure>
         </figures>
@@ -415,24 +404,20 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.inflections().forEach(function(t) {
-                drawCircle(curve.get(t),3);
-              });
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.inflections().forEach(t => this.drawCircle(curve.get(t),3));
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.inflections().forEach(function(t) {
-                drawCircle(curve.get(t),3);
-              });
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.inflections().forEach(t => this.drawCircle(curve.get(t),3));
             }
           </script></figure>
         </figures>
@@ -450,17 +435,17 @@
 
           <figures>
             <figure class="quadratic"><script type="text/beziercode">
-              new Bezier(150,40 , 80,30 , 105,150);
+              new Bezier(120,40 , 50,30 , 75,150);
               var draw = function() {
-                drawSkeleton(curve);
-                drawCurve(curve);
+                this.drawSkeleton(curve);
+                this.drawCurve(curve);
                 for(var s=0; s<256; s+=2) {
-                  setColor("rgba(255,127,"+s+",0.6)");
+                  this.setColor("rgba(255,127,"+s+",0.6)");
                   let t = s/255;
                   let p = curve.get(t);
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
-                  drawLine(p, {
+                  this.drawLine(p, {
                     x: p.x + n.x * kr.k * 5000,
                     y: p.y + n.y * kr.k * 5000,
                   });
@@ -469,17 +454,17 @@
             </script></figure>
 
             <figure class="cubic"><script type="text/beziercode">
-              new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+              new Bezier(110,15 , 10,40 , 100,130 , 90,195);
               var draw = function() {
-                drawSkeleton(curve);
-                drawCurve(curve);
+                this.drawSkeleton(curve);
+                this.drawCurve(curve);
                 for(var s=0; s<256; s+=2) {
-                  setColor("rgba(255,127,"+s+",0.6)");
+                  this.setColor("rgba(255,127,"+s+",0.6)");
                   let t = s/255;
                   let p = curve.get(t);
                   let n = curve.normal(t);
                   let kr = curve.curvature(t);
-                  drawLine(p, {
+                  this.drawLine(p, {
                     x: p.x + n.x * kr.k * 5000,
                     y: p.y + n.y * kr.k * 5000,
                   });
@@ -503,27 +488,27 @@
           </p>
         </section>
 
-      <section id="bbox">
+        <section id="bbox">
         <a href="#bbox"><h1>.bbox()</h1></a>
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("rgb(255,100,100)");
-              drawbbox(curve.bbox());
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("rgb(255,100,100)");
+              this.drawbbox(curve.bbox());
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("rgb(255,100,100)");
-              drawbbox(curve.bbox());
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("rgb(255,100,100)");
+              this.drawbbox(curve.bbox());
             }
           </script></figure>
         </figures>
@@ -538,24 +523,24 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("rgb(255,100,100)");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("rgb(255,100,100)");
               var hull = curve.hull(0.5)
-              drawHull(hull);
-              drawCircle(hull.slice(-1)[0], 5);
+              this.drawHull(hull);
+              this.drawCircle(hull.slice(-1)[0], 5);
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 50,185 , 170,175);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("rgb(255,100,100)");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("rgb(255,100,100)");
               var hull = curve.hull(0.5)
-              drawHull(hull);
-              drawCircle(hull.slice(-1)[0], 5);
+              this.drawHull(hull);
+              this.drawCircle(hull.slice(-1)[0], 5);
             }
           </script></figure>
         </figures>
@@ -575,13 +560,13 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function(evt) {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("rgb(255,100,100)");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("rgb(255,100,100)");
               if (evt) {
                 var mouse = {x: evt.offsetX, y: evt.offsetY};
                 var p = curve.project(mouse);
-                drawLine(p,mouse);
+                this.drawLine(p,mouse);
               }
             }
           </script></figure>
@@ -589,13 +574,13 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 50,185 , 170,175);
             var draw = function(evt) {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("rgb(255,100,100)");
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("rgb(255,100,100)");
               if (evt) {
                 var mouse = {x: evt.offsetX, y: evt.offsetY};
                 var p = curve.project(mouse);
-                drawLine(p,mouse);
+                this.drawLine(p,mouse);
               }
             }
           </script></figure>
@@ -607,7 +592,6 @@
       </section>
 
 
-
       <section id="offset">
         <a href="#offset"><h1>.offset(d) and .offset(t, d)</h1></a>
 
@@ -615,26 +599,22 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.offset(25).forEach(function(c) {
-                drawCurve(c);
-              });
-              drawPoint(curve.offset(0.5,25));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.offset(25).forEach(c => this.drawCurve(c));
+              this.drawPoint(curve.offset(0.5,25));
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 145,179);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.offset(25).forEach(function(c) {
-                drawCurve(c);
-              });
-              drawPoint(curve.offset(0.5,25));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.offset(25).forEach(c => this.drawCurve(c));
+              this.drawPoint(curve.offset(0.5,25));
             }
           </script></figure>
         </figures>
@@ -649,7 +629,6 @@
           the point on the curve at <code>t=...</code>, offset along its normal by a distance <code>d</code>.</p>
       </section>
 
-
       <section id="reduce">
         <a href="#reduce"><h1>.reduce()</h1></a>
 
@@ -657,32 +636,32 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
+              this.drawSkeleton(curve);
               var reduced = curve.reduce();
               if(reduced.length>0) {
-                reduced.forEach(function(c,i) {
-                  setColor("black");
-                  if(i>0) drawCircle(c.points[0],3);
-                  setRandomColor();
-                  drawCurve(c);
+                reduced.forEach((c,i) => {
+                  this.setColor("black");
+                  if(i>0) this.drawCircle(c.points[0],3);
+                  this.setRandomColor();
+                  this.drawCurve(c);
                 });
-              } else { drawCurve(curve); }
+              } else { this.drawCurve(curve); }
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
+              this.drawSkeleton(curve);
               var reduced = curve.reduce();
               if(reduced.length>0) {
-                reduced.forEach(function(c,i) {
-                  setColor("black");
-                  if(i>0) drawCircle(c.points[0],3);
-                  setRandomColor();
-                  drawCurve(c);
+                reduced.forEach((c,i) => {
+                  this.setColor("black");
+                  if(i>0) this.drawCircle(c.points[0],3);
+                  this.setRandomColor();
+                  this.drawCurve(c);
                 });
-              } else { drawCurve(curve); }
+              } else { this.drawCurve(curve); }
             }
           </script></figure>
         </figures>
@@ -704,24 +683,24 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
+              this.drawSkeleton(curve);
               var arcs = curve.arcs();
-              setColor("black");
-              arcs.forEach(function(arc) {
-                setRandomFill(0.1);
-                drawArc(arc);
+              this.setColor("black");
+              arcs.forEach(arc => {
+                this.setRandomFill(0.1);
+                this.drawArc(arc);
               });
             }
           </script></figure>
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
+              this.drawSkeleton(curve);
               var arcs = curve.arcs();
-              setColor("black");
-              arcs.forEach(function(arc) {
-                setRandomFill(0.1);
-                drawArc(arc);
+              this.setColor("black");
+              arcs.forEach(arc => {
+                this.setRandomFill(0.1);
+                this.drawArc(arc);
               });
             }
           </script></figure>
@@ -748,38 +727,38 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              setColor("black");
+              this.drawSkeleton(curve);
+              this.setColor("black");
               var reduced = curve.reduce(),
                   len = reduced.length;
               if(len>0) {
-                reduced.forEach(function(c,i) {
-                  if(i>0) drawCircle(c.points[0],3);
-                  drawCurve(c);
+                reduced.forEach((c,i) => {
+                  if(i>0) this.drawCircle(c.points[0],3);
+                  this.drawCurve(c);
                 });
                 for(var i=-30; i<=30; i+=10) {
-                  drawCurve(reduced[(len/2)|0].scale(i));
+                  this.drawCurve(reduced[(len/2)|0].scale(i));
                 }
-              } else { drawCurve(curve); }
+              } else { this.drawCurve(curve); }
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              setColor("black");
+              this.drawSkeleton(curve);
+              this.setColor("black");
               var reduced = curve.reduce(),
                   len = reduced.length;
               if(len>0) {
-                reduced.forEach(function(c,i) {
-                  if(i>0) drawCircle(c.points[0],3);
-                  drawCurve(c);
+                reduced.forEach((c,i) => {
+                  if(i>0) this.drawCircle(c.points[0],3);
+                  this.drawCurve(c);
                 });
                 for(var i=-30; i<=30; i+=10) {
-                  drawCurve(reduced[(len/2)|0].scale(i));
+                  this.drawCurve(reduced[(len/2)|0].scale(i));
                 }
-              } else { drawCurve(curve); }
+              } else { this.drawCurve(curve); }
             }
           </script></figure>
         </figures>
@@ -795,13 +774,13 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              var doc = function(c) { drawCurve(c); };
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              var doc = c => this.drawCurve(c);
               var outline = curve.outline(25);
               outline.curves.forEach(doc);
-              setColor("rgba(0,0,255,0.3)");
+              this.setColor("rgba(0,0,255,0.3)");
               outline.offset(10).curves.forEach(doc);
               outline.offset(-10).curves.forEach(doc);
             }
@@ -810,13 +789,13 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              var doc = function(c) { drawCurve(c); };
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              var doc = c => this.drawCurve(c);
               var outline = curve.outline(25);
               outline.curves.forEach(doc);
-              setColor("rgba(0,0,255,0.3)");
+              this.setColor("rgba(0,0,255,0.3)");
               outline.offset(10).curves.forEach(doc);
               outline.offset(-10).curves.forEach(doc);
             }
@@ -853,24 +832,22 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              var doc = function(c) { drawCurve(c); };
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               var outline = curve.outline(5,5,25,25);
-              outline.curves.forEach(doc);
+              outline.curves.forEach(c => this.drawCurve(c));
             }
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              var doc = function(c, idx) { drawCurve(c); };
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
               var outline = curve.outline(5,5,25,25);
-              outline.curves.forEach(doc);
+              outline.curves.forEach(c => this.drawCurve(c));
             }
           </script></figure>
         </figures>
@@ -895,12 +872,12 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(150,40 , 80,30 , 105,150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.outlineshapes(25).forEach(function(s) {
-                setRandomFill(0.2);
-                drawShape(s);
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.outlineshapes(25).forEach(s => {
+                this.setRandomFill(0.2);
+                this.drawShape(s);
               });
             }
           </script></figure>
@@ -908,12 +885,12 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,90 , 110,100 , 150,195);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              curve.outlineshapes(25).forEach(function(s) {
-                setRandomFill(0.2);
-                drawShape(s);
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              curve.outlineshapes(25).forEach(s => {
+                this.setRandomFill(0.2);
+                this.drawShape(s);
               });
             }
           </script></figure>
@@ -943,11 +920,11 @@
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(100,25 , 10,180 , 170,165 , 65,70);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              curve.intersects().forEach(function(pair) {
-                var t = pair.split("/").map(function(v) { return parseFloat(v); });
-                drawPoint(curve.get(t[0]));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              curve.intersects().forEach(pair => {
+                var t = pair.split("/").map(v => parseFloat(v));
+                this.drawPoint(curve.get(t[0]));
               });
             }
           </script></figure>
@@ -968,29 +945,25 @@
           <figure class="quadratic"><script type="text/beziercode">
             new Bezier(58, 173, 26, 28, 163, 104);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
               var line = { p1: {x:0, y:175}, p2: {x:200,y:25} };
-              setColor("red");
-              drawLine(line.p1, line.p2);
-              setColor("black");
-              curve.intersects(line).forEach(function(t) {
-                drawPoint(curve.get(t));
-              });
+              this.setColor("red");
+              this.drawLine(line.p1, line.p2);
+              this.setColor("black");
+              curve.intersects(line).forEach(t => this.drawPoint(curve.get(t)));
             }
           </script></figure>
           <figure class="cubic"><script type="text/beziercode">
             new Bezier(53, 163, 27, 19, 182, 176, 155, 36);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
               var line = { p1: {x:0, y:175}, p2: {x:200,y:25} };
-              setColor("red");
-              drawLine(line.p1, line.p2);
-              setColor("black");
-              curve.intersects(line).forEach(function(t) {
-                drawPoint(curve.get(t));
-              });
+              this.setColor("red");
+              this.drawLine(line.p1, line.p2);
+              this.setColor("black");
+              curve.intersects(line).forEach(t => this.drawPoint(curve.get(t)));
             }
           </script></figure>
         </figures>
@@ -1015,14 +988,14 @@
             new Bezier(48, 84, 100, 187, 166, 37);
             var curve2 = new Bezier(68, 150, 74, 6, 143, 150);
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              drawCurve(curve2);
-              setColor("black");
-              curve.intersects(curve2).forEach(function(pair) {
-                var t = pair.split("/").map(function(v) { return parseFloat(v); });
-                drawPoint(curve.get(t[0]));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              this.drawCurve(curve2);
+              this.setColor("black");
+              curve.intersects(curve2).forEach(pair => {
+                var t = pair.split("/").map(v => parseFloat(v));
+                this.drawPoint(curve.get(t[0]));
               });
             }
           </script></figure>
@@ -1030,14 +1003,14 @@
             new Bezier(48, 84, 104, 176, 190, 37, 121, 75);
             var curve2 = new Bezier(68, 145, 74, 6, 143, 197, 138, 55 );
             var draw = function() {
-              drawSkeleton(curve);
-              drawCurve(curve);
-              setColor("red");
-              drawCurve(curve2);
-              setColor("black");
-              curve.intersects(curve2).forEach(function(pair) {
-                var t = pair.split("/").map(function(v) { return parseFloat(v); });
-                drawPoint(curve.get(t[0]));
+              this.drawSkeleton(curve);
+              this.drawCurve(curve);
+              this.setColor("red");
+              this.drawCurve(curve2);
+              this.setColor("black");
+              curve.intersects(curve2).forEach(pair => {
+                var t = pair.split("/").map(v => parseFloat(v));
+                this.drawPoint(curve.get(t[0]));
               });
             }
           </script></figure>
@@ -1063,10 +1036,8 @@
       <p>Made by <a href="https://twitter.com/TheRealPomax">Pomax</a>. Based on the work done for <a href="http://pomax.github.io/bezierinfo">A Primer on Bézier Curves</a>. Naturally, the code's open source over on <a href="http://github.com/Pomax/bezierjs">github</a>.<br>
       Still to do: intersection resolution for outlines with overlapping extrusions.</p>
     </footer>
+-->
 
-    <script src="./bezier.js"></script>
-    <script src="js/draw.js"></script>
-    <script src="js/interaction.js"></script>
-    <script src="js/loader.js"></script>
+    <script src="js/loader.js" defer></script>
   </body>
 </html>
