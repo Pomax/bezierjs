@@ -30,16 +30,18 @@ const b = new Bezier(...);
 Copy the contents of the `lib` directory to wherever you like (`/js`, `/vendor`, etc), or place the rolled-up version of the library there, and then load the library as an import to whatever script needs to use the `Bezier` constructor using:
 
 ```
-import { Bezier } from "/js/vendor/bezier-js";
+import { Bezier } from "/js/vendor/bezier.js";
 
 const b = new Bezier(...);
 ```
 
 ## Working on the code
 
-To test new code, use `npm test`.
+All the code is in the `lib` directory, with `bezier.js` as entry point.
 
-There is no build step for the library itself, but to build it for the websiteTo build the library, use `npm run build`.
+To test code (which automatically applies code formatting and rollup), use `npm test`.
+
+There is no explicit build step for the library, `npm test` takes care of everything, except checking for code coverage.
 
 ## License
 
