@@ -1,0 +1,9 @@
+# Ignore github things
+.github
+.gitignore
+
+# Ignore documentation
+docs
+
+# Ignore tests
+test
