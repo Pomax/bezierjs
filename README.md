@@ -15,7 +15,7 @@ or read the souce (`./lib` for the library code, start at `bezier.js`).
 
 There is a rolled-up version of `bezier.js` in the `dist` directory. Just download that.
 
-## Use
+## In Node, as dependency
 
 About as simple as it gets:
 
@@ -25,7 +25,7 @@ import { Bezier } from "bezier-js";
 const b = new Bezier(...);
 ```
 
-## Use in the browser
+## In Node or the browser, from file
 
 Copy the contents of the `lib` directory to wherever you like (`/js`, `/vendor`, etc), or place the rolled-up version of the library there, and then load the library as an import to whatever script needs to use the `Bezier` constructor using:
 
