@@ -1580,6 +1580,7 @@ class Bezier {
         ft = t;
       }
     }
+    ft = ft < 0 ? 0 : ft > 1 ? 1 : ft;
     p = this.compute(ft);
     p.t = ft;
     p.d = mdist;
