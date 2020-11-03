@@ -2,8 +2,8 @@
 .github
 .gitignore
 
-# ignore original source
-lib
+# ignore "dist", which is meant as direct file for people to download and drop in their asset dir
+dist
 
 # Ignore documentation
 docs

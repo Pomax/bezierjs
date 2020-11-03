@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "author": "Pomax",
   "description": "A javascript library for working with Bezier curves",
-  "main": "./dist/bezier.js",
+  "main": "./lib/bezier.js",
   "type": "module",
   "license": "MIT",
   "bugs": {
