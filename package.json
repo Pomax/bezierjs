@@ -3,8 +3,9 @@
   "version": "3.1.0",
   "author": "Pomax",
   "description": "A javascript library for working with Bezier curves",
-  "main": "./lib/bezier.js",
   "type": "module",
+  "module": "./lib/bezier.js",
+  "main": "./dist/cjs/bezier.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Pomax/bezierjs/issues"
@@ -19,17 +20,21 @@
     "curves"
   ],
   "scripts": {
-    "rollup": "run-s rollup:docs rollup:dist",
-    "rollup:base": "rollup ./lib/bezier.js --format esm --file ",
-    "rollup:docs": "npm run rollup:base -- ./docs/js/bezier.js",
-    "rollup:dist": "npm run rollup:base -- ./dist/bezier.js",
+    "build": "run-s build:docs build:dist build:cjs",
+    "build:base": "rollup ./lib/bezier.js --format esm --file ",
+    "build:docs": "npm run build:base -- ./docs/js/bezier.js",
+    "build:dist": "npm run build:base -- ./dist/bezier.js",
+    "build:cjs": "babel --plugins @babel/plugin-transform-modules-commonjs lib --out-dir dist/cjs",
     "lint:lib": "prettier ./lib/**/*.js --write",
     "lint:test": "prettier ./test/**/*.js --write",
     "mocha": "mocha test/**/*.js",
-    "test": "npm start && npm run rollup",
+    "test": "npm start && npm run build",
     "start": "run-s lint:* mocha"
   },
   "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "chai": "^4.2.0",
     "chai-stats": "^0.3.0",
     "mocha": "^8.1.1",
