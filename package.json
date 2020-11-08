@@ -20,10 +20,10 @@
     "curves"
   ],
   "scripts": {
-    "build": "run-s build:docs build:dist build:cjs",
-    "build:base": "rollup ./lib/bezier.js --format esm --file ",
-    "build:docs": "npm run build:base -- ./docs/js/bezier.js",
-    "build:dist": "npm run build:base -- ./dist/bezier.js",
+    "build": "run-s build:*",
+    "rollup": "rollup ./lib/bezier.js --format esm --file ",
+    "build:docs": "npm run rollup -- ./docs/js/bezier.js",
+    "build:dist": "npm run rollup -- ./dist/bezier.js",
     "build:cjs": "babel --plugins @babel/plugin-transform-modules-commonjs lib --out-dir dist/cjs",
     "lint:lib": "prettier ./lib/**/*.js --write",
     "lint:test": "prettier ./test/**/*.js --write",
