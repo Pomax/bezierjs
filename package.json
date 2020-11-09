@@ -5,7 +5,7 @@
   "description": "A javascript library for working with Bezier curves",
   "type": "module",
   "exports": "./lib/bezier.js",
-  "main": "./dist/cjs/bezier.js",
+  "main": "./dist/bezier.common.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Pomax/bezierjs/issues"
@@ -24,7 +24,7 @@
     "rollup": "rollup ./lib/bezier.js --format esm --file ",
     "build:docs": "npm run rollup -- ./docs/js/bezier.js",
     "build:dist": "npm run rollup -- ./dist/bezier.js",
-    "build:cjs": "babel --plugins @babel/plugin-transform-modules-commonjs lib --out-dir dist/cjs",
+    "build:cjs": "babel --plugins @babel/plugin-transform-modules-commonjs dist/bezier.js --out-file dist/bezier.common.js",
     "lint:lib": "prettier ./lib/**/*.js --write",
     "lint:test": "prettier ./test/**/*.js --write",
     "mocha": "mocha test/**/*.js",
