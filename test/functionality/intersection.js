@@ -1,4 +1,4 @@
-import { Bezier } from "../../lib/bezier.js";
+import { Bezier } from "../../src/bezier.js";
 import chai from "chai";
 import chaiStats from "chai-stats";
 const assert = chai.use(chaiStats).assert;

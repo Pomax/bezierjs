@@ -1,6 +1,6 @@
 // test for numerical precision despite rounding errors after the significant digit
 
-import { utils } from "../../lib/utils.js";
+import { utils } from "../../src/utils.js";
 import chai from "chai";
 import chaiStats from "chai-stats";
 const assert = chai.use(chaiStats).assert;

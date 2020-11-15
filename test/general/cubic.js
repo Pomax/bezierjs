@@ -1,4 +1,4 @@
-import { Bezier } from "../../lib/bezier.js";
+import { Bezier } from "../../src/bezier.js";
 const utils = Bezier.getUtils();
 
 import chai from "chai";

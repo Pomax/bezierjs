@@ -2,10 +2,9 @@
 
 An ES Module based library for Node.js and browsers for doing (quadratic and cubic) Bezier curve work.
 
-For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs)
-or read the souce (`./lib` for the library code, start at `bezier.js`).
+For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs) or read the souce (`./lib` for the library code, start at `bezier.js`).
 
-**Note:** if you're looking for the legacy ES5 version of this library, you will have to install v2.6.1 or below. However, be aware that the ES5 version will not have any fixes/updates backported.
+**Note:** if you're looking for the legacy ES5 version of this library, you will have to install v2.6.1 or below. However, be aware that the ES5 version will not have any fixes/updates back-ported.
 
 ## Installation
 
@@ -25,9 +24,18 @@ import { Bezier } from "bezier-js";
 const b = new Bezier(...);
 ```
 
+Or, using the legacy CommonJS syntax:
+
+```
+const Bezier = require("bezier-js");
+
+const b = new Bezier(...);
+```
+
+
 ## In Node or the browser, from file
 
-Copy the contents of the `lib` directory to wherever you like (`/js`, `/vendor`, etc), or place the rolled-up version of the library there, and then load the library as an import to whatever script needs to use the `Bezier` constructor using:
+Copy the contents of the `src` directory to wherever you like (`/js`, `/vendor`, etc), or place the rolled-up version of the library there, and then load the library as an import to whatever script needs to use the `Bezier` constructor using:
 
 ```
 import { Bezier } from "/js/vendor/bezier.js";
@@ -37,7 +45,7 @@ const b = new Bezier(...);
 
 ## Working on the code
 
-All the code is in the `lib` directory, with `bezier.js` as entry point.
+All the code is in the `src` directory, with `bezier.js` as entry point.
 
 To test code (which automatically applies code formatting and rollup), use `npm test`.
 
