@@ -13,7 +13,7 @@ or read the souce (`./lib` for the library code, start at `bezier.js`).
 
 ### Without using a package manager
 
-There is a rolled-up version of `bezier.js` in the `dist` directory. Just download that.
+There is a rolled-up version of `bezier.js` in the `dist` directory. Just [download that](https://raw.githubusercontent.com/Pomax/bezierjs/master/dist/bezier.js) and drop it in your JS asset dir.
 
 ## In Node, as dependency
 
