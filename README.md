@@ -2,7 +2,7 @@
 
 An ES Module based library for Node.js and browsers for doing (quadratic and cubic) Bezier curve work.
 
-For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs) or read the souce (`./lib` for the library code, start at `bezier.js`).
+For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs) or read the souce (`./src` for the library code, start at `bezier.js`).
 
 **Note:** if you're looking for the legacy ES5 version of this library, you will have to install v2.6.1 or below. However, be aware that the ES5 version will not have any fixes/updates back-ported.
 
