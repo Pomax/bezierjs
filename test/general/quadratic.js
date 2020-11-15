@@ -63,11 +63,6 @@ describe(`Quadratic bezier`, () => {
     run(b);
   });
 
-  describe(`from SVG builder`, () => {
-    const b = Bezier.SVGtoBeziers("M 0 0 Q 0.5 1 1 0").curve(0);
-    run(b);
-  });
-
   describe(`from point set`, () => {
     const M = { x: 75, y: 25 };
     const pts = [{ x: 0, y: 0 }, M, { x: 100, y: 100 }];

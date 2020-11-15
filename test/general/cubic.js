@@ -60,11 +60,6 @@ describe(`Cubic bezier`, () => {
     run(b);
   });
 
-  describe(`from SVG builder`, () => {
-    const b = Bezier.SVGtoBeziers("m 0 0 C 0 1 1 1 1 0").curve(0);
-    run(b);
-  });
-
   describe(`from point set`, () => {
     const M = { x: 200 / 3, y: 100 / 3 };
     const pts = [{ x: 0, y: 0 }, M, { x: 100, y: 100 }];
