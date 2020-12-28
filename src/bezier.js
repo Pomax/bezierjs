@@ -333,11 +333,11 @@ class Bezier {
   }
 
   derivative(t) {
-    return utils.compute(t, this.dpoints[0]);
+    return utils.compute(t, this.dpoints[0], this._3d);
   }
 
   dderivative(t) {
-    return utils.compute(t, this.dpoints[1]);
+    return utils.compute(t, this.dpoints[1], this._3d);
   }
 
   align() {
