@@ -1,5 +1,14 @@
 # Bezier.js
 
+:warning:
+**This package needs your support to stay maintained.** If you work for an organization
+whose website is better off using react-onclickoutside than rolling its own code
+solution, please consider talking to your manager to help
+[fund this project](https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=QPRDLNGDANJSW).
+Open Source is free to use, but certainly not free to develop. If you have the
+means to reward those whose work you rely on, please consider doing so.
+:warning:
+
 An ES Module based library for Node.js and browsers for doing (quadratic and cubic) Bezier curve work.
 
 For a Demo and the API, hit up either [pomax.github.io/bezierjs](http://pomax.github.io/bezierjs) or read the souce (`./src` for the library code, start at `bezier.js`).
