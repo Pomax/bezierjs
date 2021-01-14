@@ -15,6 +15,10 @@
     "type": "git",
     "url": "https://github.com/Pomax/bezierjs"
   },
+  "funding": {
+    "type": "individual",
+    "url": "https://www.papaypal.com/donate/?cmd=_s-xclick&hosted_button_id=QPRDLNGDANJSW"
+  },  
   "keywords": [
     "bezier",
     "curves"
