@@ -4,7 +4,10 @@
   "author": "Pomax",
   "description": "A javascript library for working with Bezier curves",
   "type": "module",
-  "exports": "./src/bezier.js",
+  "exports": {
+    "import": "./src/bezier.js",
+    "require": "./dist/bezier.cjs"
+  },
   "main": "./dist/bezier.cjs",
   "license": "MIT",
   "bugs": {
