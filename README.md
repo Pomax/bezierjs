@@ -41,6 +41,16 @@ const Bezier = require("bezier-js");
 const b = new Bezier(...);
 ```
 
+### Node support matrix
+
+| Node Version | Require Supported | Import Supported                    |
+| ------------ | ----------------- | ----------------------------------- |
+| v12.0.0      | Yes               | Yes <sup>Experimental Flag</sup>    |
+| v12.14.1     | Yes               | No <sup>Experimental Flag</sup>     |
+| v12.17.0     | Yes               | Yes <sup>Experimental Warning</sup> |
+| v12.22.1     | Yes               | Yes                                 |
+| v14.0.0      | Yes               | Yes                                 |
+| v14.16.1     | Yes               | Yes                                 |
 
 ## In Node or the browser, from file
 
