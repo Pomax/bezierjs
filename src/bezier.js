@@ -636,26 +636,39 @@ class Bezier {
       return this.raise().scale(distanceFn);
     }
 
-    // TODO: add special handling for degenerate (=linear) curves.
     const clockwise = this.clockwise;
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
     const v = [this.offset(0, 10), this.offset(1, 10)];
     const points = this.points;
     const np = [];
-    const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
-
-    if (!o) {
-      throw new Error("cannot scale this curve. Try reducing it first.");
-    }
-    // move all points by distance 'd' wrt the origin 'o'
-
+    
     // move end points by fixed distance along normal.
     [0, 1].forEach(function (t) {
       const p = (np[t * order] = utils.copy(points[t * order]));
       p.x += (t ? r2 : r1) * v[t].n.x;
       p.y += (t ? r2 : r1) * v[t].n.y;
     });
+
+    // Add special handling for degenerate (=linear) curves.
+    if (this._linear) {
+      if (this.order >= 2) {
+        [0, 1].forEach((t) => {
+          if (order === 2 && !!t) return;
+          const p = (np[t + 1] = utils.copy(points[t + 1]));
+          p.x += (t ? r2 : r1) * v[t].n.x;
+          p.y += (t ? r2 : r1) * v[t].n.y;
+        });
+      }
+      return new Bezier(np)
+    }
+
+    const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
+    // move all points by distance 'd' wrt the origin 'o'
+    
+    if (!o) {
+      throw new Error("cannot scale this curve. Try reducing it first.");
+    }
 
     if (!distanceFn) {
       // move control points to lie on the intersection of the offset
@@ -694,7 +707,7 @@ class Bezier {
 
   outline(d1, d2, d3, d4) {
     d2 = typeof d2 === "undefined" ? d1 : d2;
-    const reduced = this.reduce(),
+    const reduced = this._linear ? [ this ] : this.reduce(),
       len = reduced.length,
       fcurves = [];
 
@@ -737,8 +750,10 @@ class Bezier {
         p = s.points;
         if (p[3]) {
           s.points = [p[3], p[2], p[1], p[0]];
-        } else {
+        } else if (p[2]) {
           s.points = [p[2], p[1], p[0]];
+        } else {
+          s.points = [p[1], p[0]];
         }
         return s;
       })
