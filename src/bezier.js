@@ -12,8 +12,6 @@ import { PolyBezier } from "./poly-bezier.js";
 // math-inlining.
 const { abs, min, max, cos, sin, acos, sqrt } = Math;
 const pi = Math.PI;
-// a zero coordinate, which is surprisingly useful
-const ZERO = { x: 0, y: 0, z: 0 };
 
 /**
  * Bezier curve constructor.
@@ -242,10 +240,9 @@ class Bezier {
     if (this._lut.length === steps) {
       return this._lut;
     }
+    // n steps means n+1 points
+    steps++;
     this._lut = [];
-    // We want a range from 0 to 1 inclusive, so
-    // we decrement and then use <= rather than <:
-    steps--;
     for (let i = 0, p, t; i < steps; i++) {
       t = i / (steps - 1);
       p = this.compute(t);
