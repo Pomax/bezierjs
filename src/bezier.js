@@ -243,9 +243,9 @@ class Bezier {
       return this._lut;
     }
     this._lut = [];
-    // We want a range from 0 to 1 inclusive, so
-    // we decrement and then use <= rather than <:
-    steps--;
+    // n steps means n+1 points
+    steps++;
+    this._lut = [];
     for (let i = 0, p, t; i < steps; i++) {
       t = i / (steps - 1);
       p = this.compute(t);
