@@ -252,7 +252,7 @@ const utils = {
       y: v1.y + r * (v2.y - v1.y)
     };
 
-    if (!!v1.z && !!v2.z) {
+    if (v1.z !== undefined && v2.z !== undefined) {
       ret.z = v1.z + r * (v2.z - v1.z);
     }
 
@@ -1326,11 +1326,11 @@ class Bezier {
   }
 
   derivative(t) {
-    return utils.compute(t, this.dpoints[0]);
+    return utils.compute(t, this.dpoints[0], this._3d);
   }
 
   dderivative(t) {
-    return utils.compute(t, this.dpoints[1]);
+    return utils.compute(t, this.dpoints[1], this._3d);
   }
 
   align() {
