@@ -626,6 +626,18 @@ class Bezier {
     return pass2;
   }
 
+  translate(v, d) {
+    const translated = this.points.map((p) => {
+      let np = {
+        x: p.x + v.x * d,
+        y: p.y + v.y * d,
+      };
+      if (p.z) np.z = p.z + v.z * d;
+      return np;
+    });
+    return new Bezier(translated);
+  }
+
   scale(d) {
     const order = this.order;
     let distanceFn = false;
@@ -638,19 +650,24 @@ class Bezier {
 
     // TODO: add special handling for degenerate (=linear) curves.
     const clockwise = this.clockwise;
+    const points = this.points;
+
+    if (utils.isLinear(points)) {
+      return this.translate(this.normal(0), d);
+    }
+
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
     const v = [this.offset(0, 10), this.offset(1, 10)];
-    const points = this.points;
     const np = [];
     const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
 
     if (!o) {
       throw new Error("cannot scale this curve. Try reducing it first.");
     }
-    // move all points by distance 'd' wrt the origin 'o'
 
-    // move end points by fixed distance along normal.
+    // move all points by distance 'd' wrt the origin 'o',
+    // and move end points by fixed distance along normal.
     [0, 1].forEach(function (t) {
       const p = (np[t * order] = utils.copy(points[t * order]));
       p.x += (t ? r2 : r1) * v[t].n.x;
@@ -693,7 +710,39 @@ class Bezier {
   }
 
   outline(d1, d2, d3, d4) {
-    d2 = typeof d2 === "undefined" ? d1 : d2;
+    d2 = d2 === undefined ? d1 : d2;
+
+    if (utils.isLinear(this.points)) {
+      
+      // TODO: find the actual extrema, because they might be before the start, or past the end.
+      // TODO: find out why graduated curve can have gaps
+      
+      const n = this.normal(0);
+      const start = this.points[0];
+      const end = this.points[this.points.length - 1];
+      let s, mid, e;
+
+      if (d3 === undefined) {
+        d3 = d1;
+        d4 = d2;
+      }
+
+      s = { x: start.x + n.x * d1, y: start.y + n.y * d1 };
+      e = { x: end.x + n.x * d3, y: end.y + n.y * d3 };
+      mid = { x: (s.x + e.x) / 2, y: (s.y + e.y) / 2 };
+      const fline = [s, mid, e];
+
+      s = { x: start.x - n.x * d2, y: start.y - n.y * d2 };
+      e = { x: end.x - n.x * d4, y: end.y - n.y * d4 };
+      mid = { x: (s.x + e.x) / 2, y: (s.y + e.y) / 2 };
+      const bline = [e, mid, s];
+
+      const ls = utils.makeline(bline[2], fline[0]);
+      const le = utils.makeline(fline[2], bline[0]);
+      const segments = [ls, new Bezier(fline), le, new Bezier(bline)];
+      return new PolyBezier(segments);
+    }
+
     const reduced = this.reduce(),
       len = reduced.length,
       fcurves = [];
@@ -751,8 +800,7 @@ class Bezier {
       be = bcurves[0].points[0],
       ls = utils.makeline(bs, fs),
       le = utils.makeline(fe, be),
-      segments = [ls].concat(fcurves).concat([le]).concat(bcurves),
-      slen = segments.length;
+      segments = [ls].concat(fcurves).concat([le]).concat(bcurves);
 
     return new PolyBezier(segments);
   }

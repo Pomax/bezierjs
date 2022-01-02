@@ -405,22 +405,28 @@ const utils = {
   },
 
   makeline: function (p1, p2) {
-    const x1 = p1.x,
-      y1 = p1.y,
-      x2 = p2.x,
-      y2 = p2.y,
-      dx = (x2 - x1) / 3,
-      dy = (y2 - y1) / 3;
     return new Bezier(
-      x1,
-      y1,
-      x1 + dx,
-      y1 + dy,
-      x1 + 2 * dx,
-      y1 + 2 * dy,
-      x2,
-      y2
+      p1.x,
+      p1.y,
+      (p1.x + p2.x) / 2,
+      (p1.y + p2.y) / 2,
+      p2.x,
+      p2.y
     );
+  },
+
+  isLinear: function (pts, epsilon, distance = 150) {
+    // 1 pixel over 150 pixels is close enough to linear
+    const s = pts[0];
+    const e = pts[pts.length - 1];
+    epsilon = epsilon || utils.dist(s, e) / distance;
+    // So, what's the drift?
+    const aligned = utils.align(pts, { p1: s, p2: e });
+    // by definition, the first and last point are on y==0,
+    // so by how much are the control points off?
+    const controls = aligned.slice(1, aligned.length - 1);
+    const error = controls.reduce((t, e) => t + abs(e.y), 0);
+    return error <= epsilon;
   },
 
   findbbox: function (sections) {

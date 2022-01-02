@@ -777,13 +777,15 @@
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
-            new Bezier(150,40 , 80,30 , 105,150);
+            // new Bezier(150,40 , 80,30 , 105,150);
+            new Bezier(150,40 , 80,40 , 105,40);
             var draw = function() {
               this.drawSkeleton(curve);
               this.drawCurve(curve);
               this.setColor("red");
               var doc = c => this.drawCurve(c);
               var outline = curve.outline(25);
+              console.log(outline);
               outline.curves.forEach(doc);
               this.setColor("rgba(0,0,255,0.3)");
               outline.offset(10).curves.forEach(doc);
@@ -792,7 +794,8 @@
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
-            new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
+            // new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
+            new Bezier(50, 100, 120, 100, 80, 100, 150, 100 );
             var draw = function() {
               this.drawSkeleton(curve);
               this.drawCurve(curve);
@@ -835,7 +838,8 @@
 
         <figures>
           <figure class="quadratic"><script type="text/beziercode">
-            new Bezier(150,40 , 80,30 , 105,150);
+            // new Bezier(150,40 , 80,30 , 105,150);
+            new Bezier(150,40 , 80,40 , 105,40);            
             var draw = function() {
               this.drawSkeleton(curve);
               this.drawCurve(curve);
@@ -846,7 +850,8 @@
           </script></figure>
 
           <figure class="cubic"><script type="text/beziercode">
-            new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
+            // new Bezier(102, 33, 16, 99, 101, 129, 132, 173 );
+            new Bezier(50, 100, 120, 100, 80, 100, 150, 100 );
             var draw = function() {
               this.drawSkeleton(curve);
               this.drawCurve(curve);

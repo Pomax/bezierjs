@@ -1,7 +1,7 @@
 class CodeExample {
   constructor(idx) {
     var figure = find("figure")[idx];
-    var cvs = this.cvs = document.createElement("canvas");
+    var cvs = (this.cvs = document.createElement("canvas"));
     cvs.width = 200;
     cvs.height = 200;
     this.ctx = cvs.getContext("2d");
@@ -126,7 +126,7 @@ class CodeExample {
 
   drawPoints(points, offset) {
     offset = offset || { x: 0, y: 0 };
-    points.forEach(p => this.drawCircle(p, 3, offset));
+    points.forEach((p) => this.drawCircle(p, 3, offset));
   }
 
   drawArc(p, offset) {
@@ -193,14 +193,17 @@ class CodeExample {
     const ctx = this.ctx;
     offset = offset || { x: 0, y: 0 };
     var order = shape.forward.points.length - 1;
+    var scl = shape.startcap.points.length;
+    var ecl = shape.endcap.points.length;
+
     ctx.beginPath();
     ctx.moveTo(
       offset.x + shape.startcap.points[0].x,
       offset.y + shape.startcap.points[0].y
     );
     ctx.lineTo(
-      offset.x + shape.startcap.points[3].x,
-      offset.y + shape.startcap.points[3].y
+      offset.x + shape.startcap.points[scl - 1].x,
+      offset.y + shape.startcap.points[scl - 1].y
     );
     if (order === 3) {
       ctx.bezierCurveTo(
@@ -220,8 +223,8 @@ class CodeExample {
       );
     }
     ctx.lineTo(
-      offset.x + shape.endcap.points[3].x,
-      offset.y + shape.endcap.points[3].y
+      offset.x + shape.endcap.points[ecl - 1].x,
+      offset.y + shape.endcap.points[ecl - 1].y
     );
     if (order === 3) {
       ctx.bezierCurveTo(
@@ -251,4 +254,4 @@ class CodeExample {
   }
 }
 
-export { CodeExample }
+export { CodeExample };

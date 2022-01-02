@@ -371,13 +371,23 @@ const utils = {
     return utils.lli4(v1, v1.c, v2, v2.c);
   },
   makeline: function (p1, p2) {
-    const x1 = p1.x,
-          y1 = p1.y,
-          x2 = p2.x,
-          y2 = p2.y,
-          dx = (x2 - x1) / 3,
-          dy = (y2 - y1) / 3;
-    return new Bezier(x1, y1, x1 + dx, y1 + dy, x1 + 2 * dx, y1 + 2 * dy, x2, y2);
+    return new Bezier(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2, p2.x, p2.y);
+  },
+  isLinear: function (pts, epsilon, distance = 150) {
+    // 1 pixel over 150 pixels is close enough to linear
+    const s = pts[0];
+    const e = pts[pts.length - 1];
+    epsilon = epsilon || utils.dist(s, e) / distance; // So, what's the drift?
+
+    const aligned = utils.align(pts, {
+      p1: s,
+      p2: e
+    }); // by definition, the first and last point are on y==0,
+    // so by how much are the control points off?
+
+    const controls = aligned.slice(1, aligned.length - 1);
+    const error = controls.reduce((t, e) => t + abs(e.y), 0);
+    return error <= epsilon;
   },
   findbbox: function (sections) {
     let mx = nMax,
@@ -1627,6 +1637,18 @@ class Bezier {
     return pass2;
   }
 
+  translate(v, d) {
+    const translated = this.points.map(p => {
+      let np = {
+        x: p.x + v.x * d,
+        y: p.y + v.y * d
+      };
+      if (p.z) np.z = p.z + v.z * d;
+      return np;
+    });
+    return new Bezier(translated);
+  }
+
   scale(d) {
     const order = this.order;
     let distanceFn = false;
@@ -1641,17 +1663,22 @@ class Bezier {
 
 
     const clockwise = this.clockwise;
+    const points = this.points;
+
+    if (utils.isLinear(points)) {
+      return this.translate(this.normal(0), d);
+    }
+
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
     const v = [this.offset(0, 10), this.offset(1, 10)];
-    const points = this.points;
     const np = [];
     const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
 
     if (!o) {
       throw new Error("cannot scale this curve. Try reducing it first.");
-    } // move all points by distance 'd' wrt the origin 'o'
-    // move end points by fixed distance along normal.
+    } // move all points by distance 'd' wrt the origin 'o',
+    // and move end points by fixed distance along normal.
 
 
     [0, 1].forEach(function (t) {
@@ -1699,7 +1726,51 @@ class Bezier {
   }
 
   outline(d1, d2, d3, d4) {
-    d2 = typeof d2 === "undefined" ? d1 : d2;
+    d2 = d2 === undefined ? d1 : d2;
+
+    if (utils.isLinear(this.points)) {
+      const n = this.normal(0);
+      const start = this.points[0];
+      const end = this.points[this.points.length - 1];
+      let s, mid, e;
+
+      if (d3 === undefined) {
+        d3 = d1;
+        d4 = d2;
+      }
+
+      s = {
+        x: start.x + n.x * d1,
+        y: start.y + n.y * d1
+      };
+      e = {
+        x: end.x + n.x * d3,
+        y: end.y + n.y * d3
+      };
+      mid = {
+        x: (s.x + e.x) / 2,
+        y: (s.y + e.y) / 2
+      };
+      const fline = [s, mid, e];
+      s = {
+        x: start.x - n.x * d2,
+        y: start.y - n.y * d2
+      };
+      e = {
+        x: end.x - n.x * d4,
+        y: end.y - n.y * d4
+      };
+      mid = {
+        x: (s.x + e.x) / 2,
+        y: (s.y + e.y) / 2
+      };
+      const bline = [e, mid, s];
+      const ls = utils.makeline(bline[2], fline[0]);
+      const le = utils.makeline(fline[2], bline[0]);
+      const segments = [ls, new Bezier(fline), le, new Bezier(bline)];
+      return new PolyBezier(segments);
+    }
+
     const reduced = this.reduce(),
           len = reduced.length,
           fcurves = [];

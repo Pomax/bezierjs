@@ -71,7 +71,7 @@ figure.cubic .textarea {
 }
 figure .textarea {
   position: absolute;
-  z-index: 2;
+  z-index: 10;
   background: white;
   display: block;
   width: 0px;
