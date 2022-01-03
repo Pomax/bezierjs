@@ -28,8 +28,9 @@
   ],
   "scripts": {
     "test": "npm start",
-    "start": "run-s lint:* mocha build:*",
+    "start": "run-s lint:* mocha build",
     "-----": "------------------------------------------",
+    "build": "run-s build:*",
     "build:docs": "npm run rollup -- ./docs/js/bezier.js",
     "build:dist": "npm run rollup -- ./dist/bezier.js",
     "build:cjs": "babel --plugins @babel/plugin-transform-modules-commonjs dist/bezier.js --out-file dist/bezier.cjs",

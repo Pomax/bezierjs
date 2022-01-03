@@ -796,13 +796,14 @@
             var draw = function() {
               this.drawSkeleton(curve);
               this.drawCurve(curve);
+
               this.setColor("red");
-              var doc = c => this.drawCurve(c);
+              const drawCurve = c => this.drawCurve(c);
               var outline = curve.outline(25);
-              outline.curves.forEach(doc);
+              outline.curves.forEach(drawCurve);
               this.setColor("rgba(0,0,255,0.3)");
-              outline.offset(10).curves.forEach(doc);
-              outline.offset(-10).curves.forEach(doc);
+              outline.offset(10).curves.forEach(drawCurve);
+              outline.offset(-10).curves.forEach(drawCurve);
             }
           </script></figure>
         </figures>
@@ -1033,7 +1034,6 @@
         of steps is generally good enough to get reliable values (typically 10 steps yields more than acceptable
         precision). When <code>curveIntersectionThreshold</code> is provided, this will be used for bounding box
         comparisons in x and y dimensions so that precision can be specified, otherwise a default value of .5 will be used.</p>
-
       </section>
     </main>
 

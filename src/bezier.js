@@ -82,11 +82,12 @@ class Bezier {
     if (_3d) dims.push("z");
     this.dimlen = dims.length;
 
+    // is this curve, practically speaking, a straight line?
     const aligned = utils.align(points, { p1: points[0], p2: points[order] });
-    this._linear = !aligned.some((p) => abs(p.y) > 0.0001);
+    const baselength = utils.dist(points[0], points[order]);
+    this._linear = aligned.reduce((t, p) => t + abs(p.y), 0) < baselength / 50;
 
     this._lut = [];
-
     this._t1 = 0;
     this._t2 = 1;
     this.update();
@@ -626,6 +627,22 @@ class Bezier {
     return pass2;
   }
 
+  translate(v, d1, d2) {
+    d2 = typeof d2 === "number" ? d2 : d1;
+
+    // TODO: make this take curves with control points outside
+    //       of the start-end interval into account
+
+    const o = this.order;
+    let d = this.points.map((_, i) => (1 - i / o) * d1 + (i / o) * d2);
+    return new Bezier(
+      this.points.map((p, i) => ({
+        x: p.x + v.x * d[i],
+        y: p.y + v.y * d[i],
+      }))
+    );
+  }
+
   scale(d) {
     const order = this.order;
     let distanceFn = false;
@@ -636,21 +653,31 @@ class Bezier {
       return this.raise().scale(distanceFn);
     }
 
-    // TODO: add special handling for degenerate (=linear) curves.
+    // TODO: add special handling for non-linear degenerate curves.
+
     const clockwise = this.clockwise;
+    const points = this.points;
+
+    if (this._linear) {
+      return this.translate(
+        this.normal(0),
+        distanceFn ? distanceFn(0) : d,
+        distanceFn ? distanceFn(1) : d
+      );
+    }
+
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
     const v = [this.offset(0, 10), this.offset(1, 10)];
-    const points = this.points;
     const np = [];
     const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
 
     if (!o) {
       throw new Error("cannot scale this curve. Try reducing it first.");
     }
-    // move all points by distance 'd' wrt the origin 'o'
 
-    // move end points by fixed distance along normal.
+    // move all points by distance 'd' wrt the origin 'o',
+    // and move end points by fixed distance along normal.
     [0, 1].forEach(function (t) {
       const p = (np[t * order] = utils.copy(points[t * order]));
       p.x += (t ? r2 : r1) * v[t].n.x;
@@ -693,7 +720,38 @@ class Bezier {
   }
 
   outline(d1, d2, d3, d4) {
-    d2 = typeof d2 === "undefined" ? d1 : d2;
+    d2 = d2 === undefined ? d1 : d2;
+
+    if (this._linear) {
+      // TODO: find the actual extrema, because they might
+      //       be before the start, or past the end.
+
+      const n = this.normal(0);
+      const start = this.points[0];
+      const end = this.points[this.points.length - 1];
+      let s, mid, e;
+
+      if (d3 === undefined) {
+        d3 = d1;
+        d4 = d2;
+      }
+
+      s = { x: start.x + n.x * d1, y: start.y + n.y * d1 };
+      e = { x: end.x + n.x * d3, y: end.y + n.y * d3 };
+      mid = { x: (s.x + e.x) / 2, y: (s.y + e.y) / 2 };
+      const fline = [s, mid, e];
+
+      s = { x: start.x - n.x * d2, y: start.y - n.y * d2 };
+      e = { x: end.x - n.x * d4, y: end.y - n.y * d4 };
+      mid = { x: (s.x + e.x) / 2, y: (s.y + e.y) / 2 };
+      const bline = [e, mid, s];
+
+      const ls = utils.makeline(bline[2], fline[0]);
+      const le = utils.makeline(fline[2], bline[0]);
+      const segments = [ls, new Bezier(fline), le, new Bezier(bline)];
+      return new PolyBezier(segments);
+    }
+
     const reduced = this.reduce(),
       len = reduced.length,
       fcurves = [];
@@ -751,8 +809,7 @@ class Bezier {
       be = bcurves[0].points[0],
       ls = utils.makeline(bs, fs),
       le = utils.makeline(fe, be),
-      segments = [ls].concat(fcurves).concat([le]).concat(bcurves),
-      slen = segments.length;
+      segments = [ls].concat(fcurves).concat([le]).concat(bcurves);
 
     return new PolyBezier(segments);
   }
