@@ -415,20 +415,6 @@ const utils = {
     );
   },
 
-  isLinear: function (pts, epsilon, distance = 150) {
-    // 1 pixel over 150 pixels is close enough to linear
-    const s = pts[0];
-    const e = pts[pts.length - 1];
-    epsilon = epsilon || utils.dist(s, e) / distance;
-    // So, what's the drift?
-    const aligned = utils.align(pts, { p1: s, p2: e });
-    // by definition, the first and last point are on y==0,
-    // so by how much are the control points off?
-    const controls = aligned.slice(1, aligned.length - 1);
-    const error = controls.reduce((t, e) => t + abs(e.y), 0);
-    return error <= epsilon;
-  },
-
   findbbox: function (sections) {
     let mx = nMax,
       my = nMax,

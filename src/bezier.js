@@ -82,11 +82,12 @@ class Bezier {
     if (_3d) dims.push("z");
     this.dimlen = dims.length;
 
+    // is this curve, practically speaking, a straight line?
     const aligned = utils.align(points, { p1: points[0], p2: points[order] });
-    this._linear = !aligned.some((p) => abs(p.y) > 0.0001);
+    const baselength = utils.dist(points[0], points[order]);
+    this._linear = aligned.reduce((t, p) => t + abs(p.y), 0) < baselength / 50;
 
     this._lut = [];
-
     this._t1 = 0;
     this._t2 = 1;
     this.update();
@@ -657,7 +658,7 @@ class Bezier {
     const clockwise = this.clockwise;
     const points = this.points;
 
-    if (utils.isLinear(points)) {
+    if (this._linear) {
       return this.translate(
         this.normal(0),
         distanceFn ? distanceFn(0) : d,
@@ -721,9 +722,9 @@ class Bezier {
   outline(d1, d2, d3, d4) {
     d2 = d2 === undefined ? d1 : d2;
 
-    if (utils.isLinear(this.points)) {
-      // TODO: find the actual extrema, because they might be before the start, or past the end.
-      // TODO: find out why graduated curve can have gaps
+    if (this._linear) {
+      // TODO: find the actual extrema, because they might
+      //       be before the start, or past the end.
 
       const n = this.normal(0);
       const start = this.points[0];

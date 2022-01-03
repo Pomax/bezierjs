@@ -413,20 +413,6 @@ const utils = {
     );
   },
 
-  isLinear: function (pts, epsilon, distance = 150) {
-    // 1 pixel over 150 pixels is close enough to linear
-    const s = pts[0];
-    const e = pts[pts.length - 1];
-    epsilon = epsilon || utils.dist(s, e) / distance;
-    // So, what's the drift?
-    const aligned = utils.align(pts, { p1: s, p2: e });
-    // by definition, the first and last point are on y==0,
-    // so by how much are the control points off?
-    const controls = aligned.slice(1, aligned.length - 1);
-    const error = controls.reduce((t, e) => t + abs(e.y), 0);
-    return error <= epsilon;
-  },
-
   findbbox: function (sections) {
     let mx = nMax,
       my = nMax,
@@ -1060,8 +1046,10 @@ class Bezier {
     if (_3d) dims.push("z");
     this.dimlen = dims.length;
 
+    // is this curve, practically speaking, a straight line?
     const aligned = utils.align(points, { p1: points[0], p2: points[order] });
-    this._linear = !aligned.some((p) => abs$1(p.y) > 0.0001);
+    const baselength = utils.dist(points[0], points[order]);
+    this._linear = aligned.reduce((t, p) => t + abs$1(p.y), 0) < baselength / 50;
 
     this._lut = [];
 
@@ -1635,7 +1623,7 @@ class Bezier {
     const clockwise = this.clockwise;
     const points = this.points;
 
-    if (utils.isLinear(points)) {
+    if (this._linear) {
       return this.translate(
         this.normal(0),
         distanceFn ? distanceFn(0) : d,
@@ -1699,9 +1687,9 @@ class Bezier {
   outline(d1, d2, d3, d4) {
     d2 = d2 === undefined ? d1 : d2;
 
-    if (utils.isLinear(this.points)) {
-      // TODO: find the actual extrema, because they might be before the start, or past the end.
-      // TODO: find out why graduated curve can have gaps
+    if (this._linear) {
+      // TODO: find the actual extrema, because they might
+      //       be before the start, or past the end.
 
       const n = this.normal(0);
       const start = this.points[0];
