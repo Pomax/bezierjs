@@ -1606,15 +1606,18 @@ class Bezier {
 
   translate(v, d1, d2) {
     d2 = typeof d2 === "number" ? d2 : d1;
-    let d = [];
-    for (let i = 0, o = this.order; i <= o; i++) {
-      d.push((1 - i / o) * d1 + (i / o) * d2);
-    }
-    const translated = this.points.map((p, i) => ({
-      x: p.x + v.x * d[i],
-      y: p.y + v.y * d[i],
-    }));
-    return new Bezier(translated);
+
+    // TODO: make this take curves with control points outside
+    //       of the start-end interval into account
+
+    const o = this.order;
+    let d = this.points.map((_, i) => (1 - i / o) * d1 + (i / o) * d2);
+    return new Bezier(
+      this.points.map((p, i) => ({
+        x: p.x + v.x * d[i],
+        y: p.y + v.y * d[i],
+      }))
+    );
   }
 
   scale(d) {
@@ -1636,7 +1639,7 @@ class Bezier {
       return this.translate(
         this.normal(0),
         distanceFn ? distanceFn(0) : d,
-        distanceFn ? distanceFn(1) : undefined // CONTINUE WORK HERE
+        distanceFn ? distanceFn(1) : d
       );
     }
 
