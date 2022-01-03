@@ -1637,15 +1637,18 @@ class Bezier {
     return pass2;
   }
 
-  translate(v, d) {
-    const translated = this.points.map(p => {
-      let np = {
-        x: p.x + v.x * d,
-        y: p.y + v.y * d
-      };
-      if (p.z) np.z = p.z + v.z * d;
-      return np;
-    });
+  translate(v, d1, d2) {
+    d2 = typeof d2 === "number" ? d2 : d1;
+    let d = [];
+
+    for (let i = 0, o = this.order; i <= o; i++) {
+      d.push((1 - i / o) * d1 + i / o * d2);
+    }
+
+    const translated = this.points.map((p, i) => ({
+      x: p.x + v.x * d[i],
+      y: p.y + v.y * d[i]
+    }));
     return new Bezier(translated);
   }
 
@@ -1659,14 +1662,15 @@ class Bezier {
 
     if (distanceFn && order === 2) {
       return this.raise().scale(distanceFn);
-    } // TODO: add special handling for degenerate (=linear) curves.
+    } // TODO: add special handling for non-linear degenerate curves.
 
 
     const clockwise = this.clockwise;
     const points = this.points;
 
     if (utils.isLinear(points)) {
-      return this.translate(this.normal(0), d);
+      return this.translate(this.normal(0), distanceFn ? distanceFn(0) : d, distanceFn ? distanceFn(1) : undefined // CONTINUE WORK HERE
+      );
     }
 
     const r1 = distanceFn ? distanceFn(0) : d;
@@ -1729,6 +1733,8 @@ class Bezier {
     d2 = d2 === undefined ? d1 : d2;
 
     if (utils.isLinear(this.points)) {
+      // TODO: find the actual extrema, because they might be before the start, or past the end.
+      // TODO: find out why graduated curve can have gaps
       const n = this.normal(0);
       const start = this.points[0];
       const end = this.points[this.points.length - 1];
