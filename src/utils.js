@@ -733,11 +733,15 @@ const utils = {
       return [];
     }
 
-    const trm = v2 * v2 - 4 * v1 * v3,
-      sq = Math.sqrt(trm),
-      d2 = 2 * v1;
+    const d2 = 2 * v1;
 
     if (utils.approximately(d2, 0)) return [];
+
+    const trm = v2 * v2 - 4 * v1 * v3;
+
+    if (trm < 0) return [];
+
+    const sq = Math.sqrt(trm);
 
     return [(sq - v2) / d2, -(v2 + sq) / d2].filter(function (r) {
       return 0 <= r && r <= 1;

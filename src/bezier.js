@@ -361,7 +361,7 @@ class Bezier {
   __normal2(t) {
     const d = this.derivative(t);
     const q = sqrt(d.x * d.x + d.y * d.y);
-    return { x: -d.y / q, y: d.x / q };
+    return { t, x: -d.y / q, y: d.x / q };
   }
 
   __normal3(t) {
@@ -400,6 +400,7 @@ class Bezier {
     ];
     // normal vector:
     const n = {
+      t,
       x: R[0] * r1.x + R[1] * r1.y + R[2] * r1.z,
       y: R[3] * r1.x + R[4] * r1.y + R[5] * r1.z,
       z: R[6] * r1.x + R[7] * r1.y + R[8] * r1.z,
