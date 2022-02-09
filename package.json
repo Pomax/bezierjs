@@ -9,6 +9,7 @@
     "require": "./dist/bezier.cjs"
   },
   "main": "./dist/bezier.cjs",
+  "browser": "./src/bezier.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Pomax/bezierjs/issues"
