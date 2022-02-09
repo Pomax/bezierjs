@@ -1,6 +1,6 @@
 {
   "name": "bezier-js",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "author": "Pomax",
   "description": "A javascript library for working with Bezier curves",
   "type": "module",
