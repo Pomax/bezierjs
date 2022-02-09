@@ -5,13 +5,10 @@ import { utils } from "./utils.js";
  * @param {[type]} curves [description]
  */
 class PolyBezier {
-  constructor(curves) {
+  constructor(curves = []) {
     this.curves = [];
-    this._3d = false;
-    if (!!curves) {
-      this.curves = curves;
-      this._3d = this.curves[0]._3d;
-    }
+    this.curves = curves;
+    this._3d = this.curves[0]?._3d ?? false;
   }
 
   valueOf() {
@@ -19,30 +16,16 @@ class PolyBezier {
   }
 
   toString() {
-    return (
-      "[" +
-      this.curves
-        .map(function (curve) {
-          return utils.pointsToString(curve.points);
-        })
-        .join(", ") +
-      "]"
-    );
+    return "[" + this.curves.map((curve) => curve.toString()).join(", ") + "]";
   }
 
   addCurve(curve) {
     this.curves.push(curve);
-    this._3d = this._3d || curve._3d;
+    this._3d = this._3d || curve._3d; // TODO: this needs a test to make sure things don't break when mixing 2d/3d
   }
 
   length() {
-    return this.curves
-      .map(function (v) {
-        return v.length();
-      })
-      .reduce(function (a, b) {
-        return a + b;
-      });
+    return this.curves.map((v) => v.length()).reduce((a, b) => a + b, 0);
   }
 
   curve(idx) {
@@ -59,11 +42,7 @@ class PolyBezier {
   }
 
   offset(d) {
-    const offset = [];
-    this.curves.forEach(function (v) {
-      offset.push(...v.offset(d));
-    });
-    return new PolyBezier(offset);
+    return new PolyBezier(this.curves.map((v) => v.offset(d)).flat());
   }
 }
 

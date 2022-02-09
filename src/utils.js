@@ -362,6 +362,21 @@ const utils = {
     return abs(top / bottom);
   },
 
+  abc: function (order = 2, S, B, E, t = 0.5) {
+    const u = utils.projectionratio(t, order),
+      um = 1 - u,
+      C = {
+        x: u * S.x + um * E.x,
+        y: u * S.y + um * E.y,
+      },
+      s = utils.abcratio(t, order),
+      A = {
+        x: B.x + (B.x - C.x) / s,
+        y: B.y + (B.y - C.y) / s,
+      };
+    return { A, B, C, S, E };
+  },
+
   projectionratio: function (t, n) {
     // see u(t) note on http://pomax.github.io/bezierinfo/#abc
     if (n !== 2 && n !== 3) {
@@ -521,6 +536,12 @@ const utils = {
         };
       };
     return points.map(d);
+  },
+
+  isLinear: function (points, order) {
+    const aligned = utils.align(points, { p1: points[0], p2: points[order] });
+    const baselength = utils.dist(points[0], points[order]);
+    return aligned.reduce((t, p) => t + abs(p.y), 0) < baselength / 50;
   },
 
   roots: function (points, line) {
