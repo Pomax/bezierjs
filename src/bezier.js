@@ -240,7 +240,7 @@ class Bezier {
   getLUT(steps) {
     this.verify();
     steps = steps || 100;
-    if (this._lut.length === steps) {
+    if (this._lut.length === steps + 1) {
       return this._lut;
     }
     this._lut = [];
