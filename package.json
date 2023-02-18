@@ -32,7 +32,7 @@
     "start": "run-s test build",
     "build": "run-s build:*",
     "build:browser": "esbuild ./src/bezier.js --bundle --minify --outfile=dist/bezier.js",
-    "build:node": "esbuild ./src/bezier.js --bundle --target=node --outfile=dist/bezier.cjs",
+    "build:node": "esbuild ./src/bezier.js --bundle --target=node18 --outfile=dist/bezier.cjs",
     "prettier": "run-s prettier:*",
     "prettier:src": "prettier ./src/**/*.js --write",
     "prettier:text": "prettier ./test/**/*.js --write",
