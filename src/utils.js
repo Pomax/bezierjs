@@ -162,7 +162,7 @@ const utils = {
           y: dCpts[i].y + (dCpts[i + 1].y - dCpts[i].y) * t,
         };
         if (typeof dCpts[i].z !== "undefined") {
-          dCpts[i] = dCpts[i].z + (dCpts[i + 1].z - dCpts[i].z) * t;
+          dCpts[i].z = dCpts[i].z + (dCpts[i + 1].z - dCpts[i].z) * t;
         }
       }
       dCpts.splice(dCpts.length - 1, 1);
