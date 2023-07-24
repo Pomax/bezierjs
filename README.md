@@ -76,4 +76,4 @@ This code is MIT licensed.
 
 ## Engagement
 
-For comments and questions, [tweet at me](https://twitter.com/TheRealPomax) or file an issue.
+For comments and questions, [contact me on Mastodon](https://mastodon.social/@TheRealPomax) or file an issue.
