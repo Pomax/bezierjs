@@ -906,6 +906,76 @@ class Bezier {
     return this._iterate(errorThreshold, []);
   }
 
+  //Returns a point on the curve at a specified distance from the start
+  getAtDistance(distance, coarseResolution = 100, fineResolution = 10000) {
+    const maxLength = this.length();
+    if (distance > maxLength || distance < 0) {
+      return;
+    }
+
+    const getD = (p0, p1) => {
+      const dx = p0.x - p1.x;
+      const dy = p0.y - p1.y;
+      const dz = p0.z ? p0.z - p1.z : 0;
+
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    };
+
+    let coarseStep = 1 / coarseResolution;
+    let fineStep = 1 / fineResolution;
+
+    let previousPoint = this.compute(0);
+    let accumulatedDistance = 0;
+    let coarseT = 0;
+
+    // Coarse pass
+    for (coarseT = coarseStep; coarseT <= 1; coarseT += coarseStep) {
+      const thisPoint = this.compute(coarseT);
+      const thisD = getD(thisPoint, previousPoint);
+      accumulatedDistance += thisD;
+
+      if (accumulatedDistance > distance) {
+        // If we've passed the target distance, step back to the previous t value
+        coarseT -= coarseStep;
+        accumulatedDistance -= thisD;
+        break;
+      }
+
+      previousPoint = thisPoint;
+    }
+
+    // Fine pass
+    let bestErr = Number.POSITIVE_INFINITY;
+    for (let fineT = coarseT; fineT < coarseT + coarseStep; fineT += fineStep) {
+      let thisPoint = this.compute(fineT);
+      accumulatedDistance += getD(thisPoint, previousPoint);
+      const thisErr = Math.abs(accumulatedDistance - distance);
+      if (thisErr > bestErr) {
+        return previousPoint;
+      }
+      bestErr = thisErr;
+      previousPoint = thisPoint;
+    }
+
+    throw new Error("Cannot find point at distance");
+  }
+
+  // Finds an interpolated value for a point on the curve, given values at the curve start and end points and the t value for the desired point
+  interpolateOnCurveByT(v0, v1, t) {
+    if (t < 0) {
+      return v0;
+    }
+
+    if (t > 1) {
+      return v1;
+    }
+
+    const l1 = this.length();
+    const splitCurve = this.split(t).left;
+    const l0 = splitCurve.length();
+    return v0 + (v1 - v0) * l0 / l1;
+  }
+
   _error(pc, np1, s, e) {
     const q = (e - s) / 4,
       c1 = this.get(s + q),
