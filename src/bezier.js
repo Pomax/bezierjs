@@ -973,7 +973,7 @@ class Bezier {
     const l1 = this.length();
     const splitCurve = this.split(t).left;
     const l0 = splitCurve.length();
-    return v0 + (v1 - v0) * l0 / l1;
+    return v0 + ((v1 - v0) * l0) / l1;
   }
 
   _error(pc, np1, s, e) {
