@@ -676,8 +676,8 @@ var PolyBezier = class {
   }
   bbox() {
     const c = this.curves;
-    var bbox = c[0].bbox();
-    for (var i = 1; i < c.length; i++) {
+    let bbox = c[0].bbox();
+    for (let i = 1; i < c.length; i++) {
       utils.expandbox(bbox, c[i].bbox());
     }
     return bbox;
@@ -701,10 +701,10 @@ var Bezier = class {
     if (typeof args[0] === "object") {
       coordlen = args.length;
       const newargs = [];
-      args.forEach(function(point2) {
+      args.forEach(function(point) {
         ["x", "y", "z"].forEach(function(d) {
-          if (typeof point2[d] !== "undefined") {
-            newargs.push(point2[d]);
+          if (typeof point[d] !== "undefined") {
+            newargs.push(point[d]);
           }
         });
       });
@@ -729,7 +729,7 @@ var Bezier = class {
     const _3d = this._3d = !higher && (len === 9 || len === 12) || coords && coords[0] && typeof coords[0].z !== "undefined";
     const points = this.points = [];
     for (let idx = 0, step = _3d ? 3 : 2; idx < len; idx += step) {
-      var point = {
+      const point = {
         x: args[idx],
         y: args[idx + 1]
       };
@@ -1208,15 +1208,15 @@ var Bezier = class {
     [0, 1].forEach(function(t2) {
       if (order === 2 && !!t2)
         return;
-      var p = points[t2 + 1];
-      var ov = {
+      let p = points[t2 + 1];
+      let ov = {
         x: p.x - o.x,
         y: p.y - o.y
       };
-      var rc = distanceFn ? distanceFn((t2 + 1) / order) : d;
+      let rc = distanceFn ? distanceFn((t2 + 1) / order) : d;
       if (distanceFn && !clockwise)
         rc = -rc;
-      var m = sqrt2(ov.x * ov.x + ov.y * ov.y);
+      let m = sqrt2(ov.x * ov.x + ov.y * ov.y);
       ov.x /= m;
       ov.y /= m;
       np[t2 + 1] = {
@@ -1308,7 +1308,7 @@ var Bezier = class {
   lineIntersects(line) {
     const mx = min(line.p1.x, line.p2.x), my = min(line.p1.y, line.p2.y), MX = max(line.p1.x, line.p2.x), MY = max(line.p1.y, line.p2.y);
     return utils.roots(this.points, line).filter((t2) => {
-      var p = this.get(t2);
+      let p = this.get(t2);
       return utils.between(p.x, mx, MX) && utils.between(p.y, my, MY);
     });
   }
