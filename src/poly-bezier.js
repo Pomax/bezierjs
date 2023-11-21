@@ -51,8 +51,8 @@ class PolyBezier {
 
   bbox() {
     const c = this.curves;
-    var bbox = c[0].bbox();
-    for (var i = 1; i < c.length; i++) {
+    let bbox = c[0].bbox();
+    for (let i = 1; i < c.length; i++) {
       utils.expandbox(bbox, c[i].bbox());
     }
     return bbox;

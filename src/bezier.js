@@ -12,8 +12,6 @@ import { PolyBezier } from "./poly-bezier.js";
 // math-inlining.
 const { abs, min, max, cos, sin, acos, sqrt } = Math;
 const pi = Math.PI;
-// a zero coordinate, which is surprisingly useful
-const ZERO = { x: 0, y: 0, z: 0 };
 
 /**
  * Bezier curve constructor.
@@ -67,7 +65,7 @@ class Bezier {
 
     const points = (this.points = []);
     for (let idx = 0, step = _3d ? 3 : 2; idx < len; idx += step) {
-      var point = {
+      const point = {
         x: args[idx],
         y: args[idx + 1],
       };
@@ -433,6 +431,10 @@ class Bezier {
   }
 
   split(t1, t2) {
+    if (t1 === t2) {
+      throw new Error("t1 and t2 cannot be equal");
+    }
+
     // shortcuts
     if (t1 === 0 && !!t2) {
       return this.split(t2).left;
@@ -702,14 +704,14 @@ class Bezier {
     // ensure the correct tangent to endpoint".
     [0, 1].forEach(function (t) {
       if (order === 2 && !!t) return;
-      var p = points[t + 1];
-      var ov = {
+      let p = points[t + 1];
+      let ov = {
         x: p.x - o.x,
         y: p.y - o.y,
       };
-      var rc = distanceFn ? distanceFn((t + 1) / order) : d;
+      let rc = distanceFn ? distanceFn((t + 1) / order) : d;
       if (distanceFn && !clockwise) rc = -rc;
-      var m = sqrt(ov.x * ov.x + ov.y * ov.y);
+      let m = sqrt(ov.x * ov.x + ov.y * ov.y);
       ov.x /= m;
       ov.y /= m;
       np[t + 1] = {
@@ -853,7 +855,7 @@ class Bezier {
       MX = max(line.p1.x, line.p2.x),
       MY = max(line.p1.y, line.p2.y);
     return utils.roots(this.points, line).filter((t) => {
-      var p = this.get(t);
+      let p = this.get(t);
       return utils.between(p.x, mx, MX) && utils.between(p.y, my, MY);
     });
   }
