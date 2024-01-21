@@ -680,7 +680,7 @@ class Bezier {
     // move all points by distance 'd' wrt the origin 'o',
     // and move end points by fixed distance along normal.
     [0, 1].forEach(function (t) {
-      const p = (np[t * order] = utils.copy(points[t * order]));
+      const p = (np[t * order] = utils.clonePoint(points[t * order]));
       p.x += (t ? r2 : r1) * v[t].n.x;
       p.y += (t ? r2 : r1) * v[t].n.y;
     });

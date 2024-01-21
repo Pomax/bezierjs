@@ -306,8 +306,8 @@ const utils = {
     return "[" + points.map(utils.pointToString).join(", ") + "]";
   },
 
-  copy: function (obj) {
-    return JSON.parse(JSON.stringify(obj));
+  clonePoint: function (point) {
+    return { x: point.x, y: point.y };
   },
 
   angle: function (o, v1, v2) {
