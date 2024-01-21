@@ -513,14 +513,22 @@ const utils = {
   align: function (points, line) {
     const tx = line.p1.x,
       ty = line.p1.y,
-      a = -atan2(line.p2.y - ty, line.p2.x - tx),
-      d = function (v) {
-        return {
-          x: (v.x - tx) * cos(a) - (v.y - ty) * sin(a),
-          y: (v.x - tx) * sin(a) + (v.y - ty) * cos(a),
-        };
+      dx = line.p2.x - tx,
+      dy = line.p2.y - ty,
+      magnitude = sqrt(dx ** 2 + dy ** 2),
+      unitX = dx / magnitude,
+      unitY = dy / magnitude;
+
+    return points.map((p) => {
+      const x = p.x - tx;
+      const y = p.y - ty;
+      // Apply a basis change on x,y to align the x axis of the curve with the line,
+      // Zero point of the curve being `p1`
+      return {
+        x: unitX * x - unitY * y,
+        y: unitY * x + unitX * y,
       };
-    return points.map(d);
+    });
   },
 
   roots: function (points, line) {

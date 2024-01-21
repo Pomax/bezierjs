@@ -848,14 +848,32 @@ class Bezier {
   }
 
   lineIntersects(line) {
-    const mx = min(line.p1.x, line.p2.x),
-      my = min(line.p1.y, line.p2.y),
-      MX = max(line.p1.x, line.p2.x),
-      MY = max(line.p1.y, line.p2.y);
-    return utils.roots(this.points, line).filter((t) => {
-      var p = this.get(t);
-      return utils.between(p.x, mx, MX) && utils.between(p.y, my, MY);
-    });
+    const roots = utils.roots(this.points, line);
+
+    if (line.type === "line") {
+      return roots;
+    } else if (line.type === "ray") {
+      const vx = line.p2.x - line.p1.x;
+      const vy = line.p2.y - line.p1.y;
+      return roots.filter((t) => {
+        const p = this.get(t);
+        const dx = p.x - line.p1.x;
+        const dy = p.y - line.p1.y;
+        return (
+          (dx === 0 && dy === 0) ||
+          (Math.sign(dx) === Math.sign(vx) && Math.sign(dy) === Math.sign(vy))
+        );
+      });
+    } else {
+      const mx = min(line.p1.x, line.p2.x),
+        my = min(line.p1.y, line.p2.y),
+        MX = max(line.p1.x, line.p2.x),
+        MY = max(line.p1.y, line.p2.y);
+      return roots.filter((t) => {
+        const p = this.get(t);
+        return utils.between(p.x, mx, MX) && utils.between(p.y, my, MY);
+      });
+    }
   }
 
   selfintersects(curveIntersectionThreshold) {
