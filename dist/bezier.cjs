@@ -24,7 +24,8 @@ var __toCommonJS = /* @__PURE__ */ ((cache) => {
 // src/bezier.js
 var bezier_exports = {};
 __export(bezier_exports, {
-  Bezier: () => Bezier
+  Bezier: () => Bezier,
+  PolyBezier: () => PolyBezier
 });
 
 // src/utils.js
@@ -1404,5 +1405,6 @@ var Bezier = class {
 module.exports = __toCommonJS(bezier_exports);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  Bezier
+  Bezier,
+  PolyBezier
 });
