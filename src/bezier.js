@@ -1008,4 +1008,4 @@ class Bezier {
   }
 }
 
-export { Bezier };
+export { Bezier, PolyBezier };
