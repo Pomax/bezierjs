@@ -478,7 +478,11 @@ var utils = {
     if (p.length === 3) {
       const a = p[0], b = p[1], c = p[2], d = a - 2 * b + c;
       if (d !== 0) {
-        const m1 = -sqrt(b * b - a * c), m2 = -a + b, v1 = -(m1 + m2) / d, v2 = -(-m1 + m2) / d;
+        const m1Pow2 = b * b - a * c;
+        if (m1Pow2 < 0) {
+          return [];
+        }
+        const m1 = -sqrt(m1Pow2), m2 = -a + b, v1 = -(m1 + m2) / d, v2 = -(-m1 + m2) / d;
         return [v1, v2];
       } else if (b !== c && d === 0) {
         return [(2 * b - c) / (2 * (b - c))];
