@@ -24,7 +24,8 @@ var __toCommonJS = /* @__PURE__ */ ((cache) => {
 // src/bezier.js
 var bezier_exports = {};
 __export(bezier_exports, {
-  Bezier: () => Bezier
+  Bezier: () => Bezier,
+  PolyBezier: () => PolyBezier
 });
 
 // src/utils.js
@@ -92,7 +93,7 @@ var utils = {
     0.0123412297999872,
     0.0123412297999872
   ],
-  arcfn: function(t2, derivativeFn) {
+  arcfn: function (t2, derivativeFn) {
     const d = derivativeFn(t2);
     let l = d.x * d.x + d.y * d.y;
     if (typeof d.z !== "undefined") {
@@ -100,7 +101,7 @@ var utils = {
     }
     return sqrt(l);
   },
-  compute: function(t2, points, _3d) {
+  compute: function (t2, points, _3d) {
     if (t2 === 0) {
       points[0].t = 0;
       return points[0];
@@ -166,7 +167,7 @@ var utils = {
     dCpts[0].t = t2;
     return dCpts[0];
   },
-  computeWithRatios: function(t2, points, ratios, _3d) {
+  computeWithRatios: function (t2, points, ratios, _3d) {
     const mt = 1 - t2, r = ratios, p = points;
     let f1 = r[0], f2 = r[1], f3 = r[2], f4 = r[3], d;
     f1 *= mt;
@@ -206,7 +207,7 @@ var utils = {
       };
     }
   },
-  derive: function(points, _3d) {
+  derive: function (points, _3d) {
     const dpoints = [];
     for (let p = points, d = p.length, c = d - 1; d > 1; d--, c--) {
       const list = [];
@@ -225,13 +226,13 @@ var utils = {
     }
     return dpoints;
   },
-  between: function(v, m, M) {
+  between: function (v, m, M) {
     return m <= v && v <= M || utils.approximately(v, m) || utils.approximately(v, M);
   },
-  approximately: function(a, b, precision) {
+  approximately: function (a, b, precision) {
     return abs(a - b) <= (precision || epsilon);
   },
-  length: function(derivativeFn) {
+  length: function (derivativeFn) {
     const z = 0.5, len = utils.Tvalues.length;
     let sum = 0;
     for (let i = 0, t2; i < len; i++) {
@@ -240,11 +241,11 @@ var utils = {
     }
     return z * sum;
   },
-  map: function(v, ds, de, ts, te) {
+  map: function (v, ds, de, ts, te) {
     const d1 = de - ds, d2 = te - ts, v2 = v - ds, r = v2 / d1;
     return ts + d2 * r;
   },
-  lerp: function(r, v1, v2) {
+  lerp: function (r, v1, v2) {
     const ret = {
       x: v1.x + r * (v2.x - v1.x),
       y: v1.y + r * (v2.y - v1.y)
@@ -254,35 +255,35 @@ var utils = {
     }
     return ret;
   },
-  pointToString: function(p) {
+  pointToString: function (p) {
     let s = p.x + "/" + p.y;
     if (typeof p.z !== "undefined") {
       s += "/" + p.z;
     }
     return s;
   },
-  pointsToString: function(points) {
+  pointsToString: function (points) {
     return "[" + points.map(utils.pointToString).join(", ") + "]";
   },
-  copy: function(obj) {
+  copy: function (obj) {
     return JSON.parse(JSON.stringify(obj));
   },
-  angle: function(o, v1, v2) {
+  angle: function (o, v1, v2) {
     const dx1 = v1.x - o.x, dy1 = v1.y - o.y, dx2 = v2.x - o.x, dy2 = v2.y - o.y, cross = dx1 * dy2 - dy1 * dx2, dot = dx1 * dx2 + dy1 * dy2;
     return atan2(cross, dot);
   },
-  round: function(v, d) {
+  round: function (v, d) {
     const s = "" + v;
     const pos = s.indexOf(".");
     return parseFloat(s.substring(0, pos + 1 + d));
   },
-  dist: function(p1, p2) {
+  dist: function (p1, p2) {
     const dx = p1.x - p2.x, dy = p1.y - p2.y;
     return sqrt(dx * dx + dy * dy);
   },
-  closest: function(LUT, point) {
+  closest: function (LUT, point) {
     let mdist = pow(2, 63), mpos, d;
-    LUT.forEach(function(p, idx) {
+    LUT.forEach(function (p, idx) {
       d = utils.dist(point, p);
       if (d < mdist) {
         mdist = d;
@@ -291,7 +292,7 @@ var utils = {
     });
     return { mdist, mpos };
   },
-  abcratio: function(t2, n) {
+  abcratio: function (t2, n) {
     if (n !== 2 && n !== 3) {
       return false;
     }
@@ -303,7 +304,7 @@ var utils = {
     const bottom = pow(t2, n) + pow(1 - t2, n), top = bottom - 1;
     return abs(top / bottom);
   },
-  projectionratio: function(t2, n) {
+  projectionratio: function (t2, n) {
     if (n !== 2 && n !== 3) {
       return false;
     }
@@ -315,26 +316,26 @@ var utils = {
     const top = pow(1 - t2, n), bottom = pow(t2, n) + top;
     return top / bottom;
   },
-  lli8: function(x1, y1, x2, y2, x3, y3, x4, y4) {
+  lli8: function (x1, y1, x2, y2, x3, y3, x4, y4) {
     const nx = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4), ny = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4), d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (d == 0) {
       return false;
     }
     return { x: nx / d, y: ny / d };
   },
-  lli4: function(p1, p2, p3, p4) {
+  lli4: function (p1, p2, p3, p4) {
     const x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y, x3 = p3.x, y3 = p3.y, x4 = p4.x, y4 = p4.y;
     return utils.lli8(x1, y1, x2, y2, x3, y3, x4, y4);
   },
-  lli: function(v1, v2) {
+  lli: function (v1, v2) {
     return utils.lli4(v1, v1.c, v2, v2.c);
   },
-  makeline: function(p1, p2) {
+  makeline: function (p1, p2) {
     return new Bezier(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2, p2.x, p2.y);
   },
-  findbbox: function(sections) {
+  findbbox: function (sections) {
     let mx = nMax, my = nMax, MX = nMin, MY = nMin;
-    sections.forEach(function(s) {
+    sections.forEach(function (s) {
       const bbox = s.bbox();
       if (mx > bbox.x.min)
         mx = bbox.x.min;
@@ -350,16 +351,16 @@ var utils = {
       y: { min: my, mid: (my + MY) / 2, max: MY, size: MY - my }
     };
   },
-  shapeintersections: function(s1, bbox1, s2, bbox2, curveIntersectionThreshold) {
+  shapeintersections: function (s1, bbox1, s2, bbox2, curveIntersectionThreshold) {
     if (!utils.bboxoverlap(bbox1, bbox2))
       return [];
     const intersections = [];
     const a1 = [s1.startcap, s1.forward, s1.back, s1.endcap];
     const a2 = [s2.startcap, s2.forward, s2.back, s2.endcap];
-    a1.forEach(function(l1) {
+    a1.forEach(function (l1) {
       if (l1.virtual)
         return;
-      a2.forEach(function(l2) {
+      a2.forEach(function (l2) {
         if (l2.virtual)
           return;
         const iss = l1.intersects(l2, curveIntersectionThreshold);
@@ -374,7 +375,7 @@ var utils = {
     });
     return intersections;
   },
-  makeshape: function(forward, back, curveIntersectionThreshold) {
+  makeshape: function (forward, back, curveIntersectionThreshold) {
     const bpl = back.points.length;
     const fpl = forward.points.length;
     const start = utils.makeline(back.points[bpl - 1], forward.points[0]);
@@ -386,12 +387,12 @@ var utils = {
       endcap: end,
       bbox: utils.findbbox([start, forward, back, end])
     };
-    shape.intersections = function(s2) {
+    shape.intersections = function (s2) {
       return utils.shapeintersections(shape, shape.bbox, s2, s2.bbox, curveIntersectionThreshold);
     };
     return shape;
   },
-  getminmax: function(curve, d, list) {
+  getminmax: function (curve, d, list) {
     if (!list)
       return { min: 0, max: 0 };
     let min2 = nMax, max2 = nMin, t2, c;
@@ -413,8 +414,8 @@ var utils = {
     }
     return { min: min2, mid: (min2 + max2) / 2, max: max2, size: max2 - min2 };
   },
-  align: function(points, line) {
-    const tx = line.p1.x, ty = line.p1.y, a = -atan2(line.p2.y - ty, line.p2.x - tx), d = function(v) {
+  align: function (points, line) {
+    const tx = line.p1.x, ty = line.p1.y, a = -atan2(line.p2.y - ty, line.p2.x - tx), d = function (v) {
       return {
         x: (v.x - tx) * cos(a) - (v.y - ty) * sin(a),
         y: (v.x - tx) * sin(a) + (v.y - ty) * cos(a)
@@ -422,11 +423,11 @@ var utils = {
     };
     return points.map(d);
   },
-  roots: function(points, line) {
+  roots: function (points, line) {
     line = line || { p1: { x: 0, y: 0 }, p2: { x: 1, y: 0 } };
     const order = points.length - 1;
     const aligned = utils.align(points, line);
-    const reduce = function(t2) {
+    const reduce = function (t2) {
       return 0 <= t2 && t2 <= 1;
     };
     if (order === 2) {
@@ -474,7 +475,7 @@ var utils = {
       return [u1 - v1 - a / 3].filter(reduce);
     }
   },
-  droots: function(p) {
+  droots: function (p) {
     if (p.length === 3) {
       const a = p[0], b = p[1], c = p[2], d = a - 2 * b + c;
       if (d !== 0) {
@@ -494,7 +495,7 @@ var utils = {
     }
     return [];
   },
-  curvature: function(t2, d1, d2, _3d, kOnly) {
+  curvature: function (t2, d1, d2, _3d, kOnly) {
     let num, dnm, adk, dk, k = 0, r = 0;
     const d = utils.compute(t2, d1);
     const dd = utils.compute(t2, d2);
@@ -519,7 +520,7 @@ var utils = {
     }
     return { k, r, dk, adk };
   },
-  inflections: function(points) {
+  inflections: function (points) {
     if (points.length < 4)
       return [];
     const p = utils.align(points, { p1: points[0], p2: points.slice(-1)[0] }), a = p[2].x * p[1].y, b = p[3].x * p[1].y, c = p[1].x * p[2].y, d = p[3].x * p[2].y, v1 = 18 * (-3 * a + 2 * b + 3 * c - d), v2 = 18 * (3 * a - b - 3 * c), v3 = 18 * (c - a);
@@ -538,11 +539,11 @@ var utils = {
     if (trm < 0)
       return [];
     const sq = Math.sqrt(trm);
-    return [(sq - v2) / d2, -(v2 + sq) / d2].filter(function(r) {
+    return [(sq - v2) / d2, -(v2 + sq) / d2].filter(function (r) {
       return 0 <= r && r <= 1;
     });
   },
-  bboxoverlap: function(b1, b2) {
+  bboxoverlap: function (b1, b2) {
     const dims = ["x", "y"], len = dims.length;
     for (let i = 0, dim, l, t2, d; i < len; i++) {
       dim = dims[i];
@@ -554,7 +555,7 @@ var utils = {
     }
     return true;
   },
-  expandbox: function(bbox, _bbox) {
+  expandbox: function (bbox, _bbox) {
     if (_bbox.x.min < bbox.x.min) {
       bbox.x.min = _bbox.x.min;
     }
@@ -584,7 +585,7 @@ var utils = {
       bbox.z.size = bbox.z.max - bbox.z.min;
     }
   },
-  pairiteration: function(c1, c2, curveIntersectionThreshold) {
+  pairiteration: function (c1, c2, curveIntersectionThreshold) {
     const c1b = c1.bbox(), c2b = c2.bbox(), r = 1e5, threshold = curveIntersectionThreshold || 0.5;
     if (c1b.x.size + c1b.y.size < threshold && c2b.x.size + c2b.y.size < threshold) {
       return [
@@ -597,21 +598,21 @@ var utils = {
       { left: cc1.right, right: cc2.right },
       { left: cc1.right, right: cc2.left }
     ];
-    pairs = pairs.filter(function(pair) {
+    pairs = pairs.filter(function (pair) {
       return utils.bboxoverlap(pair.left.bbox(), pair.right.bbox());
     });
     let results = [];
     if (pairs.length === 0)
       return results;
-    pairs.forEach(function(pair) {
+    pairs.forEach(function (pair) {
       results = results.concat(utils.pairiteration(pair.left, pair.right, threshold));
     });
-    results = results.filter(function(v, i) {
+    results = results.filter(function (v, i) {
       return results.indexOf(v) === i;
     });
     return results;
   },
-  getccenter: function(p1, p2, p3) {
+  getccenter: function (p1, p2, p3) {
     const dx1 = p2.x - p1.x, dy1 = p2.y - p1.y, dx2 = p3.x - p2.x, dy2 = p3.y - p2.y, dx1p = dx1 * cos(quart) - dy1 * sin(quart), dy1p = dx1 * sin(quart) + dy1 * cos(quart), dx2p = dx2 * cos(quart) - dy2 * sin(quart), dy2p = dx2 * sin(quart) + dy2 * cos(quart), mx1 = (p1.x + p2.x) / 2, my1 = (p1.y + p2.y) / 2, mx2 = (p2.x + p3.x) / 2, my2 = (p2.y + p3.y) / 2, mx1n = mx1 + dx1p, my1n = my1 + dy1p, mx2n = mx2 + dx2p, my2n = my2 + dy2p, arc = utils.lli8(mx1, my1, mx1n, my1n, mx2, my2, mx2n, my2n), r = utils.dist(arc, p1);
     let s = atan2(p1.y - arc.y, p1.x - arc.x), m = atan2(p2.y - arc.y, p2.x - arc.x), e = atan2(p3.y - arc.y, p3.x - arc.x), _;
     if (s < e) {
@@ -637,7 +638,7 @@ var utils = {
     arc.r = r;
     return arc;
   },
-  numberSort: function(a, b) {
+  numberSort: function (a, b) {
     return a - b;
   }
 };
@@ -649,14 +650,16 @@ var PolyBezier = class {
     this._3d = false;
     if (!!curves) {
       this.curves = curves;
-      this._3d = this.curves[0]._3d;
+      if (this.curves.length) {
+        this._3d = this.curves[0]._3d;
+      }
     }
   }
   valueOf() {
     return this.toString();
   }
   toString() {
-    return "[" + this.curves.map(function(curve) {
+    return "[" + this.curves.map(function (curve) {
       return utils.pointsToString(curve.points);
     }).join(", ") + "]";
   }
@@ -665,9 +668,9 @@ var PolyBezier = class {
     this._3d = this._3d || curve._3d;
   }
   length() {
-    return this.curves.map(function(v) {
+    return this.curves.map(function (v) {
       return v.length();
-    }).reduce(function(a, b) {
+    }).reduce(function (a, b) {
       return a + b;
     });
   }
@@ -684,7 +687,7 @@ var PolyBezier = class {
   }
   offset(d) {
     const offset = [];
-    this.curves.forEach(function(v) {
+    this.curves.forEach(function (v) {
       offset.push(...v.offset(d));
     });
     return new PolyBezier(offset);
@@ -701,8 +704,8 @@ var Bezier = class {
     if (typeof args[0] === "object") {
       coordlen = args.length;
       const newargs = [];
-      args.forEach(function(point2) {
-        ["x", "y", "z"].forEach(function(d) {
+      args.forEach(function (point2) {
+        ["x", "y", "z"].forEach(function (d) {
           if (typeof point2[d] !== "undefined") {
             newargs.push(point2[d]);
           }
@@ -820,7 +823,7 @@ var Bezier = class {
     }
   }
   coordDigest() {
-    return this.points.map(function(c, pos) {
+    return this.points.map(function (c, pos) {
       return "" + pos + c.x + c.y + (c.z ? c.z : 0);
     }).join("");
   }
@@ -1032,8 +1035,8 @@ var Bezier = class {
   extrema() {
     const result = {};
     let roots = [];
-    this.dims.forEach(function(dim) {
-      let mfn = function(v) {
+    this.dims.forEach(function (dim) {
+      let mfn = function (v) {
         return v[dim];
       };
       let p = this.dpoints[0].map(mfn);
@@ -1042,19 +1045,19 @@ var Bezier = class {
         p = this.dpoints[1].map(mfn);
         result[dim] = result[dim].concat(utils.droots(p));
       }
-      result[dim] = result[dim].filter(function(t2) {
+      result[dim] = result[dim].filter(function (t2) {
         return t2 >= 0 && t2 <= 1;
       });
       roots = roots.concat(result[dim].sort(utils.numberSort));
     }.bind(this));
-    result.values = roots.sort(utils.numberSort).filter(function(v, idx) {
+    result.values = roots.sort(utils.numberSort).filter(function (v, idx) {
       return roots.indexOf(v) === idx;
     });
     return result;
   }
   bbox() {
     const extrema = this.extrema(), result = {};
-    this.dims.forEach(function(d) {
+    this.dims.forEach(function (d) {
       result[d] = utils.getminmax(this, d, extrema[d]);
     }.bind(this));
     return result;
@@ -1078,7 +1081,7 @@ var Bezier = class {
       return ret;
     }
     if (this._linear) {
-      const nv = this.normal(0), coords = this.points.map(function(p) {
+      const nv = this.normal(0), coords = this.points.map(function (p) {
         const ret = {
           x: p.x + t2 * nv.x,
           y: p.y + t2 * nv.y
@@ -1090,7 +1093,7 @@ var Bezier = class {
       });
       return [new Bezier(coords)];
     }
-    return this.reduce().map(function(s) {
+    return this.reduce().map(function (s) {
       if (s._linear) {
         return s.offset(t2)[0];
       }
@@ -1129,7 +1132,7 @@ var Bezier = class {
       pass1.push(segment);
       t1 = t2;
     }
-    pass1.forEach(function(p1) {
+    pass1.forEach(function (p1) {
       t1 = 0;
       t2 = 0;
       while (t2 <= 1) {
@@ -1189,7 +1192,7 @@ var Bezier = class {
     if (!o) {
       throw new Error("cannot scale this curve. Try reducing it first.");
     }
-    [0, 1].forEach(function(t2) {
+    [0, 1].forEach(function (t2) {
       const p = np[t2 * order] = utils.copy(points[t2 * order]);
       p.x += (t2 ? r2 : r1) * v[t2].n.x;
       p.y += (t2 ? r2 : r1) * v[t2].n.y;
@@ -1205,7 +1208,7 @@ var Bezier = class {
       });
       return new Bezier(np);
     }
-    [0, 1].forEach(function(t2) {
+    [0, 1].forEach(function (t2) {
       if (order === 2 && !!t2)
         return;
       var p = points[t2 + 1];
@@ -1254,12 +1257,12 @@ var Bezier = class {
     let bcurves = [], p, alen = 0, tlen = this.length();
     const graduated = typeof d3 !== "undefined" && typeof d4 !== "undefined";
     function linearDistanceFunction(s, e, tlen2, alen2, slen) {
-      return function(v) {
+      return function (v) {
         const f1 = alen2 / tlen2, f2 = (alen2 + slen) / tlen2, d = e - s;
         return utils.map(v, 0, 1, s + f1 * d, s + f2 * d);
       };
     }
-    reduced.forEach(function(segment) {
+    reduced.forEach(function (segment) {
       const slen = segment.length();
       if (graduated) {
         fcurves.push(segment.scale(linearDistanceFunction(d1, d3, tlen, alen, slen)));
@@ -1270,7 +1273,7 @@ var Bezier = class {
       }
       alen += slen;
     });
-    bcurves = bcurves.map(function(s) {
+    bcurves = bcurves.map(function (s) {
       p = s.points;
       if (p[3]) {
         s.points = [p[3], p[2], p[1], p[0]];
@@ -1324,15 +1327,15 @@ var Bezier = class {
   }
   curveintersects(c1, c2, curveIntersectionThreshold) {
     const pairs = [];
-    c1.forEach(function(l) {
-      c2.forEach(function(r) {
+    c1.forEach(function (l) {
+      c2.forEach(function (r) {
         if (l.overlaps(r)) {
           pairs.push({ left: l, right: r });
         }
       });
     });
     let intersections = [];
-    pairs.forEach(function(pair) {
+    pairs.forEach(function (pair) {
       const result = utils.pairiteration(pair.left, pair.right, curveIntersectionThreshold);
       if (result.length > 0) {
         intersections = intersections.concat(result);
@@ -1404,5 +1407,6 @@ var Bezier = class {
 module.exports = __toCommonJS(bezier_exports);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  Bezier
+  Bezier,
+  PolyBezier
 });

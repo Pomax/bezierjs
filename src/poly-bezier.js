@@ -10,7 +10,9 @@ class PolyBezier {
     this._3d = false;
     if (!!curves) {
       this.curves = curves;
-      this._3d = this.curves[0]._3d;
+      if (this.curves.length) {
+        this._3d = this.curves[0]._3d;
+      }
     }
   }
 
